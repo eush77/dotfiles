@@ -1,0 +1,37 @@
+#!/bin/bash
+
+## Touchpad state switcher
+#
+# >> touchpad-control
+# Switches the state. No arguments.
+#
+# Features:
+# * controls the cursor position (hide in the corner / put in the center);
+# * sends notifications via "notify-send".
+#
+# Designed to be attached to media keys.
+#
+
+# This is the way to retrieve the parameters automatically:
+# >> EDGE="$(($(xrandr |head -1 |sed -r 's/^.*current ([[:digit:]]+)\s.*$/\1/')-1))"
+
+# Not in the very corner for applications not to treat it specially but close.
+EDGEX=1365
+EDGEY=2
+
+CENTERX=683
+CENTERY=384
+
+# Turn on/off, move the cursor
+if [[ "$(synclient |grep TouchpadOff |cut -d= -f2 |tr -d ' ')" == "1" ]]; then
+    synclient TouchpadOff=0
+    xdotool mousemove "$CENTERX" "$CENTERY"
+    STATE="activated"
+else
+    synclient TouchpadOff=1
+    xdotool mousemove "$EDGEX" "$EDGEY"
+    STATE="deactivated"
+fi
+
+# Show notification
+notify-send --hint="string:x-canonical-private-synchronous:true" --icon="notification-device-firewire" "Touchpad $STATE"

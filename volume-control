@@ -1,0 +1,66 @@
+#!/bin/bash
+
+## Volume controller
+#
+# >> volume-control [inc[rease] | dec[rease] | mute]
+# Performs the selected operation.
+#
+# Also sends notifications via "notify-send".
+# Workhorse: "amixer".
+#
+# Designed to be attached to media keys.
+#
+
+# Volume step - you are welcome to change.
+STEP="10%"
+
+########
+# Retrieves and ranks volume information.
+# Variables to set:
+# * $VALUE -- percentage level (integer number);
+# * $ICON -- notification icon.
+function vget {
+    TUPLE="$(amixer get Master |tail -1 |sed -r 's/^.*\[(.+)%\] \[.*\[(.+)\]$/\1\t\2/')"
+    # Extracted string: "<volume_percent> [tab] <on_off_state>"
+    VALUE="$(cut -f1 <<<"$TUPLE")"
+    STATE="$(cut -f2 <<<"$TUPLE")"
+    if [[ "$STATE" = "off" ]]; then
+        ICON="muted"
+    elif [[ "$VALUE" -eq 100 ]]; then
+        ICON="high"
+    elif [[ "$VALUE" -eq 0 ]]; then
+        ICON="off"
+    elif [[ "$VALUE" -lt 50 ]]; then
+        ICON="low"
+    else
+        ICON="medium"
+    fi
+    ICON="notification-audio-volume-$ICON"
+}
+
+# >> vset [+|-]
+# Adjust the volume by $STEP.
+function vset {
+    amixer set Master "${STEP}$1"
+}
+
+function mute {
+    amixer set Master toggle
+}
+########
+
+CMD="$1"
+if [[ "$CMD" = "mute" ]]; then
+    mute
+else # Increase / decrease
+    CMD="${CMD::3}"
+    if [[ "$CMD" = "inc" ]]; then
+        vset +
+    elif [[ "$CMD" = "dec" ]]; then
+        vset -
+    fi
+fi
+vget
+
+# Notify
+notify-send --hint="string:x-canonical-private-synchronous:true" --icon="$ICON" --hint="int:value:$VALUE" 'Volume'

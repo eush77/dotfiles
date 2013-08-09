@@ -1,0 +1,47 @@
+#!/bin/bash
+
+## Player control utility
+#
+# >> player-control [pause | next | prev[ious]]
+# Performs the selected operation.
+#
+# "Music On Console" wrapper.
+# Generates notifications via "notify-send".
+# Notifications have appropriate icons attached and also provide current track information.
+#
+# Designed to be attached to media keys.
+#
+
+function playing {
+    mocp --format="%artist - %song"
+}
+
+function state+playing {
+    mocp --format="%state$(printf '\t')%artist - %song"
+}
+
+CMD="$1"
+if [[ "$CMD" = "pause" ]]; then
+    mocp -G
+    TUPLE="$(state+playing)"
+    # [TAB] is the delimiter, hence can cut it into pieces
+    STATE="$(cut -f1 <<<"$TUPLE")"
+    TRACK="$(cut -f2 <<<"$TUPLE")"
+    ICON="$(sed 's|.*|\L&|' <<<"$STATE")" # PLAY -> play
+    STATE="$(sed 's|^.|\U&|' <<<"$ICON")" # play -> Play
+else # Next / previous
+    CMD="${CMD::4}"
+    if [[ "$CMD" = "next" ]]; then
+        mocp -f
+        ICON="next"
+        STATE="Next track"
+    elif [[ "$CMD" = "prev" ]]; then
+        mocp -r
+        ICON="previous"
+        STATE="Previous track"
+    fi
+    TRACK="$(playing)"
+fi
+
+# Notify
+notify-send --hint="string:x-canonical-private-synchronous:true" --icon="notification-audio-$ICON" "$STATE" "$TRACK"
