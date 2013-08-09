@@ -1,0 +1,58 @@
+#!/usr/bin/python2.7
+#encoding: utf-8
+
+'HTML entities lookup table'
+
+import sys
+from htmlentitydefs import name2codepoint as base
+
+NCOLS = 6 # Default
+
+def list(ncols=1, format='{code}: {char}'):
+    '''Returns a list of columns, each being itself a list of entries in a given format.
+    Each cell provides information about a single entity.
+
+    Format specifications:
+    {code} -- HTML code, such as "aelig",
+    {char} -- actual character, as "æ".
+
+    Such a table is guaranteed to be square, vacant cells are filled with empty strings.
+    '''
+    if not isinstance(ncols, int):
+        raise TypeError('an integer is required')
+    if ncols < 1:
+        raise ValueError('parameter must be at least 1')
+    flat = [format.format(code=s, char=c) for s,c in
+            sorted((name, unichr(code).encode('utf8')) for name,code in base.items())]
+    width = max(map(len, flat))
+    flat = [s.ljust(width) for s in flat] # Justify each row
+    cols = [flat[k::ncols] for k in xrange(ncols)]
+    height = max(map(len, cols))
+    return [col + ([] if len(col)==height else ['']) for col in cols]
+
+if __name__=='__main__':
+    args = sys.argv[1:]
+    if not args or (len(args)==1 and args[0] in ['-h', '--help']):
+        print 'Description: get unicode character via HTML entity name.'
+        print 'Usage: "htmlentity [name]...",'
+        print '       "htmlentity list [ncols]",'
+        print '       "htmlentity [-h | --help]".'
+        sys.exit(0)
+    try:
+        if args[0] == 'list':
+            if len(args) > 2:
+                raise Exception('Invalid arguments format!')
+            ncols = int(args[1]) if len(args)==2 else NCOLS
+            print '\n'.join('\t'.join(t) for t in zip(*list(ncols)))
+        else: # Iterate through codes given, print on a separate line
+            for entity in args:
+                print '{0}:'.format(entity),
+                if entity in base:
+                    code = base[entity]
+                    print '#{0:d} ({1})'.format(code, unichr(code).encode('utf8'))
+                else:
+                    print '?'
+    except Exception as e:
+        prefix = ('\033[31m{}\033[0m' if sys.stderr.isatty() else '{}').format('Error:')
+        convert = lambda s: s[:1].lower() + s[1:] + ('' if s.endswith('!') else '!')
+        print '{} {}'.format(prefix, convert(e.message))

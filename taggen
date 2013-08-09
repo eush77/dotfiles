@@ -1,0 +1,59 @@
+#!/bin/bash
+if [[ $# -eq 0 || "$1" == "--help" ]];then
+    for((i=0;i<80;i++));do
+        echo -ne '—'
+    done
+    echo
+    echo -e "\e[1m\e[33mDescription\e[0m"
+    echo -e "\e[4C'\e[4mtaggen\e[0m' generates \"ID3v1\" and \"ID3v2\" tags using"
+    echo -e "\e[8C\"\$1\" as an artist name,\n\e[8C\"\$2\" as a genre specificator (in the terms of \"ID3v1\")."
+    echo -e "\e[4CIt assumes that the working dir contains 'MP3''s in the following hierarchy."
+    echo -e "\e[12C./<year> - <album>/<track> - <title>.mp3"
+    echo -e "\e[4C\e[4mUPD\e[0m Moreover, you can place your \"AlbumArt.jpg\" cover file inside an album folder."
+    echo -e "\e[4CIn this case this cover is expected to be attached to all the 'MP3''s laying beside it."
+    echo -e "\e[1m\e[33mRequired\e[0m"
+    echo -e "\e[4CThis script version won't work unless you have installed:"
+    echo -e "\e[8C\"mp3info\",\n\e[8C\"id3v2\",\n\e[8C\"eyeD3\" (for covers embedding)"
+    echo -e "\e[4Cand, of course, some standard stuff."
+    echo -e "\e[1m\e[33mUsage\e[0m"
+    echo -e "\e[4C$ taggen <artist> <genre>"
+    echo -e "\e[4C$ taggen --help"
+    echo -e "\e[1m\e[33mExample\e[0m"
+    echo -e "\e[4C\$ taggen 'Linkin Park' 20"
+    echo -e "\e[1m\e[33mRelated\e[0m"
+    echo -e "\e[4C'\e[4malbart\e[0m',\n\e[4C'\e[4mtitle-case\e[0m',\n\e[4C'\e[4mtag_locale.sh\e[0m'."
+    exit
+fi
+if [ $# -ne 2 ];then
+    echo Error: 2 parameters expected.
+    echo Type \"taggen --help\" for more info.
+    exit 1
+fi
+
+for i in `find -iname '*.mp3' |sed -r "s/ /\`echo -ne '\001'\`/g"`; do
+    i=`sed -r "s/\`echo -ne '\001'\`/ /g" <<<"$i"`;
+    name=`sed -r "s/.*\/([^/]*)/\1/" <<<"${i}"`;
+    n=`cut -d' ' -f1 <<<"${name}"`;
+    t=`echo "${name}" |cut -d' ' --complement -f1,2 |sed -r 's/\.mp3//'`;
+    path=`sed -r "s/.\/(.*)\/.*/\1/" <<<"${i}"`;
+    y=`cut -d' ' -f1 <<<"${path}"`;
+    a=`cut -d' ' --complement -f1,2 <<<"${path}"`;
+    echo "$i";
+    echo -e "\t$y\n\t$a\n\t$n\n\t$t";
+    id3v2 -d "$i"
+    mp3info -a "$1" -l "$a" -g "$2" -n "$n" -t "$t" -y "$y" "$i";
+    id3v2 -C "$i"
+    #The next several lines (down to the next echo command) were attached some months later
+    IMAGE="./${path}/AlbumArt.jpg"
+    if [[ -e "${IMAGE}" ]];then
+        #eyeD3 --no-color --add-image="${IMAGE}:FRONT_COVER" "$i" >/dev/null
+        # Long title strings have been asking for the following update for a really long time...
+        eyeD3 --no-color --add-image="${IMAGE}:FRONT_COVER" -t "$t" "$i" >/dev/null
+    fi
+    echo
+done
+echo -e "\n\nSample \"ID3V1\" tag record."
+cd *
+mp3info 01*
+cd ..
+exit

@@ -1,0 +1,27 @@
+#!/usr/bin/python2
+# Convert files in current directory to uppercase
+
+import os, re, string, sys, signal
+
+def exit():
+    print
+    sys.exit()
+
+signal.signal(signal.SIGINT, lambda i,f: exit())
+ifiles, ofiles = sorted([s for s in os.listdir('.') if os.path.isfile(s)]), []
+for old in ifiles:
+    new = (lambda p: re.sub('(^| )([a-z])', '\\1\0\\2', p[0]) + '.' + p[2])(old.rpartition('.'))
+    for c in string.lowercase:
+        new = new.replace('\0'+c, c.upper())
+    ofiles.append(new)
+
+print 'Changes to be made:'
+ilist, olist = [['\033['+color+s+'\033[0m ' for s in files] for files,color in ((ifiles,'33m'),(ofiles,'36m'))]
+ilist = map(lambda s: s.ljust(max(map(str.__len__, ilist)), '-'), ilist)
+print '\n'.join(['\t%s-> %s' %(old,new) for old,new in zip(ilist,olist)])
+
+sys.stdout.write('Proceed? ')
+if (lambda s: s.strip().lower()=='n' or not s or s[-1]!='\n')(sys.stdin.readline()):
+    exit()
+map(os.rename, ifiles, ofiles)
+print '\033[32mSuccess!\033[0m'

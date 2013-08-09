@@ -1,0 +1,63 @@
+#!/bin/bash
+
+XSCR=xscreensaver
+PLAYER=smplayer
+DONE=0
+CMD="`ps -C "${XSCR}" -o cmd=`"
+PID="`ps -C "${XSCR}" -o pid= |tr -d ' '`"
+if [[ $# -eq 0 ]];then
+    echo "No call arguments specified."
+    echo -e "Type '\e[4mmovie --help\e[0m' to get some help about how to use this tool."
+    exit
+fi
+if [[ "$1" == "--help" ]];then
+    echo -e '\t\e[4mDescription\e[0m'
+    echo '"movie" is a lightweight script intended to watch movies without any need to move a mouse to prevent screensaver from showing up. (It always annoys.)'
+    echo "You can play several movies in a row using any player program and freed of any screensaver daemon."
+    echo "Additional functionality enables launching a \"stub\" mode in order just to temporary freeze the screensaver."
+    echo -e '\t\e[4mUsage\e[0m'
+    echo "$ movie <file1> <file2> <file3> ..."
+    echo "$ movie [--stub|--help]"
+    echo -e '\t\e[4mScript variables\e[0m'
+    echo 'You can simply modify the script file to change these values from defaults.'
+    echo -e "\"\e[1mXSCR\e[0m\" represents the screensaver program name to search for in the processes list. Current value: \"${XSCR}\"."
+    echo -e "\"\e[1mPLAYER\e[0m\" is for the player program. A movie name can be the first and the only argument. Current value: \"${PLAYER}\"."
+    echo
+    exit
+fi
+if [[ "${PID}" == "" ]];then
+    echo -e "Screensaver program is not currently running.\nNo blocking is to be done.\n"
+else
+    echo "Screensaver program detected attached to PID \"${PID}\"."
+    kill ${PID}
+    echo "Process killed."
+fi
+if [[ "$#" -eq 1 && "$1" == "--stub" ]]; then
+    echo -en "\e[36;40m[Hung]\e[0m"
+    read
+else
+    for i in "$@"; do
+        if [[ ! -e "$i" ]];then
+            echo "\"$i\" skipped: file not found."
+            continue
+        fi
+        echo -ne "Are you ready for \"\e[1m$i\e[0m\"\e[32;40m?\e[0m "
+        read PROMPT
+        PROMPT="`tr '[[:upper:]]' [[:lower:]] <<<"${PROMPT}"`"
+        if [[ "${PROMPT}" == "n" || "${PROMPT}" == "q" ]];then
+            echo "No, you aren't."
+            break
+        fi
+        echo -ne "\e[36;40mYou are watching \"$i\".\e[0m"
+        "${PLAYER}" "$i" >/dev/null 2>&1
+        echo -ne '\e[2K\e[E'
+        let 'DONE++'
+    done
+fi
+echo -e "\n\e[4mStatus\e[0m: ${DONE} movies played."
+if [[ "${CMD}" != "" ]];then
+    bash -c "${CMD}" >/dev/null 2>&1 &
+    echo "Screensaver program relaunched."
+    ps -C "${XSCR}" -F
+fi
+exit

@@ -1,0 +1,57 @@
+#!/bin/bash
+if [[ "$1" == "--help" ]];then
+    echo -e '\t\e[4mDescription\e[0m'
+    echo '"Albart" is a script to organize cover images inside music album folders. It tries to keep only one alive. If it is possible, then the selected cover file is unified renamed to "AlbumArt.jpg".'
+    echo -e '\t\e[4mUsage\e[0m'
+    echo    '$ albart          #this is similary to "albart ."'
+    echo -e '$ albart <folder> #it\047ll success if this folder contains the only image file'
+    echo    '$ albart <file>   #the concrete file to be kept'
+    echo
+    exit
+fi
+OLDFLD="`pwd`"
+if [[ "$1" == "" ]];then
+    NAME=.
+else
+    NAME="$1"
+fi
+if grep -q 'directory$' <<<"`file "${NAME}" 2>/dev/null`";then
+    cd "${NAME}"
+    NAME="`ls -1a |grep '\.jpg'`"
+    if [[ "${NAME}" == "" ]];then
+        echo 'No files to operate.'
+        cd "${OLDFLD}"
+        exit
+    fi
+    if [[ `wc -l <<<"${NAME}"` -gt 1 ]];then
+        echo 'Indeterminable choice.'
+        cd "${OLDFLD}"
+        exit
+    fi
+    mv "${NAME}" "AlbumArt.jpg"
+    cd "${OLDFLD}"
+    exit
+fi
+cd "`dirname "$1" 2>/dev/null`"
+NAME="`basename "$1" 2>/dev/null`"
+if [[ ! -e "${NAME}" ]];then
+    echo "File not found."
+    cd "${OLDFLD}"
+    exit
+fi
+if ! grep -q '\.jpg$' <<<"${NAME}";then
+    echo 'Warning: the file extension does not equal "jpg".' >/dev/stderr
+fi
+mv "${NAME}" "temp"
+LIST=`ls -1a |grep '\.jpg' |sed 's/^/Found image file "/;s/$/"./'`
+if [[ "${LIST}" != "" ]];then
+    echo "${LIST}"
+    echo -ne "There found some excessive covers. Delete 'em all (y/n)\e[35;40m?\e[0m "
+    read PERMIT
+    if [[ "${PERMIT}" == "y" ]];then
+        rm -v *.jpg
+    fi
+fi
+mv "temp" "AlbumArt.jpg"
+cd "${OLDFLD}"
+exit

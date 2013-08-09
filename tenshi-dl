@@ -1,0 +1,36 @@
+#!/bin/bash
+if [[ "x$1" == "x--help" ]]; then
+    echo -e "\t_________________"
+    echo -e "\t== Description =="
+    echo "'tenshi-dl' merely grabs direct URLs from a web page of 'http://tenshi.ru/' and writes them into a corresponding output file capable to reading by 'dlurls' script.'"
+    echo -e "\t== Usage =="
+    echo "tenshi-dl <URL> <output_file>"
+    echo -e "\t== Examples =="
+    echo "tenshi-dl \"http://tenshi.ru/anime-ost/Death_Note/TV.OST-I/\" ost1.urls"
+    echo "tenshi-dl \"http://tenshi.ru/anime-ost/Death_Note/TV.OST-I/Scans/\" scans1.urls"
+    echo -e "\t== TODO =="
+    echo "Currently the script does not support extra dot chars inside a target filename (not only because of my stupidity, I did the script actually for the very certain \"good\" task)."
+    echo
+    exit
+fi
+if [ $# -ne 2 ];then
+    echo Error: 2 parameters expected.
+    echo Type \"tenshi-dl --help\" for more info.
+    exit 1
+fi
+wget "$1" -O"$2"
+echo -e "Extracting direct links..."
+sed -i 's/<[^>]*>//g' "$2"
+sed -i '/^ *$/d' "$2"
+sed -i '1,+2d;s/ //' "$2"
+sed -ri 's/(\.[^ ]*) +.*$/\1/' "$2"
+sed -i '/\//d' "$2"
+lim=`wc -l "$2" |sed -e 's/ .*$//'`
+echo -n >temp
+for((i=1;i<=lim;i++)); do
+    echo -n "$1" >>temp
+    sed -ne "${i}p" "$2" >>temp
+done
+mv temp "$2"
+echo -e "\nDone! Please check up manually \"$2\"."
+exit
