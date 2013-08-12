@@ -21,7 +21,11 @@ function state+playing {
 }
 
 CMD="$1"
-if [[ "$CMD" = "pause" ]]; then
+if ! mocp -i &>/dev/null; then
+    # Server is not running
+    ICON="stop"
+    STATE="(Not running)"
+elif [[ "$CMD" = "pause" ]]; then
     mocp -G
     TUPLE="$(state+playing)"
     # [TAB] is the delimiter, hence can cut it into pieces
