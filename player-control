@@ -2,7 +2,7 @@
 
 ## Player control utility
 #
-# >> player-control [pause | next | prev[ious]]
+# >> player-control [pause | next | prev[ious] | info]
 # Performs the selected operation.
 #
 # "Music On Console" wrapper.
@@ -12,21 +12,34 @@
 # Designed to be attached to media keys.
 #
 
+########
 function playing {
     mocp --format="%artist - %song"
 }
 
+# Tab-separated tuple
 function state+playing {
     mocp --format="%state$(printf '\t')%artist - %song"
 }
+
+function notify {
+    notify-send --hint="string:x-canonical-private-synchronous:true" --icon="notification-audio-$ICON" "$STATE" "$TRACK"
+}
+########
 
 CMD="$1"
 if ! mocp -i &>/dev/null; then
     # Server is not running
     ICON="stop"
     STATE="(Not running)"
-elif [[ "$CMD" = "pause" ]]; then
+    notify
+    exit
+fi
+if [[ "$CMD" = "pause" ]]; then
     mocp -G
+    CMD="info" # Redelegate
+fi
+if [[ "$CMD" = "info" ]]; then
     TUPLE="$(state+playing)"
     # [TAB] is the delimiter, hence can cut it into pieces
     STATE="$(cut -f1 <<<"$TUPLE")"
@@ -47,5 +60,4 @@ else # Next / previous
     TRACK="$(playing)"
 fi
 
-# Notify
-notify-send --hint="string:x-canonical-private-synchronous:true" --icon="notification-audio-$ICON" "$STATE" "$TRACK"
+notify
