@@ -1,0 +1,5 @@
+MusicDir="/home/hydragen/music"
+Theme="my_theme"
+MessageLingerTime=0
+ShowFormat=no
+FormatString="%(n:%n| :)%(a:%a - :)%(t:%t:)%(A: \(%A\):)"
