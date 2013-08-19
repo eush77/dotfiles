@@ -1,0 +1,11 @@
+# Syscall
+regexp=^(\d+\s+)?\w+
+colours=yellow
+-------
+# Punctuation
+regexp=\(|\)|,
+colours=dark magenta
+-------
+# Exit code
+regexp==[^=]+$
+colours=cyan
