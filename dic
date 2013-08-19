@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ $# -ne 1 ];then
+    echo Error: parameter expected \(and the only one\).
+    echo Type \"dic --help\" for more info.
+    exit 1
+fi
+
+if [[ "$1" == "--help" ]];then
+    echo -e "\t_________________"
+    echo -e "\t== Description =="
+    echo "'dic' is a small script utility providing a handy access to 'sdcv' dictionaries. In fact, it calls 'sdcv' with a given parameter word and then doubles it using 'less' filter. So you can see the output in the most convienient form and choose the most suitable result using the only command."
+    echo "Note: '-i' parameter causes 'dic' to run interactively."
+    echo -e "\t== Usage =="
+    echo "->$ dic <word>"
+    echo "->$ dic --help"
+    echo "->$ dic -i"
+    echo
+    exit
+fi
+
+if [[ "$1" == "-i" ]];then
+    echo -e "\e[33m'dic' interactive mode started.\nNote: type 'q' or 'Q' to finish.\e[0m"
+    N=0
+    while true;do
+        echo -ne "\r\e[32mdic:$((++N))>\e[0m "
+#        echo -ne "\e[1K\e[0E\e[32mdic:$((++N))>\e[0m "
+        read QUERY
+        if [[ -z "${QUERY}" ]];then
+            let N--
+            continue
+        elif [[ "${QUERY}" == "q" || "${QUERY}" == "Q" ]];then
+            exit
+        fi
+        dic "${QUERY}"
+    done
+fi
+
+sdcv -n "$1" |less

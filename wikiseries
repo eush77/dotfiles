@@ -1,0 +1,42 @@
+#!/usr/bin/python2.7
+
+## Wikiseries
+# Extracts series list from Wikipedia "List of XXX episodes" pages.
+#
+
+import urllib2, re, sys, platform, os
+
+service = sys.stderr
+service.write('Enter target wiki URL:\n')
+url = sys.stdin.readline().replace('\n', '')
+
+service.write('Extracting series list from this page:\n\t"%s"\n'%url)
+
+if platform.system()=='Windows':
+    service.write('Please specify output file path:\n')
+    output = open(sys.stdin.readline().replace('\n', ''), 'w')
+else:
+    numArgs = len(sys.argv)
+    if numArgs>2:
+        raise Exception('Too many arguments given!')
+    output = sys.stdout if numArgs==1 else open(sys.argv[1], 'w')
+    del numArgs
+
+lines = urllib2.urlopen(urllib2.Request(url, headers={'User-Agent': 'lynx'})).readlines()
+eps = zip((lambda li: [sum(li[:e]) for e,v in enumerate(li, 1)])
+                  ([1 if re.search(r'mw-headline.*Season', s) else 0 for s in lines]),
+          lines)
+eps = [(i, (re.sub(r'^"|"$|\n', '',
+            re.sub(r'<.*?>', '', v)))) for i,v in eps if i>0 and 'summary' in v]
+# Now numbered with episode index like this: [(1,'name1'), (1,'name2'), (2,'name3')]
+eps = [(t[0], len([v for v in eps[:e] if v[0]==t[0]]), v[1]) for e,t in enumerate(eps, 1)]
+# Now every tuple is numbered inside its season: (seasonIdx, seriesIdx, name)
+series = [['#Season %u'%i] for i in range(max(t[0] for t in eps)+1)]
+for season, epnum, name in eps:
+    series[season].append('%02u - %s' %(epnum,name))
+
+output.write('\n'.join('\n'.join(li)+'\n' for li in series[1:]))
+output.close()
+
+if platform.system()=='Windows':
+    os.system('pause')

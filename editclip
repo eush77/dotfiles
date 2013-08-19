@@ -1,0 +1,11 @@
+#!/bin/bash
+
+## Clipboard editor
+# Opens selected text in Emacs, saves result in the clipboard
+#
+
+tmp="$(mktemp)"
+xclip -select primary -o > "$tmp"
+emacs -g 80x10-0-0 -T clipboard "$tmp"
+cat "$tmp" | xclip -sel clip
+rm "$tmp"
