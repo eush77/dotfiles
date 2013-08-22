@@ -37,8 +37,8 @@ if [[ "$#" -eq 1 && "$1" == "--stub" ]]; then
     read
 else
     for i in "$@"; do
-        if [[ ! -e "$i" ]];then
-            echo "\"$i\" skipped: file not found."
+        if [[ ! -f "$i" ]];then
+            echo "\"$i\" skipped: not a regular file."
             continue
         fi
         echo -ne "Are you ready for \"\e[1m$i\e[0m\"\e[32;40m?\e[0m "
