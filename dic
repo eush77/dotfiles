@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 1 ];then
-    echo Error: parameter expected \(and the only one\).
-    echo Type \"dic --help\" for more info.
+if [[ "$#" -ne "1" ]];then
+    echo 'Error: parameter expected (and the only one).'
+    echo 'Type "dic --help" for more info.'
     exit 1
 fi
 
