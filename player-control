@@ -12,6 +12,9 @@
 # Designed to be attached to media keys.
 #
 
+# Wait this amount of time before asking MOC about a song playing after prev/next
+REFRESH_DELAY=0.1
+
 ########
 function playing {
     mocp --format="%artist - %song"
@@ -57,6 +60,7 @@ else # Next / previous
         ICON="previous"
         STATE="Previous track"
     fi
+    sleep "$REFRESH_DELAY"
     TRACK="$(playing)"
 fi
 
