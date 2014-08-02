@@ -1,7 +1,0 @@
-#!/usr/bin/python3
-import random, sys
-from os import path
-
-with open(path.dirname(sys.argv[0]) + '/words.txt') as f:
-    lines = f.read().split()
-    print(random.choice(lines))
