@@ -20,8 +20,15 @@
      :workspace.focused {"alt-w" [:focus-last-editor]
                          "esc" [:focus-last-editor]}
 
+     :tabs {"ctrl-pageup" [:tabs.prev]
+            "ctrl-pagedown" [:tabs.next]}
+
      :editor {"ctrl-m" [:clear-inline-results]
-              "ctrl-n" [:goto-line]}}
+              "ctrl-n" [:goto-line]
+              "ctrl-shift-c" [:toggle-comment-selection]
+              "ctrl-shift-0" [:editor.sublime.singleSelectionTop]
+              "ctrl-shift-up" [:editor.sublime.selectLinesUpward]
+              "ctrl-shift-down" [:editor.sublime.selectLinesDownward]}}
 
  :- {:editor {"ctrl-=" [:editor.fold-code]}
      :editor.keys.normal {"\"" [(:editor.repeat-pair "\"")]

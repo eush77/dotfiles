@@ -16,6 +16,12 @@
               (:lt.objs.style/set-theme "default")
               :lt.plugins.visible-whitespace/show-whitespace
               :lt.objs.editor/line-numbers
-              (:lt.objs.style/font-settings "CosmicSansNeueMono" 12 1)]}
+              (:lt.objs.style/font-settings "CosmicSansNeueMono" 12 1)
+              (:lt.objs.editor/tab-settings false 2 2)]
+
+     :editor.c [(:lt.objs.editor/tab-settings false 4 4)]
+     :editor.cpp [(:lt.objs.editor/tab-settings false 4 4)]
+     :editor.cpph [(:lt.objs.editor/tab-settings false 4 4)]
+     :editor.css [(:lt.objs.editor/tab-settings false 4 4)]}
 
  :- {:app [:lt.objs.intro/show-intro]}}
