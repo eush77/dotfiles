@@ -15,6 +15,8 @@ alias gs 'g s'
 alias emacs 'emacs -nw'
 alias matlab 'matlab -nodesktop -nosplash'
 alias nodejs 'echo -n'
+alias re 'grep -P'
+alias se 'sed -r'
 
 setxkbmap -rules evdev -model pc104 -layout "us,ru" -variant ",winkeys" -option "grp:caps_toggle,grp:win_switch,grp_led:caps,compose:menu,numpad:microsoft"
 
