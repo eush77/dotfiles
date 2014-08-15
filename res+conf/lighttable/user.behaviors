@@ -12,7 +12,7 @@
 {:+ {:app [(:lt.objs.style/set-skin "dark")
            (:lt.objs.files/file.ignore-pattern "\\.git/|\\.pyc|~|\\.swp|\\.jar")]
 
-     :editor [:lt.objs.editor/no-wrap
+     :editor [:lt.objs.editor/wrap
               (:lt.objs.style/set-theme "default")
               :lt.plugins.visible-whitespace/show-whitespace
               :lt.objs.editor/line-numbers

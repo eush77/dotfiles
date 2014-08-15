@@ -14,7 +14,7 @@
            "alt-w" [:lt.plugins.workspace-nav/focus]
            "ctrl-alt-c" [:toggle-console]
            "ctrl-t" [:new-file]
-           "ctrl-=" [:window.zoom-in],
+           "ctrl-=" [:window.zoom-in]
            "ctrl-0" [:window.zoom-reset]}
 
      :workspace.focused {"alt-w" [:focus-last-editor]
@@ -23,12 +23,15 @@
      :tabs {"ctrl-pageup" [:tabs.prev]
             "ctrl-pagedown" [:tabs.next]}
 
-     :editor {"ctrl-m" [:clear-inline-results]
+     :editor {"shift-enter" [:editor.sublime.insertLineBefore :editor.line-end :editor.selection.clear]
+              "ctrl-m" [:clear-inline-results]
               "ctrl-n" [:goto-line]
               "ctrl-shift-c" [:toggle-comment-selection]
               "ctrl-shift-0" [:editor.sublime.singleSelectionTop]
               "ctrl-shift-up" [:editor.sublime.selectLinesUpward]
-              "ctrl-shift-down" [:editor.sublime.selectLinesDownward]}}
+              "ctrl-shift-down" [:editor.sublime.selectLinesDownward]
+              "ctrl-shift-space" [:editor.sublime.selectBetweenBrackets]
+              "ctrl-shift-pagedown" [:editor.sublime.selectNextOccurrence]}}
 
  :- {:editor {"ctrl-=" [:editor.fold-code]}
      :editor.keys.normal {"\"" [(:editor.repeat-pair "\"")]
