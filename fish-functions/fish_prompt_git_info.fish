@@ -21,10 +21,15 @@ function fish_prompt_git_info --argument-names text_color --description='Include
                set branch '??'
                set branch_color $dirty_color
             else if test (count $git_status) -ne 0
-               set branch $branch"*"
                if printf '%s\n' $git_status |grep '^??' >/dev/null
                   # Untracked files.
+                  set branch $branch"**"
+               else if begin; printf '%s\n' $git_status |grep '^.[^ ]' >/dev/null; end
+                  # Changes not staged for commit.
                   set branch $branch"*"
+               else
+                  # Changes to be committed.
+                  set branch $branch"="
                end
                set branch_color $dirty_color
             else
