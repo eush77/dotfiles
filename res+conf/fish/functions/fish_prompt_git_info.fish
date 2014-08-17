@@ -13,13 +13,19 @@ function fish_prompt_git_info --argument-names text_color --description='Include
          end
 
          if git status >/dev/null ^&1
+
+            set git_status (git status --short)
             set branch (git rev-parse --abbrev-ref HEAD ^/dev/null)
 
             if test $status -ne 0
                set branch '??'
                set branch_color $dirty_color
-            else if test (count (git status --short)) -ne 0
+            else if test (count $git_status) -ne 0
                set branch $branch"*"
+               if printf '%s\n' $git_status |grep '^??' >/dev/null
+                  # Untracked files.
+                  set branch $branch"*"
+               end
                set branch_color $dirty_color
             else
                set branch_color $clean_color
