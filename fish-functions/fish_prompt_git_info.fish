@@ -12,12 +12,14 @@ function fish_prompt_git_info --argument-names text_color --description='Include
             set dirty_color $fish_prompt_git_info_dirty
          end
 
-         if git status >/dev/null ^&1
+         set git_status (git status --short ^/dev/null)
 
-            set git_status (git status --short)
+         if test $status -eq 0
+
             set branch (git rev-parse --abbrev-ref HEAD ^/dev/null)
 
             if test $status -ne 0
+               # Not initialized.
                set branch '??'
                set branch_color $dirty_color
             else if test (count $git_status) -ne 0
