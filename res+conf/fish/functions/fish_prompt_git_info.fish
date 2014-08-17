@@ -13,19 +13,21 @@ function fish_prompt_git_info --argument-names text_color --description='Include
          end
 
          if git status >/dev/null ^&1
-            printf '['
+            set branch (git rev-parse --abbrev-ref HEAD ^/dev/null)
 
-            set branch (git rev-parse --abbrev-ref HEAD)
-
-            if test (count (git status --short)) -eq 0
-               set_color $clean_color
-               printf '%s' $branch
+            if test $status -ne 0
+               set branch '??'
+               set branch_color $dirty_color
+            else if test (count (git status --short)) -ne 0
+               set branch $branch"*"
+               set branch_color $dirty_color
             else
-               # Dirty state.
-               set_color $dirty_color
-               printf '%s*' $branch
+               set branch_color $clean_color
             end
 
+            printf '['
+            set_color $branch_color
+            printf '%s' $branch
             set_color $text_color
             printf ']'
          end
