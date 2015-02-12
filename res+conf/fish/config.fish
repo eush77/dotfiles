@@ -1,5 +1,3 @@
-set -gx PATH ./node_modules/.bin $PATH
-
 set -gx CXX 'colorg++'
 set -gx EDITOR 'emacs -nw'
 set -gx LESSOPEN '| src-hilite-lesspipe.sh %s'
@@ -17,8 +15,6 @@ alias matlab 'matlab -nodesktop -nosplash'
 alias nodejs 'echo -n'
 alias re 'grep -P'
 alias se 'sed -r'
-
-setxkbmap -rules evdev -model pc104 -layout "us,ru" -variant ",winkeys" -option "caps:ctrl_modifier,grp:lctrl_toggle,altwin:ctrl_win,grp_led:caps,compose:menu,numpad:microsoft"
 
 set -gx LESS_TERMCAP_mb (printf '\e[01;31m')
 set -gx LESS_TERMCAP_md (printf '\e[01;31m')
