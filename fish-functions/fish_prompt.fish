@@ -7,8 +7,12 @@ function fish_prompt --description='Fancy prompt'
          else
             set text_color $fish_prompt_color_path
          end
-
          set_color $text_color
+
+         if test $SHLVL -gt 1
+            printf '(+%d) ' (math $SHLVL - 1)
+         end
+
          if fish_prompt_git_info $text_color
             printf ' '
          end
