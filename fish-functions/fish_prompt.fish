@@ -2,6 +2,11 @@ set -g fish_prompt_color_path 423189
 set -g fish_prompt_color_equivalent_path brown
 
 function fish_prompt --description='Fancy prompt'
+  if set --query CMD_DURATION
+    set_color yellow
+    printf '\a> %s\n' $CMD_DURATION
+  end
+
   if test $TMUX
     set text_color $fish_prompt_color_equivalent_path
   else
