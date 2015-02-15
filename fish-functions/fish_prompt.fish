@@ -2,9 +2,16 @@ set -g fish_prompt_color_path 423189
 set -g fish_prompt_color_equivalent_path brown
 
 function fish_prompt --description='Fancy prompt'
+  set -l exit_code $status
+
+  set_color yellow
+
   if set --query CMD_DURATION
-    set_color yellow
     printf '\a> %s\n' $CMD_DURATION
+  end
+
+  if test $exit_code -ne 0
+    printf '> code %s\n' $exit_code
   end
 
   if test $TMUX
