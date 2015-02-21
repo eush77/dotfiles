@@ -8,8 +8,10 @@ set -gx MP2 '/mnt/mp2'
 alias l 'ls -CF -BX --group-directories-first -v'
 alias la 'ls -alhFX --group-directories-first'
 alias lc 'ls -1 -BX -v --group-directories-first'
-alias g git
-alias gs 'g s'
+
+#alias g git
+set -g fish_user_abbreviations "g=git"
+
 alias emacs 'emacs -nw'
 alias matlab 'matlab -nodesktop -nosplash'
 alias nodejs 'echo -n'
