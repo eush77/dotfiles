@@ -1,9 +1,10 @@
 set -gx CXX 'colorg++'
 set -gx EDITOR 'emacs -nw'
 set -gx LESSOPEN '| src-hilite-lesspipe.sh %s'
-set -gx LESS '-R'
+set -gx LESS '--ignore-case --RAW-CONTROL-CHARS'
 set -gx MP '/mnt/mp'
 set -gx MP2 '/mnt/mp2'
+set -gx PAGER 'less'
 
 alias l 'ls -CF -BX --group-directories-first -v'
 alias la 'ls -alhFX --group-directories-first'
