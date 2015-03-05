@@ -285,6 +285,7 @@
            ))
         ) t)
 
-(if window-system
-    (load-theme 'solarized-dark)
+(when window-system
+  (require 'solarized-theme)
+  (load-theme 'solarized-dark)
   (add-to-list 'default-frame-alist '(font . "Terminus 10")))
