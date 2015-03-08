@@ -15,7 +15,6 @@ set -g fish_user_abbreviations "g=git"
 
 alias emacs 'emacs -nw'
 alias matlab 'matlab -nodesktop -nosplash'
-alias nodejs 'echo -n'
 alias re 'grep -P'
 alias se 'sed -r'
 
