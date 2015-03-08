@@ -30,7 +30,14 @@ function fish_prompt --description='Fancy prompt'
   end
   set_color $text_color
 
-  printf (prompt_pwd)
+  set -l path (prompt_pwd)
+
+  # Special-case /tmp/tmpdir.
+  if begin; printf '%s' (pwd) |grep -q '^/tmp/tmpdir/'; end
+    set path (printf '%s' $path |sed 's:/t/t/:\#:')
+  end
+
+  printf '%s' $path
   set_color normal
   printf ' ❩  '
 end
