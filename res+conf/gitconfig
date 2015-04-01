@@ -10,6 +10,7 @@
     alias = !git config --get-regexp '^alias\\.' |sed -e 's:^alias\\.::' -e '/^alias/d' -e 's:\\ :\\t:' |column -ts '\t'
     s = status
     brieflog = !GIT_PAGER=cat git log --oneline -10
+    graph = log --all --oneline --decorate --graph
     l = ! (git s |head -1) && git brieflog
     d = diff --color-words
     ds = !git d --staged
