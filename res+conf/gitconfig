@@ -1,17 +1,11 @@
+[color]
+    ui = true
 [user]
     #name = NAME
     #email = EMAIL
 [core]
     excludesfile = ~/.gitignore
     whitespace = trailing-space
-[color]
-    ui = true
-[pager]
-    stash = false
-[push]
-    default = upstream
-[rebase]
-    autosquash = true
 [alias]
     alias = !git config --get-regexp '^alias\\.' |sed -e 's:^alias\\.::' -e '/^alias/d' -e 's:\\ :\\t:' |column -ts '\t'
     s = status
@@ -23,3 +17,9 @@
     ds = !git d --staged
     co = checkout
     br = branch
+[push]
+    default = matching
+[rebase]
+    autosquash = true
+[pager]
+    stash = false
