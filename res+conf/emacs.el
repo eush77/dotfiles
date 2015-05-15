@@ -162,16 +162,6 @@
         (dotimes (_ (- count)) (previous-line))
       (dotimes (_ count) (next-line)))))
 
-;; C-m and C-[ are synonymous to ENTER and ESC.
-;; In the terminal it isn't possible to work around it at all.
-;; In graphical mode there is a hack to unbind C-m from ENTER (presented below).
-;; Initially I thought of C-m and C-[, alas there doesn't seem to exist
-;; an easy way to unbind C-[ from ESC. Similar twist damages META key,
-;; as if it was somehow involved.
-(when window-system
-  (define-key k-minor-mode-map (kbd "C-;") 'backward-paragraph)
-  (define-key k-minor-mode-map (kbd "C-m") 'forward-paragraph)
-  (define-key k-minor-mode-map (kbd "<return>") 'newline))
 
 (define-key k-minor-mode-map (kbd "M-c") 'control-lock-toggle)
 
@@ -223,13 +213,25 @@
   "A minor mode so that my key settings work across all different major modes."
   t " +k" 'k-minor-mode-map)
 
+(defvar k-minor-dangerous-mode-map (make-keymap))
+
+(when window-system
+  (define-key k-minor-dangerous-mode-map (kbd "C-;") 'backward-paragraph)
+  (define-key k-minor-dangerous-mode-map (kbd "C-m") 'forward-paragraph)
+  (define-key k-minor-dangerous-mode-map (kbd "<return>") 'newline))
+
+(define-minor-mode k-minor-dangerous-mode
+  "Extension to k-minor-mode that should not be applied to all major modes."
+  t "" 'k-minor-dangerous-mode-map)
+
 (mapc
  (lambda (hook)
-   (add-hook hook (apply-partially 'k-minor-mode 0)))
+   (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
  '(minibuffer-setup-hook
    dired-mode-hook))
 
 (k-minor-mode 1)
+(k-minor-dangerous-mode 1)
 
 (defun balanced (command)
   "Retain window balance after operation."
@@ -289,7 +291,10 @@
            ))
         ) t)
 
+(defadvice load-theme (before theme-dont-propagate activate)
+  (mapcar #'disable-theme custom-enabled-themes))
+
 (when window-system
-  (require 'solarized-theme)
-  (load-theme 'solarized-dark)
+  ;; (require 'solarized-theme)
+  ;; (load-theme 'solarized-dark)
   (add-to-list 'default-frame-alist '(font . "Terminus 10")))
