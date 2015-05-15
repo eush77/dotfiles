@@ -19,9 +19,9 @@
 (scroll-bar-mode -1)
 (setq initial-scratch-message nil)
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
 (setq c-basic-offset 2)
 (c-set-offset 'case-label '+)
+
 (defvar backup-dir "~/.emacs-backups")
 (setq backup-directory-alist (list (cons "." backup-dir)))
 (setq make-backup-files nil)
@@ -40,7 +40,8 @@
 (global-set-key (kbd "C-x f")
                 (lambda () (interactive)
                   (call-interactively 'eval-region)
-                  (call-interactively 'keyboard-quit)))
+                  (message "eval-region...ok")
+                  (pop-mark)))
 
 ;; Bound to backward-kill-word by default.
 (global-unset-key (kbd "C-<backspace>"))
@@ -135,6 +136,11 @@
                   (interactive)
                   (find-tag (find-tag-default))))
 
+(define-key k-minor-mode-map (kbd "C-c S-<down>") 'shrink-window)
+(define-key k-minor-mode-map (kbd "C-c S-<up>") 'enlarge-window)
+(define-key k-minor-mode-map (kbd "C-c S-<left>") 'shrink-window-horizontally)
+(define-key k-minor-mode-map (kbd "C-c S-<right>") 'enlarge-window-horizontally)
+
 (define-key k-minor-mode-map (kbd "S-<left>") 'window-jump-left)
 (define-key k-minor-mode-map (kbd "S-<right>") 'window-jump-right)
 (define-key k-minor-mode-map (kbd "S-<up>") 'window-jump-up)
@@ -163,9 +169,8 @@
 ;; an easy way to unbind C-[ from ESC. Similar twist damages META key,
 ;; as if it was somehow involved.
 (when window-system
-  (defvar jump-line-count 10)
-  (define-key k-minor-mode-map (kbd "C-;") (jump-line (- jump-line-count)))
-  (define-key k-minor-mode-map (kbd "C-m") (jump-line jump-line-count))
+  (define-key k-minor-mode-map (kbd "C-;") 'backward-paragraph)
+  (define-key k-minor-mode-map (kbd "C-m") 'forward-paragraph)
   (define-key k-minor-mode-map (kbd "<return>") 'newline))
 
 (define-key k-minor-mode-map (kbd "M-c") 'control-lock-toggle)
@@ -215,7 +220,7 @@
 (define-key k-minor-mode-map (kbd "<next>") (recentered 'scroll-up))
 
 (define-minor-mode k-minor-mode
-  "A minor mode so that my key settings override annoying major modes."
+  "A minor mode so that my key settings work across all different major modes."
   t " +k" 'k-minor-mode-map)
 
 (mapc
@@ -236,7 +241,6 @@
 (require 'key-chord)
 (key-chord-mode 1)
 ;; Windows, frames, and buffers.
-(key-chord-define-global "xo" 'other-window)
 (key-chord-define-global "x1" 'delete-other-windows)
 (key-chord-define-global "x2" (balanced 'split-window-below))
 (key-chord-define-global "x3" (balanced 'split-window-right))
