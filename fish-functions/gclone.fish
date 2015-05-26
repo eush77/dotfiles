@@ -1,6 +1,6 @@
 function gclone -a repo --description "git-clone + cd"
   if not printf "%s" $repo |grep -q :
-    set repo (printf "https://github.com/%s" $repo)
+    set repo (printf "git@github.com:%s.git" $repo)
   end
   set -l dir (printf "%s" $repo |sed -r "s|.*[/:]||;s|\.git\$||")
 
