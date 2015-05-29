@@ -50,6 +50,7 @@
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
 (let ((default-directory "~/.emacs.d/elpa"))
