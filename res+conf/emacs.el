@@ -244,6 +244,10 @@
     (funcall command)
     (balance-windows)))
 
+(defun safe-delete-frame () (interactive)
+  (if (yes-or-no-p "Delete this frame? ")
+      (delete-frame)))
+
 (require 'key-chord)
 (key-chord-mode 1)
 ;; Windows, frames, and buffers.
@@ -253,7 +257,7 @@
 (key-chord-define-global "x0" (balanced 'delete-window))
 (key-chord-define-global "5o" 'other-frame)
 (key-chord-define-global "52" 'make-frame-command)
-(key-chord-define-global "50" 'delete-frame)
+(key-chord-define-global "50" 'safe-delete-frame)
 (key-chord-define-global "xb" 'ido-switch-buffer)
 (key-chord-define-global "xk" 'ido-kill-buffer)
 (key-chord-define-global "xs" 'save-buffer)
