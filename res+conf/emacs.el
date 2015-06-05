@@ -232,7 +232,8 @@
  (lambda (hook)
    (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
  '(minibuffer-setup-hook
-   dired-mode-hook))
+   dired-mode-hook
+   custom-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
