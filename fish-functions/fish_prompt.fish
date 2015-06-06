@@ -21,6 +21,12 @@ function fish_prompt --description='Fancy prompt'
   end
   set_color $text_color
 
+  if test $USER = root
+    set_color red
+    printf '[#] '
+    set_color $text_color
+  end
+
   if test $SHLVL -gt 1
     printf '(+%d) ' (math $SHLVL - 1)
   end
