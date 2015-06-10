@@ -1,0 +1,25 @@
+set cgdbmodekey=<Insert>
+set winsplit=top_big
+set arrowstyle=long
+
+map q iquit<CR>
+
+# Code browsing.
+map l <C-u>
+map h <C-d>
+
+# Control flow.
+map <F9> <F10>
+map n inext<CR><Insert>
+map s istep<CR><Insert>
+map u iup<CR><Insert>
+map d idown<CR><Insert>
+map f ifinish<CR><Insert>
+map c icontinue<CR><Insert>
+
+# Run / reset from breakfile.
+map e irun<CR><Insert>
+map r isource<Space>break<CR><Insert>
+
+# Quick inspection.
+map p ip<Space>
