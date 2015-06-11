@@ -52,6 +52,16 @@
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
 
+
+;; Put "cchh" grep files alias before anything else. This will make
+;; interactive grep choose it by default for C/C++ files, which is
+;; what I usually want.
+(require 'grep)
+(let ((cchh (assoc "cchh" grep-files-aliases)))
+  (setq grep-files-aliases
+        (cons cchh (remove cchh grep-files-aliases))))
+
+
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
 (let ((default-directory "~/.emacs.d/elpa"))
   (normal-top-level-add-subdirs-to-load-path))
