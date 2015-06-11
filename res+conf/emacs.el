@@ -233,7 +233,11 @@
    (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
  '(minibuffer-setup-hook
    dired-mode-hook
-   custom-mode-hook))
+   custom-mode-hook
+   ack-mode-hook
+   grep-mode-hook
+   help-mode-hook
+   ielm-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
