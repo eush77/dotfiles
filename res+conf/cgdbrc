@@ -18,8 +18,8 @@ map f ifinish<CR><Insert>
 map c icontinue<CR><Insert>
 
 # Run / reset from breakfile.
-map e irun<CR><Insert>
-map r isource<Space>break<CR><Insert>
+map r irun<CR><Insert>
+map e isource<Space>break<CR><Insert>
 
 # Quick inspection.
 map p ip<Space>
