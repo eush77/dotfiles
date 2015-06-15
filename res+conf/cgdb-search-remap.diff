@@ -1,0 +1,19 @@
+diff --git a/cgdb/interface.c b/cgdb/interface.c
+index 258342a..43a59cf 100644
+--- a/cgdb/interface.c
++++ b/cgdb/interface.c
+@@ -1256,12 +1256,12 @@ int internal_if_input(int key)
+                         if_draw();
+                     }
+                     return 0;
+-                case 'n':
++                case '.':
+                     source_search_regex(src_win, ibuf_get(regex_last), 2,
+                             regex_direction_last, regex_icase);
+                     if_draw();
+                     break;
+-                case 'N':
++                case ',':
+                     source_search_regex(src_win, ibuf_get(regex_last), 2,
+                             !regex_direction_last, regex_icase);
+                     if_draw();
