@@ -21,5 +21,6 @@ map c icontinue<CR><Insert>
 map r ipy<Space>gdb.execute("run")<CR><Insert>
 map e isource<Space>break<CR><Insert>
 
-# Quick inspection.
+# Command shortcuts.
 map p ip<Space>
+map b ib<Space>
