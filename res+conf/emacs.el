@@ -46,6 +46,8 @@
 ;; Bound to backward-kill-word by default.
 (global-unset-key (kbd "C-<backspace>"))
 
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
