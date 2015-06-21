@@ -19,6 +19,7 @@
 (scroll-bar-mode -1)
 (setq initial-scratch-message nil)
 (setq-default indent-tabs-mode nil)
+(setq-default tab-width 8)
 (setq c-basic-offset 2)
 (c-set-offset 'case-label '+)
 
@@ -54,6 +55,8 @@
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
 
+(add-hook 'sgml-mode-hook 'emmet-mode)
+(add-hook 'css-mode-hook 'emmet-mode)
 
 ;; Put "cchh" grep files alias before anything else. This will make
 ;; interactive grep choose it by default for C/C++ files, which is
@@ -249,10 +252,14 @@
    ack-mode-hook
    grep-mode-hook
    help-mode-hook
-   ielm-mode-hook))
+   ielm-mode-hook
+   package-menu-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
+
+(require 'dired)
+(define-key dired-mode-map (kbd "SPC") 'dired-up-directory)
 
 (defun balanced (command)
   "Retain window balance after operation."
