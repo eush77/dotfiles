@@ -55,6 +55,11 @@
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
 
+;; markdown-mode populates auto-mode-alist entries when loaded.
+;; In order to override those entries we need to load it right away.
+(require 'markdown-mode)
+(add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
+
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
