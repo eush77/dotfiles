@@ -36,6 +36,11 @@ function fish_prompt --description='Fancy prompt'
   end
   set_color $text_color
 
+  # Print directory stack.
+  if begin; count $dirstack >/dev/null; end
+    printf "%s\n" $dirstack |tac |xargs -n1 basename |tr "\n" ","
+  end
+
   set -l path (prompt_pwd)
 
   # Special-case /tmp/tmpdir.
