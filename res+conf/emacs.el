@@ -232,7 +232,8 @@
 (define-key k-minor-mode-map (kbd "<next>") (recentered 'scroll-up))
 
 (define-key k-minor-mode-map (kbd "M-v")
-  (lambda () (interactive) (shell-command "xsel -b" 1)))
+  (lambda () (interactive)
+    (insert (shell-command-to-string "xsel -b"))))
 
 (define-minor-mode k-minor-mode
   "A minor mode so that my key settings work across all different major modes."
