@@ -260,7 +260,8 @@
    grep-mode-hook
    help-mode-hook
    ielm-mode-hook
-   package-menu-mode-hook))
+   package-menu-mode-hook
+   ibuffer-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
