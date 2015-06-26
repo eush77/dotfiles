@@ -155,15 +155,10 @@
                   (interactive)
                   (find-tag (find-tag-default))))
 
-(define-key k-minor-mode-map (kbd "C-c S-<down>") 'shrink-window)
-(define-key k-minor-mode-map (kbd "C-c S-<up>") 'enlarge-window)
-(define-key k-minor-mode-map (kbd "C-c S-<left>") 'shrink-window-horizontally)
-(define-key k-minor-mode-map (kbd "C-c S-<right>") 'enlarge-window-horizontally)
-
-(define-key k-minor-mode-map (kbd "S-<left>") 'window-jump-left)
-(define-key k-minor-mode-map (kbd "S-<right>") 'window-jump-right)
-(define-key k-minor-mode-map (kbd "S-<up>") 'window-jump-up)
-(define-key k-minor-mode-map (kbd "S-<down>") 'window-jump-down)
+(define-key k-minor-mode-map (kbd "S-<down>") 'shrink-window)
+(define-key k-minor-mode-map (kbd "S-<up>") 'enlarge-window)
+(define-key k-minor-mode-map (kbd "S-<left>") 'shrink-window-horizontally)
+(define-key k-minor-mode-map (kbd "S-<right>") 'enlarge-window-horizontally)
 
 (define-key k-minor-mode-map (kbd "C-M-j") 'window-jump-left)
 (define-key k-minor-mode-map (kbd "C-M-k") 'window-jump-right)
