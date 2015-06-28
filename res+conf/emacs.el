@@ -27,11 +27,8 @@
 (setq backup-directory-alist (list (cons "." backup-dir)))
 (setq make-backup-files nil)
 (setq auto-save nil)
-; Manual indentation
-; (defun dotab nil (interactive) (insert "    "))
-; (global-set-key (kbd "C-q") 'dotab)
-; (defun untab nil (interactive) (delete-backward-char 4))
-; (global-set-key (kbd "M-q") 'untab)
+(setq default-input-method 'russian-computer)
+
 (add-hook 'emacs-startup-hook 'column-number-mode)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
