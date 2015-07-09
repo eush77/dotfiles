@@ -227,6 +227,11 @@
   (lambda () (interactive)
     (insert (shell-command-to-string "xsel -b"))))
 
+(define-key k-minor-mode-map (kbd "M-\\")
+  (lambda () (interactive)
+    (let ((current-prefix-arg '(4)))
+      (call-interactively 'shell-command-on-region))))
+
 (define-minor-mode k-minor-mode
   "A minor mode so that my key settings work across all different major modes."
   t " +k" 'k-minor-mode-map)
