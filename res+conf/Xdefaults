@@ -1,0 +1,9 @@
+xterm*termName: xterm-256color
+xterm*locale: true
+xterm*metaSendsEscape: true
+xterm*saveLines: 8192
+
+xterm*reverseVideo: on
+xterm*cursorUnderLine: true
+xterm*faceName: Courier New
+xterm*faceSize: 10
