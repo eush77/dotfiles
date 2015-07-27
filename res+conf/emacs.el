@@ -165,8 +165,16 @@
 (define-key k-minor-mode-map (kbd "C-M-p") 'window-jump-up)
 (define-key k-minor-mode-map (kbd "C-M-n") 'window-jump-down)
 
-(define-key k-minor-mode-map (kbd "M-p") 'scroll-down)
-(define-key k-minor-mode-map (kbd "M-n") 'scroll-up)
+;; Preserve input history navigation key bindings.
+(defun prefer-history-navigation (navfn histfn)
+  (lambda () (interactive)
+    (if (memq major-mode '(inferior-emacs-lisp-mode))
+        (funcall histfn 1) (funcall navfn))))
+
+(define-key k-minor-mode-map (kbd "M-p")
+  (prefer-history-navigation 'scroll-down 'comint-previous-input))
+(define-key k-minor-mode-map (kbd "M-n")
+  (prefer-history-navigation 'scroll-up 'comint-next-input))
 
 (defun jump-line (count)
   "Jump COUNT lines ahead or back."
@@ -175,7 +183,6 @@
     (if (< count 0)
         (dotimes (_ (- count)) (previous-line))
       (dotimes (_ count) (next-line)))))
-
 
 (define-key k-minor-mode-map (kbd "M-c") 'control-lock-toggle)
 
@@ -246,6 +253,9 @@
 (define-minor-mode k-minor-dangerous-mode
   "Extension to k-minor-mode that should not be applied to all major modes."
   t "" 'k-minor-dangerous-mode-map)
+
+;; Preserve minibuffer history ring.
+(add-hook 'minibuffer-setup-hook (apply-partially 'k-minor-mode 0))
 
 (mapc
  (lambda (hook)
