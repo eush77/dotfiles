@@ -33,7 +33,7 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (setq truncate-partial-width-windows nil)
-(setq split-width-threshold 80)
+(setq split-width-threshold 100)
 
 ;; Meant to be overriden. Makes sense only for Emacs configs.
 (global-set-key (kbd "C-x f")
