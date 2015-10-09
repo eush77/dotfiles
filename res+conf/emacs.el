@@ -19,12 +19,11 @@
 (scroll-bar-mode -1)
 (setq initial-scratch-message nil)
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 8)
 (setq c-basic-offset 2)
 (c-set-offset 'case-label '+)
+(c-set-offset 'access-label -1)
 
-(defvar backup-dir "~/.emacs-backups")
-(setq backup-directory-alist (list (cons "." backup-dir)))
+(setq backup-directory-alist '("~/.emacs.d/backups"))
 (setq make-backup-files nil)
 (setq auto-save nil)
 (setq default-input-method 'russian-computer)
@@ -34,6 +33,27 @@
 
 (setq truncate-partial-width-windows nil)
 (setq split-width-threshold 100)
+
+
+;; Highlights current word on a page. Similar to "C-s C-w".
+;; Meant to be used with mouse selects.
+(defun highlight-word ()
+  (interactive)
+  (highlight-phrase (current-word)))
+
+(defun unhighlight ()
+  (interactive)
+  (hi-lock-mode 0))
+
+
+;; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
+(defun find-tag-no-prompt ()
+  "Jump to the tag at point without prompting."
+  (interactive)
+  (find-tag (find-tag-default)))
+
+(global-set-key [double-mouse-1] 'find-tag-no-prompt)
+(global-set-key [mouse-2] 'pop-tag-mark)
 
 ;; Meant to be overriden. Makes sense only for Emacs configs.
 (global-set-key (kbd "C-x f")
@@ -68,6 +88,19 @@
 (let ((cchh (assoc "cchh" grep-files-aliases)))
   (setq grep-files-aliases
         (cons cchh (remove cchh grep-files-aliases))))
+
+(defun compile-goto-error-no-switch ()
+  "Select grep result but don't switch window."
+  (interactive)
+  (compile-goto-error)
+  (other-window -1))
+
+(define-key grep-mode-map (kbd "n") 'compilation-next-error)
+(define-key grep-mode-map (kbd "p") 'compilation-previous-error)
+(define-key grep-mode-map (kbd "M-n") 'next-error-no-select)
+(define-key grep-mode-map (kbd "M-p") 'previous-error-no-select)
+(define-key grep-mode-map (kbd "l") 'recenter-top-bottom)
+(define-key grep-mode-map (kbd "<return>") 'compile-goto-error-no-switch)
 
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
@@ -148,12 +181,7 @@
 
 (define-key k-minor-mode-map (kbd "C-c C-c") 'comment-or-uncomment-region)
 
-;; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
-(define-key k-minor-mode-map (kbd "M-.")
-                (lambda ()
-                  "Jump to the tag at point without prompting."
-                  (interactive)
-                  (find-tag (find-tag-default))))
+(define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
 
 (define-key k-minor-mode-map (kbd "S-<down>") 'shrink-window)
 (define-key k-minor-mode-map (kbd "S-<up>") 'enlarge-window)
@@ -268,7 +296,8 @@
    help-mode-hook
    ielm-mode-hook
    package-menu-mode-hook
-   ibuffer-mode-hook))
+   ibuffer-mode-hook
+   w3m-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
@@ -344,4 +373,5 @@
 (when window-system
   ;; (require 'solarized-theme)
   ;; (load-theme 'solarized-dark)
-  (add-to-list 'default-frame-alist '(font . "Terminus 10")))
+  (add-to-list 'default-frame-alist '(font . "Terminus 10"))
+  (setq x-pointer-shape x-pointer-arrow))
