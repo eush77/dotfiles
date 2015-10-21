@@ -8,7 +8,7 @@
     whitespace = trailing-space
 [alias]
     alias = !git config --get-regexp '^alias\\.' |sed -e 's:^alias\\.::' -e '/^alias/d' -e 's:\\ :\\t:' |column -ts '\t'
-    s = status
+    s = status --short
     brieflog = !GIT_PAGER=cat git log --oneline -10
     graph = log --all --oneline --decorate --graph
     reset-unmerged = !git reset -- $(git ls-files --unmerged |cut -f2 |uniq)
@@ -19,7 +19,7 @@
     co = checkout
     br = branch
 [push]
-    default = matching
+    default = simple
 [rebase]
     autosquash = true
 [pager]
