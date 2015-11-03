@@ -1,6 +1,6 @@
 set -gx EDITOR 'emacs -nw'
 set -gx PAGER 'less'
-set -gx LESS '--ignore-case --RAW-CONTROL-CHARS'
+set -gx LESS '--ignore-case --RAW-CONTROL-CHARS --quit-if-one-screen --no-init --status-column'
 set -gx LESSOPEN '| src-hilite-lesspipe.sh %s'
 set -gx MP '/mnt/mp'
 
