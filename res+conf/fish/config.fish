@@ -7,6 +7,7 @@ set -gx MP '/mnt/mp'
 alias l 'ls -CF -BX --group-directories-first -v'
 alias la 'ls -alhFX --group-directories-first'
 alias lc 'ls -1 -BX -v --group-directories-first'
+alias gg 'git grep'
 
 abbr -a g git
 abbr -a n npm
