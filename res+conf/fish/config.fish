@@ -1,6 +1,6 @@
 set -gx EDITOR 'emacs -nw'
 set -gx PAGER 'less'
-set -gx LESS '--ignore-case --RAW-CONTROL-CHARS --quit-if-one-screen --no-init'
+set -gx LESS '--ignore-case --RAW-CONTROL-CHARS --quit-if-one-screen --no-init --jump-target=.3'
 set -gx LESSOPEN '| emacs --batch -u eush77 -l /usr/local/bin/e2ansi-cat %s 2>/dev/null'
 set -gx MP '/mnt/mp'
 
