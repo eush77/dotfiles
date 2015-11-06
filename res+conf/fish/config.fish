@@ -1,7 +1,7 @@
 set -gx EDITOR 'emacs -nw'
 set -gx PAGER 'less'
 set -gx LESS '--ignore-case --RAW-CONTROL-CHARS --quit-if-one-screen --no-init'
-set -gx LESSOPEN '| src-hilite-lesspipe.sh %s'
+set -gx LESSOPEN '| emacs --batch -u eush77 -l /usr/local/bin/e2ansi-cat %s 2>/dev/null'
 set -gx MP '/mnt/mp'
 
 alias l 'ls -CF -BX --group-directories-first -v'
