@@ -13,7 +13,7 @@ HISTSIZE=10000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 shopt -s histappend cmdhist checkjobs
 PROMPT_COMMAND='history -a'
-PS1='[\#]\w\$ '
+PS1='[\#]\W\$ '
 export WWW_HOME=http://www.duckduckgo.com
 export LESS='-MR'
 export LESSOPEN='| src-hilite-lesspipe.sh "%s"'
@@ -50,7 +50,7 @@ alias hilite='source-highlight -fesc -i'
 
 #======================= Unordered stuff ===================================
 set +H
-setxkbmap -model pc104 -layout "us,ru" -variant ",winkeys" -option "grp:caps_toggle,grp:win_switch,grp_led:caps,compose:menu,numpad:microsoft"
+#setxkbmap -model pc104 -layout "us,ru" -variant ",winkeys" -option "grp:caps_toggle,grp:win_switch,grp_led:caps,compose:menu,numpad:microsoft"
 bind 'set completion-ignore-case on'
 #===========================================================================
 
