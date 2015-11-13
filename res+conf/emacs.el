@@ -91,6 +91,19 @@
   (setq grep-files-aliases
         (cons cchh (remove cchh grep-files-aliases))))
 
+;; [vc-git-grep]
+;; Advice this function to search recursively.
+(defadvice grep-expand-template (around grep-expand-template-git-recursive)
+  (when (and (string-match "^git .*grep " (ad-get-arg 0)))
+    (ad-set-arg 0 (replace-regexp-in-string
+                   "<F>" "**/<F>" (ad-get-arg 0))))
+  ad-do-it)
+(defadvice vc-git-grep (around vc-git-grep-recursive activate)
+  (ad-activate-regexp "grep-expand-template-git-recursive")
+  ad-do-it
+  (ad-deactivate-regexp "grep-expand-template-git-recursive"))
+
+
 (defun compile-goto-error-no-switch ()
   "Select grep result but don't switch window."
   (interactive)
