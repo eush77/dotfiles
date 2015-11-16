@@ -198,6 +198,7 @@
 (define-key k-minor-mode-map (kbd "C-c C-c") 'comment-or-uncomment-region)
 
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
+(define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
 
 (define-key k-minor-mode-map (kbd "S-<down>") 'shrink-window)
 (define-key k-minor-mode-map (kbd "S-<up>") 'enlarge-window)
