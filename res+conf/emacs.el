@@ -96,7 +96,7 @@
 (defadvice grep-expand-template (around grep-expand-template-git-recursive)
   (when (and (string-match "^git .*grep " (ad-get-arg 0)))
     (ad-set-arg 0 (replace-regexp-in-string
-                   "<F>" "**/<F>" (ad-get-arg 0))))
+                   "<F>" "\"<F>\"" (ad-get-arg 0))))
   ad-do-it)
 (defadvice vc-git-grep (around vc-git-grep-recursive activate)
   (ad-activate-regexp "grep-expand-template-git-recursive")
