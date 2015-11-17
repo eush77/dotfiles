@@ -195,7 +195,7 @@
 
 (defvar k-minor-mode-map (make-keymap))
 
-(define-key k-minor-mode-map (kbd "C-c C-c") 'comment-or-uncomment-region)
+(define-key k-minor-mode-map (kbd "C-c C-c") 'comment-dwim)
 
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
 (define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
