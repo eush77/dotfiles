@@ -229,6 +229,7 @@
         (dotimes (_ (- count)) (previous-line))
       (dotimes (_ count) (next-line)))))
 
+(define-key k-minor-mode-map (kbd "C-M-c") 'control-lock-toggle)
 (define-key k-minor-mode-map (kbd "M-c") 'control-lock-toggle)
 
 (define-key k-minor-mode-map (kbd "M-<right>") 'mc/edit-lines)
