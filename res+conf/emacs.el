@@ -398,4 +398,5 @@
 (when window-system
   (require 'solarized)
   (load-theme 'solarized-dark)
-  (add-to-list 'default-frame-alist '(font . "Monoid 10")))
+  (add-to-list 'default-frame-alist '(font . "Monoid 10"))
+  (setq x-pointer-shape x-pointer-arrow))
