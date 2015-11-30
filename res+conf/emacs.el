@@ -298,6 +298,9 @@
 
 (defvar k-minor-dangerous-mode-map (make-keymap))
 
+(define-key k-minor-dangerous-mode-map (kbd "M-p") 'scroll-down)
+(define-key k-minor-dangerous-mode-map (kbd "M-n") 'scroll-up)
+
 (when window-system
   (define-key k-minor-dangerous-mode-map (kbd "C-;") 'backward-paragraph)
   (define-key k-minor-dangerous-mode-map (kbd "C-m") 'forward-paragraph)
