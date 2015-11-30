@@ -53,7 +53,11 @@
   (hi-lock-mode 0))
 
 
-;; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
+;; [etags]
+; Use case-sensitive search.
+(setq-default tags-case-fold-search nil)
+
+; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
 (defun find-tag-no-prompt ()
   "Jump to the tag at point without prompting."
   (interactive)
@@ -88,10 +92,11 @@
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
+;; [grep-mode]
+(require 'grep)
 ;; Put "cchh" grep files alias before anything else. This will make
 ;; interactive grep choose it by default for C/C++ files, which is
 ;; what I usually want.
-(require 'grep)
 (let ((cchh (assoc "cchh" grep-files-aliases)))
   (setq grep-files-aliases
         (cons cchh (remove cchh grep-files-aliases))))
