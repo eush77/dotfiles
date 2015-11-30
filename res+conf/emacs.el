@@ -24,6 +24,11 @@
 (c-set-offset 'case-label '+)
 (c-set-offset 'access-label -1)
 (c-set-offset 'innamespace 0)
+; Use C99 one-line comments by default.
+(add-hook 'c-mode-hook (lambda ()
+                         (setq comment-start "// ")
+                         (setq comment-end "")))
+
 (defvar backup-dir "~/.emacs-backups")
 (setq backup-directory-alist (list (cons "." backup-dir)))
 (setq make-backup-files nil)
