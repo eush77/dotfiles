@@ -322,7 +322,8 @@
    ielm-mode-hook
    package-menu-mode-hook
    ibuffer-mode-hook
-   w3m-mode-hook))
+   w3m-mode-hook
+   eshell-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
