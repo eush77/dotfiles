@@ -1,0 +1,5 @@
+set shell=bash
+set textwidth=72
+nmap <Space> i_<Esc>r
+map <c-a> ^
+map <c-e> $
