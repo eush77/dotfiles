@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n'
+
+while watch-file $(git ls-files); do
+    if make "$@"; then
+        status=0
+        icon=ok
+    else
+        status=$?
+        icon=error
+    fi
+    notify-send -t 1000 -i $icon $(printf "Compilation status: %d" $status)
+done
