@@ -209,6 +209,29 @@
 (require 'hideshow)
 (require 'control-lock)
 
+;; Vi-style open-line commands.
+;;
+;; http://www.emacswiki.org/emacs/OpenNextLine
+(defun open-next-line (arg)
+  "Move to the next line and then opens a line.
+    See also `newline-and-indent'."
+  (interactive "p")
+  (end-of-line)
+  (open-line arg)
+  (next-line 1)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+(defun open-previous-line (arg)
+  "Open a new line before the current one.
+     See also `newline-and-indent'."
+  (interactive "p")
+  (beginning-of-line)
+  (open-line arg)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+(defvar newline-and-indent t)
+
+
 ;; Define a minor mode with global always-on-top key bindings.
 ;; https://stackoverflow.com/questions/683425/globally-override-key-binding-in-emacs
 
@@ -267,6 +290,8 @@
 (define-key k-minor-mode-map (kbd "C-^") 'not-modified)
 (define-key k-minor-mode-map (kbd "C-~") 'not-modified)
 (define-key k-minor-mode-map (kbd "M-_") 'goto-last-change)
+(define-key k-minor-mode-map (kbd "C-o") 'open-previous-line)
+(define-key k-minor-mode-map (kbd "M-o") 'open-next-line)
 
 (defun with-hs (command &rest arguments)
   "Load hs-minor-mode if it isn't loaded yet."
