@@ -257,6 +257,8 @@
 (define-key k-minor-mode-map (kbd "C-M-<down>") 'mc/mark-all-like-this)
 (define-key k-minor-mode-map (kbd "C-x M-SPC") 'set-rectangular-region-anchor)
 
+(define-key k-minor-mode-map (kbd "C-c p") 'backward-paragraph)
+(define-key k-minor-mode-map (kbd "C-c n") 'forward-paragraph)
 (define-key k-minor-mode-map (kbd "C-S-b") 'backward-sexp)
 (define-key k-minor-mode-map (kbd "C-S-f") 'forward-sexp)
 (define-key k-minor-mode-map (kbd "M-=") 'er/expand-region)
