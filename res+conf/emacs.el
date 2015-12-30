@@ -19,12 +19,14 @@
 (scroll-bar-mode -1)
 (setq initial-scratch-message nil)
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 8)
-(setq c-basic-offset 2)
+(setq-default tab-width 5)
+(setq-default c-basic-offset 2)
+(setq-default c-default-style "linux")
+(setq-default comment-style 'extra-line)
 (c-set-offset 'case-label '+)
 (c-set-offset 'access-label -1)
 (c-set-offset 'innamespace 0)
-; Use C99 one-line comments by default.
+;; Use C99 one-line comments by default.
 (add-hook 'c-mode-hook (lambda ()
                          (setq comment-start "// ")
                          (setq comment-end "")))
@@ -54,10 +56,10 @@
 
 
 ;; [etags]
-; Use case-sensitive search.
+;; Use case-sensitive search.
 (setq-default tags-case-fold-search nil)
 
-; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
+;; https://stackoverflow.com/questions/12074897/automatically-jump-to-tag-in-emacs
 (defun find-tag-no-prompt ()
   "Jump to the tag at point without prompting."
   (interactive)
@@ -311,6 +313,15 @@
 (define-key k-minor-dangerous-mode-map (kbd "M-p") 'scroll-down)
 (define-key k-minor-dangerous-mode-map (kbd "M-n") 'scroll-up)
 
+
+;; C-m and C-[ are synonymous to ENTER and ESC.
+;; In the terminal it isn't possible to work around it at all.
+;; In graphical mode there is a hack to unbind C-m from ENTER
+;; (presented below).
+;
+;; Initially I thought of C-m and C-[, alas there doesn't seem to exist
+;; an easy way to unbind C-[ from ESC. Similar twist damages META key,
+;; as if it was somehow involved.
 (when window-system
   (define-key k-minor-dangerous-mode-map (kbd "C-;") 'backward-paragraph)
   (define-key k-minor-dangerous-mode-map (kbd "C-m") 'forward-paragraph)
