@@ -22,6 +22,7 @@
 (setq-default tab-width 5)
 (setq-default c-basic-offset 2)
 (setq-default c-default-style "linux")
+(setq-default comment-multi-line t)
 (setq-default comment-style 'extra-line)
 (c-set-offset 'case-label '+)
 (c-set-offset 'access-label -1)
