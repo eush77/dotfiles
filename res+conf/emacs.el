@@ -240,6 +240,9 @@
 
 (define-key k-minor-mode-map (kbd "C-c C-c") 'comment-dwim)
 
+;; Probably S-M-SPC in window mode.
+(define-key k-minor-mode-map (kbd "M-SPC") 'cycle-spacing)
+
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
 (define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
 
