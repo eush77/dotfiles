@@ -14,8 +14,8 @@
     reset-unmerged = !git reset -- $(git ls-files --unmerged |cut -f2 |uniq)
     fixup = !GIT_EDITOR=true git rebase --autosquash -i
     l = !git brieflog
-    d = diff --color-words
-    ds = !git d --staged
+    d = diff
+    ds = diff --staged
     co = checkout
     br = branch
 [push]
@@ -25,3 +25,7 @@
 [grep]
     patternType = perl
     lineNumber = true
+[pager]
+    log = diff-highlight | less
+    show = diff-highlight | less
+    diff = diff-highlight | less
