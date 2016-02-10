@@ -22,3 +22,6 @@
     default = simple
 [rebase]
     autosquash = true
+[grep]
+    patternType = perl
+    lineNumber = true
