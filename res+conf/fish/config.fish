@@ -26,6 +26,11 @@ set -gx LESS_TERMCAP_so (printf '\e[01;44;33m')
 set -gx LESS_TERMCAP_ue (printf '\e[0m')
 set -gx LESS_TERMCAP_us (printf '\e[01;32m')
 
+# Stardict console client wrapper.
+function dic
+    sdcv -n $argv |less
+end
+
 # Kill background jobs on exit.
 function _killbg --on-process-exit %self
         for pid in (jobs --pid)
