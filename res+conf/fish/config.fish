@@ -31,3 +31,6 @@ function _killbg --on-process-exit %self
                 kill $pid
         end
 end
+
+# Hook up direnv.
+eval (direnv hook fish)
