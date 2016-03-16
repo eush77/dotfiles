@@ -38,5 +38,8 @@ function _killbg --on-process-exit %self
         end
 end
 
+# Hook for desk activation
+test -n "$DESK_ENV"; and . "$DESK_ENV"; or true
+
 # Hook up direnv.
 eval (direnv hook fish)
