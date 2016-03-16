@@ -3,7 +3,9 @@
 ;; Fish-shell is not POSIX-compliant. Thus Emacs should stick to Bash.
 ;; https://github.com/lee-dohm/emacs/blob/fee920d6ce0c119cb58a419740bc3baf6170/init.d/shell.el
 (setq-default explicit-shell-file-name "/bin/bash")
-(setq-default shell-file-name "/bin/bash")
+;; Yet we want Fish for shell-command so that we can access $PATH and
+;; shell functions.
+(setq-default shell-file-name "/usr/bin/fish")
 
 ;; FIX SHIFT-UP
 ;; from http://stackoverflow.com/questions/10871745/shift-up-arrow-doesnt-highlight-text-emacs-iterm2
@@ -39,7 +41,10 @@
 (setq default-input-method 'russian-computer)
 
 (add-hook 'emacs-startup-hook 'column-number-mode)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook
+          (lambda ()
+            (if (not (eq major-mode 'diff-mode))
+                (delete-trailing-whitespace))))
 
 (setq truncate-partial-width-windows nil)
 (setq split-width-threshold 100)
@@ -81,6 +86,16 @@
 
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
+;; Compilation: save current buffer, recompile, then switch to results.
+(global-set-key
+ (kbd "<f7>")
+ (lambda () (interactive)
+   "Recompile and switch to compilation buffer."
+   (save-buffer)
+   (recompile)
+   (if (not (compilation-buffer-p (current-buffer)))
+       (switch-to-buffer-other-frame compilation-last-buffer))))
+
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
@@ -96,6 +111,7 @@
 (add-hook 'css-mode-hook 'emmet-mode)
 
 ;; [grep-mode]
+;; [compilation-mode]
 (require 'grep)
 ;; Put "cchh" grep files alias before anything else. This will make
 ;; interactive grep choose it by default for C/C++ files, which is
@@ -103,6 +119,25 @@
 (let ((cchh (assoc "cchh" grep-files-aliases)))
   (setq grep-files-aliases
         (cons cchh (remove cchh grep-files-aliases))))
+
+(defun compile-goto-error-no-switch ()
+  "Select grep result but don't switch window."
+  (interactive)
+  (compile-goto-error)
+  (other-window -1))
+
+;; `grep-mode' and `compilation-mode' share most of keybindings.
+(mapc
+ (lambda (map)
+   (define-key map (kbd "n") 'compilation-next-error)
+   (define-key map (kbd "p") 'compilation-previous-error)
+   (define-key map (kbd "M-n") 'next-error-no-select)
+   (define-key map (kbd "M-p") 'previous-error-no-select)
+   (define-key map (kbd "l") 'recenter-top-bottom))
+ (list grep-mode-map
+       compilation-mode-map))
+(define-key grep-mode-map (kbd "<return>") 'compile-goto-error-no-switch)
+(define-key compilation-mode-map (kbd "<return>") 'compile-goto-error)
 
 ;; [vc-git-grep]
 ;; Advice this function to search recursively.
@@ -123,19 +158,6 @@
                "\"" ""
                (substring tmpl 3 -4))))
            ad-return-value))))
-
-(defun compile-goto-error-no-switch ()
-  "Select grep result but don't switch window."
-  (interactive)
-  (compile-goto-error)
-  (other-window -1))
-
-(define-key grep-mode-map (kbd "n") 'compilation-next-error)
-(define-key grep-mode-map (kbd "p") 'compilation-previous-error)
-(define-key grep-mode-map (kbd "M-n") 'next-error-no-select)
-(define-key grep-mode-map (kbd "M-p") 'previous-error-no-select)
-(define-key grep-mode-map (kbd "l") 'recenter-top-bottom)
-(define-key grep-mode-map (kbd "<return>") 'compile-goto-error-no-switch)
 
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
@@ -243,6 +265,7 @@
 ;; Probably S-M-SPC in window mode.
 (define-key k-minor-mode-map (kbd "M-SPC") 'cycle-spacing)
 
+(define-key k-minor-mode-map (kbd "M-,") 'find-tag)
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
 (define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
 
@@ -374,11 +397,13 @@
    ack-mode-hook
    grep-mode-hook
    help-mode-hook
+   Info-mode-hook
    ielm-mode-hook
    package-menu-mode-hook
    ibuffer-mode-hook
    w3m-mode-hook
-   eshell-mode-hook))
+   eshell-mode-hook
+   compilation-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
