@@ -18,6 +18,8 @@
     ds = diff --staged
     co = checkout
     br = branch
+    parent = !git log --ancestry-path --format=%h $1 |tail -1 && true
+    co-next = !git checkout $(git parent $1) && true
 [push]
     default = simple
 [rebase]
