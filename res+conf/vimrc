@@ -1,6 +1,9 @@
 set shell=bash
+set softtabstop=4 expandtab
 set textwidth=72
 set hlsearch
+set incsearch
+set ignorecase
 nmap s :exec "normal i".nr2char(getchar())."\e"<CR>
 nmap S :exec "normal a".nr2char(getchar())."\e"<CR>
 nmap <Space> :nohlsearch<Bar>echo<CR>
