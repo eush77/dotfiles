@@ -1,5 +1,6 @@
-.todo
 *~
 #*
-.dir-locals.el
+.*.swp
 TAGS
+.dir-locals.el
+.envrc
