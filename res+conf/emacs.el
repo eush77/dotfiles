@@ -29,6 +29,7 @@
 (c-set-offset 'case-label '+)
 (c-set-offset 'access-label -1)
 (c-set-offset 'innamespace 0)
+(c-set-offset 'inline-open 0)
 ;; Use C99 one-line comments by default.
 (add-hook 'c-mode-hook (lambda ()
                          (setq comment-start "// ")
@@ -159,6 +160,11 @@
                (substring tmpl 3 -4))))
            ad-return-value))))
 
+;; [doc-view-mode]
+(require 'doc-view)
+(setq doc-view-continuous t)
+(define-key doc-view-mode-map (kbd "<up>") 'doc-view-previous-line-or-previous-page)
+(define-key doc-view-mode-map (kbd "<down>") 'doc-view-next-line-or-next-page)
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
 (let ((default-directory "~/.emacs.d/elpa"))
@@ -228,6 +234,7 @@
 
 (require 'dired-details)
 (dired-details-install)
+(setq dired-dwim-target t)
 
 (require 'hideshow)
 (require 'control-lock)
@@ -280,15 +287,18 @@
 (define-key k-minor-mode-map (kbd "C-M-n") 'window-jump-down)
 
 ;; Preserve input history navigation key bindings.
-(defun prefer-history-navigation (navfn histfn)
+(defun prefer-history-navigation (navfn comintfn eshellfn)
   (lambda () (interactive)
-    (if (memq major-mode '(inferior-emacs-lisp-mode))
-        (funcall histfn 1) (funcall navfn))))
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode)) (funcall comintfn 1))
+          ((memq major-mode '(eshell-mode)) (funcall eshellfn 1))
+          (t (funcall navfn)))))
 
 (define-key k-minor-mode-map (kbd "M-p")
-  (prefer-history-navigation 'scroll-down 'comint-previous-input))
+  (prefer-history-navigation 'scroll-down 'comint-previous-input
+                             'eshell-previous-input))
 (define-key k-minor-mode-map (kbd "M-n")
-  (prefer-history-navigation 'scroll-up 'comint-next-input))
+  (prefer-history-navigation 'scroll-up 'comint-next-input
+                             'eshell-next-input))
 
 (defun jump-line (count)
   "Jump COUNT lines ahead or back."
@@ -307,8 +317,8 @@
 (define-key k-minor-mode-map (kbd "C-M-<down>") 'mc/mark-all-like-this)
 (define-key k-minor-mode-map (kbd "C-x M-SPC") 'set-rectangular-region-anchor)
 
-(define-key k-minor-mode-map (kbd "C-c p") 'backward-paragraph)
-(define-key k-minor-mode-map (kbd "C-c n") 'forward-paragraph)
+(define-key k-minor-mode-map (kbd "C-c C-p") 'backward-paragraph)
+(define-key k-minor-mode-map (kbd "C-c C-n") 'forward-paragraph)
 (define-key k-minor-mode-map (kbd "C-S-b") 'backward-sexp)
 (define-key k-minor-mode-map (kbd "C-S-f") 'forward-sexp)
 (define-key k-minor-mode-map (kbd "M-=") 'er/expand-region)
@@ -401,9 +411,11 @@
    ielm-mode-hook
    package-menu-mode-hook
    ibuffer-mode-hook
+   isearch-mode-hook
    w3m-mode-hook
    eshell-mode-hook
-   compilation-mode-hook))
+   compilation-mode-hook
+   doc-view-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
