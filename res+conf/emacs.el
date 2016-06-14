@@ -401,21 +401,23 @@
 (mapc
  (lambda (hook)
    (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
- '(minibuffer-setup-hook
-   dired-mode-hook
-   custom-mode-hook
+ '(Info-mode-hook
+   Man-mode
    ack-mode-hook
+   compilation-mode-hook
+   custom-mode-hook
+   dired-mode-hook
+   doc-view-mode-hook
+   eshell-mode-hook
    grep-mode-hook
    help-mode-hook
-   Info-mode-hook
-   ielm-mode-hook
-   package-menu-mode-hook
    ibuffer-mode-hook
+   ielm-mode-hook
    isearch-mode-hook
-   w3m-mode-hook
-   eshell-mode-hook
-   compilation-mode-hook
-   doc-view-mode-hook))
+   minibuffer-setup-hook
+   package-menu-mode-hook
+   vc-git-log-view-mode
+   w3m-mode-hook))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
