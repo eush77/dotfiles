@@ -239,6 +239,10 @@
 (require 'hideshow)
 (require 'control-lock)
 
+;; Change default zap-to-char behavior.
+(require 'misc)
+(global-set-key (kbd "M-z") 'zap-up-to-char)
+
 ;; Vi-style open-line commands.
 ;;
 ;; http://www.emacswiki.org/emacs/OpenNextLine
