@@ -14,14 +14,21 @@
     reset-unmerged = !git reset -- $(git ls-files --unmerged |cut -f2 |uniq)
     fixup = !GIT_EDITOR=true git rebase --autosquash -i
     l = !git brieflog
+    apply-patch = !\
+        git apply --check \"$2\" && \
+        git apply \"$2\" && \
+        git add . && \
+        git commit -am \"apply $(basename \"$2\")\" --author=\"$1\" && \
+        true
+    archive-branch = ! git push archive $1 && git branch -D $1
     d = diff
     ds = diff --staged
     co = checkout
-    br = branch
-    parent = !git log --ancestry-path --format=%h $1 |tail -1 && true
-    co-next = !git checkout $(git parent $1) && true
+    br = branch --sort -committerdate
+    parent = ! git log --ancestry-path --reverse --format=%h $2 | sed -n $1p && true
+    colog = ! percol | cut -d ' ' -f1 | xargs git checkout
 [push]
-    default = simple
+    default = upstream
 [rebase]
     autosquash = true
 [grep]
