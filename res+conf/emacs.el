@@ -3,9 +3,7 @@
 ;; Fish-shell is not POSIX-compliant. Thus Emacs should stick to Bash.
 ;; https://github.com/lee-dohm/emacs/blob/fee920d6ce0c119cb58a419740bc3baf6170/init.d/shell.el
 (setq-default explicit-shell-file-name "/bin/bash")
-;; Yet we want Fish for shell-command so that we can access $PATH and
-;; shell functions.
-(setq-default shell-file-name "/usr/bin/fish")
+(setq-default shell-file-name "/bin/bash")
 
 ;; FIX SHIFT-UP
 ;; from http://stackoverflow.com/questions/10871745/shift-up-arrow-doesnt-highlight-text-emacs-iterm2
@@ -304,6 +302,10 @@
   (prefer-history-navigation 'scroll-up 'comint-next-input
                              'eshell-next-input))
 
+(setq eshell-prompt-function
+      (lambda nil
+        (concat (eshell/basename (eshell/pwd)) " $ ")))
+
 (defun jump-line (count)
   "Jump COUNT lines ahead or back."
   (lambda ()
@@ -422,6 +424,17 @@
    package-menu-mode-hook
    vc-git-log-view-mode
    w3m-mode-hook))
+
+(setq-default k-minor-dangerous-mode-stack nil)
+
+(add-hook 'isearch-mode-hook
+          (lambda ()
+            (push (if k-minor-dangerous-mode 1 0) k-minor-dangerous-mode-stack)
+            (k-minor-dangerous-mode 0)))
+
+(add-hook 'isearch-mode-end-hook
+          (lambda ()
+            (k-minor-dangerous-mode (pop k-minor-dangerous-mode-stack))))
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
