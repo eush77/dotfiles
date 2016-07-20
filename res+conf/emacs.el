@@ -230,6 +230,9 @@
 
 (require 'goto-last-change)
 
+(require 'dired)
+(define-key dired-mode-map (kbd "SPC") 'dired-up-directory)
+
 (require 'dired-details)
 (dired-details-install)
 (setq dired-dwim-target t)
@@ -438,9 +441,6 @@
 
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
-
-(require 'dired)
-(define-key dired-mode-map (kbd "SPC") 'dired-up-directory)
 
 (defun balanced (command)
   "Retain window balance after operation."
