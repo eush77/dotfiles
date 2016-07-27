@@ -2,3 +2,51 @@ set disassembly-flavor intel
 set history save
 set history filename ~/.gdb_history
 set history size unlimited
+set debug-file-directory /usr/lib/debug
+
+define list-start
+    x/20i $pc
+end
+document list-start
+List instructions starting from the program counter ($pc).
+end
+alias ls = list-start
+
+define list-instructions
+    x/20i $pc - 0x30
+end
+document list-instructions
+List instructions around program counter ($pc).
+end
+alias li = list-instructions
+define l
+    li
+end
+document list-instructions
+List instructions around program counter ($pc).
+end
+
+define li-display
+    disable display
+    py gdb.execute("display/30i " + hex(gdb.selected_frame().pc()))
+end
+document li-display
+Set the current program counter ($pc) for display.
+end
+
+define nextc
+    py arch = gdb.selected_frame().architecture()
+    py pc = lambda: int(gdb.selected_frame().pc())
+    py inst = lambda: arch.disassemble(pc())[0]["asm"].split()
+    py isstop = lambda inst: inst[0] in ("call", "ret")
+    py gdb.execute("nexti", to_string=True)
+    py while not isstop(inst()): gdb.execute("ni", to_string=True)
+    list-instructions
+    py iscall = inst()[0] == "call"
+    py if iscall: print("Callee:\n")
+    py if iscall: gdb.execute("x/i $" + inst()[1])
+end
+document nextc
+Continue until next call or return.
+end
+alias nc = nextc
