@@ -4,8 +4,10 @@ set history filename ~/.gdb_history
 set history size unlimited
 set debug-file-directory /usr/lib/debug
 
+set listsize 30
+
 define list-start
-    x/20i $pc
+    py gdb.execute("x/{}i $pc".format(gdb.parameter("listsize")))
 end
 document list-start
 List instructions starting from the program counter ($pc).
@@ -13,14 +15,14 @@ end
 alias ls = list-start
 
 define list-instructions
-    x/20i $pc - 0x30
+    py gdb.execute("x/{}i $pc - 0x30".format(gdb.parameter("listsize")))
 end
 document list-instructions
 List instructions around program counter ($pc).
 end
 alias li = list-instructions
 define l
-    li
+    list-instructions
 end
 document list-instructions
 List instructions around program counter ($pc).
@@ -28,7 +30,8 @@ end
 
 define li-display
     disable display
-    py gdb.execute("display/30i " + hex(gdb.selected_frame().pc()))
+    py gdb.execute("display/{}i {:#x}".format( \
+        gdb.parameter("listsize"), gdb.selected_frame().pc()))
 end
 document li-display
 Set the current program counter ($pc) for display.
