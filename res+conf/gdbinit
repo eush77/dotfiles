@@ -43,7 +43,7 @@ define nextc
     py inst = lambda: arch.disassemble(pc())[0]["asm"].split()
     py isstop = lambda inst: inst[0] in ("call", "ret")
     py gdb.execute("nexti", to_string=True)
-    py while not isstop(inst()): gdb.execute("ni", to_string=True)
+    py while not isstop(inst()): gdb.execute("nexti", to_string=True)
     list-instructions
     py iscall = inst()[0] == "call"
     py if iscall: print("Callee:\n")
@@ -53,3 +53,20 @@ document nextc
 Continue until next call or return.
 end
 alias nc = nextc
+
+define reverse-nextc
+    py arch = gdb.selected_frame().architecture()
+    py pc = lambda: int(gdb.selected_frame().pc())
+    py inst = lambda: arch.disassemble(pc())[0]["asm"].split()
+    py isstop = lambda inst: inst[0] in ("call", "ret")
+    py gdb.execute("reverse-nexti", to_string=True)
+    py while not isstop(inst()): gdb.execute("reverse-nexti", to_string=True)
+    list-instructions
+    py iscall = inst()[0] == "call"
+    py if iscall: print("Callee:\n")
+    py if iscall: gdb.execute("x/i $" + inst()[1])
+end
+document reverse-nextc
+Continue backward until next call or return.
+end
+alias rnc = reverse-nextc
