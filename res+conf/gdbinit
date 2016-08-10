@@ -10,6 +10,8 @@ define list-start
     py gdb.execute("x/{}i $pc".format(gdb.parameter("listsize")))
 end
 document list-start
+list-start
+
 List instructions starting from the program counter ($pc).
 end
 alias ls = list-start
@@ -18,6 +20,8 @@ define list-instructions
     py gdb.execute("x/{}i $pc - 0x30".format(gdb.parameter("listsize")))
 end
 document list-instructions
+list-instructions
+
 List instructions around program counter ($pc).
 end
 alias li = list-instructions
@@ -25,16 +29,9 @@ define l
     list-instructions
 end
 document list-instructions
-List instructions around program counter ($pc).
-end
+list-instructions
 
-define li-display
-    disable display
-    py gdb.execute("display/{}i {:#x}".format( \
-        gdb.parameter("listsize"), gdb.selected_frame().pc()))
-end
-document li-display
-Set the current program counter ($pc) for display.
+List instructions around program counter ($pc).
 end
 
 define nextc
@@ -46,10 +43,13 @@ define nextc
     py while not isstop(inst()): gdb.execute("nexti", to_string=True)
     list-instructions
     py iscall = inst()[0] == "call"
-    py if iscall: print("Callee:\n")
-    py if iscall: gdb.execute("x/i $" + inst()[1])
+    py if iscall: print("Callee:")
+    py if iscall: gdb.execute("x/i " + \
+        ("$" if inst()[1][:2] != "0x" else "") + inst()[1])
 end
 document nextc
+nextc
+
 Continue until next call or return.
 end
 alias nc = nextc
@@ -63,10 +63,33 @@ define reverse-nextc
     py while not isstop(inst()): gdb.execute("reverse-nexti", to_string=True)
     list-instructions
     py iscall = inst()[0] == "call"
-    py if iscall: print("Callee:\n")
-    py if iscall: gdb.execute("x/i $" + inst()[1])
+    py if iscall: print("Callee:")
+    py if iscall: gdb.execute("x/i " + \
+        ("$" if inst()[1][:2] != "0x" else "") + inst()[1])
 end
 document reverse-nextc
+reverse-nextc
+
 Continue backward until next call or return.
 end
 alias rnc = reverse-nextc
+
+define ni
+    nexti
+    list-instructions
+end
+
+define rni
+    reverse-nexti
+    list-instructions
+end
+
+define si
+    stepi
+    list-start
+end
+
+define rsi
+    reverse-stepi
+    list-instructions
+end
