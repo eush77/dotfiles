@@ -6,6 +6,8 @@ set debug-file-directory /usr/lib/debug
 
 set listsize 30
 
+alias rf = reverse-finish
+
 define list-start
     py gdb.execute("x/{}i $pc".format(gdb.parameter("listsize")))
 end
@@ -93,3 +95,6 @@ define rsi
     reverse-stepi
     list-instructions
 end
+
+source ~/.gdb.d/llvm.gdb
+source ~/.gdb.d/postgres.gdb
