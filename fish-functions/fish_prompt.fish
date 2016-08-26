@@ -51,4 +51,9 @@ function fish_prompt --description='Fancy prompt'
   printf '%s' $path
   set_color normal
   printf ' ❩  '
+
+  # TODO: This should be in another function.
+  if test (count $fish_with_command) -gt 0
+      commandline -r "$fish_with_command "
+  end
 end
