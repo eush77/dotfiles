@@ -3,7 +3,7 @@
 ;; Fish-shell is not POSIX-compliant. Thus Emacs should stick to Bash.
 ;; https://github.com/lee-dohm/emacs/blob/fee920d6ce0c119cb58a419740bc3baf6170/init.d/shell.el
 (setq-default explicit-shell-file-name "/bin/bash")
-(setq-default shell-file-name "/bin/bash")
+(setq-default shell-file-name "/usr/bin/fish")
 
 ;; FIX SHIFT-UP
 ;; from http://stackoverflow.com/questions/10871745/shift-up-arrow-doesnt-highlight-text-emacs-iterm2
@@ -33,11 +33,11 @@
                          (setq comment-start "// ")
                          (setq comment-end "")))
 
-(defvar backup-dir "~/.emacs-backups")
-(setq backup-directory-alist (list (cons "." backup-dir)))
-(setq make-backup-files nil)
-(setq auto-save nil)
 (setq default-input-method 'russian-computer)
+
+;; Backups and auto-save.
+(push (cons "." "~/.emacs.d/backups/") backup-directory-alist)
+;(push (list "." "~/.emacs.d/backups/" t) auto-save-file-name-transforms)
 
 (add-hook 'emacs-startup-hook 'column-number-mode)
 (add-hook 'before-save-hook
@@ -47,6 +47,8 @@
 
 (setq truncate-partial-width-windows nil)
 (setq split-width-threshold 100)
+
+(blink-cursor-mode -1)
 
 
 ;; Highlights current word on a page. Similar to "C-s C-w".
@@ -69,6 +71,11 @@
   "Jump to the tag at point without prompting."
   (interactive)
   (find-tag (find-tag-default)))
+
+(defun find-tag-no-prompt-next ()
+  "Jump to the next tag in the current search."
+  (interactive)
+  (find-tag nil t))
 
 (global-set-key [double-mouse-1] 'find-tag-no-prompt)
 (global-set-key [mouse-2] 'pop-tag-mark)
@@ -97,7 +104,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . js3-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
 
@@ -108,6 +115,11 @@
 
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
+
+(custom-set-variables
+ '(sort-fold-case t t)
+)
+
 
 ;; [grep-mode]
 ;; [compilation-mode]
@@ -135,7 +147,7 @@
    (define-key map (kbd "l") 'recenter-top-bottom))
  (list grep-mode-map
        compilation-mode-map))
-(define-key grep-mode-map (kbd "<return>") 'compile-goto-error-no-switch)
+(define-key grep-mode-map (kbd "<return>") 'compile-goto-error)
 (define-key compilation-mode-map (kbd "<return>") 'compile-goto-error)
 
 ;; [vc-git-grep]
@@ -279,6 +291,7 @@
 
 (define-key k-minor-mode-map (kbd "M-,") 'find-tag)
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
+(define-key k-minor-mode-map (kbd "C-M-.") 'find-tag-no-prompt-next)
 (define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
 
 (define-key k-minor-mode-map (kbd "S-<down>") 'shrink-window)
@@ -410,10 +423,10 @@
 (mapc
  (lambda (hook)
    (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
- '(Info-mode-hook
-   Man-mode
-   ack-mode-hook
+ '(ack-mode-hook
+   blackbox-mode-hook
    compilation-mode-hook
+   cscope-list-entry-mode
    custom-mode-hook
    dired-mode-hook
    doc-view-mode-hook
@@ -422,7 +435,9 @@
    help-mode-hook
    ibuffer-mode-hook
    ielm-mode-hook
+   Info-mode-hook
    isearch-mode-hook
+   Man-mode
    minibuffer-setup-hook
    package-menu-mode-hook
    vc-git-log-view-mode
