@@ -316,7 +316,9 @@
 
 (define-key k-minor-mode-map (kbd "M-p")
   (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode inferior-sml-mode))
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode
+                              inferior-sml-mode
+                              shell-mode))
            (comint-previous-input 1))
           ((eq major-mode 'eshell-mode)
            (eshell-previous-input 1))
@@ -326,7 +328,9 @@
 
 (define-key k-minor-mode-map (kbd "M-n")
   (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode inferior-sml-mode))
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode
+                              inferior-sml-mode
+                              shell-mode))
            (comint-next-input 1))
           ((eq major-mode 'eshell-mode)
            (eshell-next-input 1))
@@ -458,6 +462,7 @@
    minibuffer-setup-hook
    package-menu-mode-hook
    sbt-mode-hook
+   shell-mode-hook
    vc-git-log-view-mode
    w3m-mode-hook))
 
