@@ -33,6 +33,7 @@
                          (setq comment-start "// ")
                          (setq comment-end "")))
 
+(c-set-offset 'topmost-intro-cont 0)
 (setq default-input-method 'russian-computer)
 
 ;; Backups and auto-save.
@@ -307,16 +308,31 @@
 ;; Preserve input history navigation key bindings.
 (defun prefer-history-navigation (navfn comintfn eshellfn)
   (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode)) (funcall comintfn 1))
-          ((memq major-mode '(eshell-mode)) (funcall eshellfn 1))
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode
+                              eshell-mode
+                              inferior-sml-mode))
+           (funcall comintfn 1))
           (t (funcall navfn)))))
 
 (define-key k-minor-mode-map (kbd "M-p")
-  (prefer-history-navigation 'scroll-down 'comint-previous-input
-                             'eshell-previous-input))
+  (lambda () (interactive)
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode inferior-sml-mode))
+           (comint-previous-input 1))
+          ((eq major-mode 'eshell-mode)
+           (eshell-previous-input 1))
+          ((eq major-mode 'doc-view-mode)
+           (doc-view-previous-page))
+          (t (scroll-down)))))
+
 (define-key k-minor-mode-map (kbd "M-n")
-  (prefer-history-navigation 'scroll-up 'comint-next-input
-                             'eshell-next-input))
+  (lambda () (interactive)
+    (cond ((memq major-mode '(inferior-emacs-lisp-mode inferior-sml-mode))
+           (comint-next-input 1))
+          ((eq major-mode 'eshell-mode)
+           (eshell-next-input 1))
+          ((eq major-mode 'doc-view-mode)
+           (doc-view-next-page))
+          (t (scroll-up)))))
 
 (setq eshell-prompt-function
       (lambda nil
@@ -435,11 +451,13 @@
    help-mode-hook
    ibuffer-mode-hook
    ielm-mode-hook
+   inferior-sml-mode-hook
    Info-mode-hook
    isearch-mode-hook
    Man-mode
    minibuffer-setup-hook
    package-menu-mode-hook
+   sbt-mode-hook
    vc-git-log-view-mode
    w3m-mode-hook))
 
