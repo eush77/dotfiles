@@ -57,7 +57,7 @@
 				true
 	ds = diff --staged
 	fixup = ! GIT_EDITOR=true git rebase --autosquash -i
-	fshow = ! cd $GIT_PREFIX &&\
+	fshow = ! cd ${GIT_PREFIX:-.} &&\
 			  git show $1 >/tmp/$(basename $1) &&\
 			  less /tmp/$(basename $1) &&\
 			  rm /tmp/$(basename $1) &&\
