@@ -121,6 +121,42 @@
  '(sort-fold-case t t)
 )
 
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+
+(defadvice load-theme (after run-after-load-theme-hook activate)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+
+;; Semantic highlighting - highlight identifiers, not syntax keywords.
+(add-hook 'after-init-hook 'global-color-identifiers-mode)
+(add-hook
+ 'after-load-theme-hook
+ (lambda ()
+   (dolist (face '(font-lock-comment-face
+                   font-lock-comment-delimiter-face
+                   font-lock-constant-face
+                   font-lock-type-face
+                   font-lock-function-name-face
+                   font-lock-variable-name-face
+                   font-lock-keyword-face
+                   font-lock-string-face
+                   font-lock-builtin-face
+                   font-lock-preprocessor-face
+                   font-lock-warning-face
+                   font-lock-doc-face))
+     (set-face-attribute face nil
+                         :foreground nil
+                         :weight 'normal
+                         :slant 'normal))
+
+   (set-face-attribute 'font-lock-comment-delimiter-face nil :slant 'italic)
+   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+   (set-face-attribute 'font-lock-doc-face nil :slant 'italic)
+   (set-face-attribute 'font-lock-keyword-face nil :weight 'bold)
+   (set-face-attribute 'font-lock-builtin-face nil :weight 'bold)
+   (set-face-attribute 'font-lock-preprocessor-face nil :weight 'bold)))
+
 
 ;; [grep-mode]
 ;; [compilation-mode]
