@@ -53,7 +53,8 @@
 	co = checkout
 	d = diff
 	descend = ! git log --ancestry-path --reverse --format=%h $2 |\
-				sed -n $1p &&\
+					sed -n $1p |\
+					( test -t 1 && xargs git show || cat ) &&\
 				true
 	ds = diff --staged
 	fixup = ! GIT_EDITOR=true git rebase --autosquash -i
