@@ -130,32 +130,34 @@
 
 ;; Semantic highlighting - highlight identifiers, not syntax keywords.
 (add-hook 'after-init-hook 'global-color-identifiers-mode)
-(add-hook
- 'after-load-theme-hook
- (lambda ()
-   (dolist (face '(font-lock-comment-face
-                   font-lock-comment-delimiter-face
-                   font-lock-constant-face
-                   font-lock-type-face
-                   font-lock-function-name-face
-                   font-lock-variable-name-face
-                   font-lock-keyword-face
-                   font-lock-string-face
-                   font-lock-builtin-face
-                   font-lock-preprocessor-face
-                   font-lock-warning-face
-                   font-lock-doc-face))
-     (set-face-attribute face nil
-                         :foreground nil
-                         :weight 'normal
-                         :slant 'normal))
 
-   (set-face-attribute 'font-lock-comment-delimiter-face nil :slant 'italic)
-   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
-   (set-face-attribute 'font-lock-doc-face nil :slant 'italic)
-   (set-face-attribute 'font-lock-keyword-face nil :weight 'bold)
-   (set-face-attribute 'font-lock-builtin-face nil :weight 'bold)
-   (set-face-attribute 'font-lock-preprocessor-face nil :weight 'bold)))
+;; Disable colorful syntax highlighting in color-identifiers-enabled buffers.
+(let ((face-remapping-specs
+       (lambda ()
+         (let ((foreground (face-foreground 'default)))
+           (mapcar
+            (lambda (spec)
+              (cons (car spec) (plist-put (cdr spec) :foreground foreground)))
+            '((font-lock-builtin-face :slant normal :weight bold)
+              (font-lock-comment-delimiter-face :slant italic :weight normal)
+              (font-lock-comment-face :slant italic :weight normal)
+              (font-lock-constant-face :slant normal :weight normal)
+              (font-lock-doc-face :slant italic :weight normal)
+              (font-lock-function-name-face :slant normal :weight normal)
+              (font-lock-keyword-face :slant normal :weight bold)
+              (font-lock-preprocessor-face :slant normal :weight bold)
+              (font-lock-string-face :slant normal :weight normal)
+              (font-lock-type-face :slant normal :weight normal)
+              (font-lock-variable-name-face :slant normal :weight normal)
+              (font-lock-warning-face :slant normal :weight normal)))))))
+  (dolist (hook '(after-load-theme-hook after-change-major-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (dolist (buffer (buffer-list))
+                  (with-current-buffer buffer
+                    (when (assoc major-mode color-identifiers:modes-alist)
+                      (mapc (apply-partially 'apply 'face-remap-add-relative)
+                            (funcall face-remapping-specs)))))))))
 
 
 ;; [grep-mode]
