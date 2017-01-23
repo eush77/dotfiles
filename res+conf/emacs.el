@@ -149,15 +149,34 @@
               (font-lock-string-face :slant normal :weight normal)
               (font-lock-type-face :slant normal :weight normal)
               (font-lock-variable-name-face :slant normal :weight normal)
-              (font-lock-warning-face :slant normal :weight normal)))))))
+              (font-lock-warning-face :slant normal :weight normal))))))
+      (per-buffer-face-remapping-cookies #s(hash-table test eq)))
   (dolist (hook '(after-load-theme-hook after-change-major-mode-hook))
     (add-hook hook
               (lambda ()
                 (dolist (buffer (buffer-list))
                   (with-current-buffer buffer
                     (when (assoc major-mode color-identifiers:modes-alist)
-                      (mapc (apply-partially 'apply 'face-remap-add-relative)
-                            (funcall face-remapping-specs)))))))))
+                      (let ((entry
+                             (gethash buffer
+                                      per-buffer-face-remapping-cookies)))
+                        (when (or (not entry) (not (eq major-mode (car entry))))
+                          (when (and entry (not (eq major-mode (car entry))))
+                            (mapc 'face-remap-remove-relative (cdr entry)))
+                          (let ((cookies
+                                 (mapcar (apply-partially
+                                          'apply
+                                          'face-remap-add-relative)
+                                         (funcall face-remapping-specs))))
+                            (puthash buffer (cons major-mode cookies)
+                                     per-buffer-face-remapping-cookies))))))))))
+  (add-hook 'after-load-theme-hook
+            (lambda ()
+              (maphash (lambda (buffer entry)
+                         (with-current-buffer buffer
+                           (mapc 'face-remap-remove-relative (cdr entry))))
+                       per-buffer-face-remapping-cookies)
+              (clrhash per-buffer-face-remapping-cookies))))
 
 
 ;; [grep-mode]
