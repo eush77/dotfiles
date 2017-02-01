@@ -52,7 +52,7 @@
 	brieflog = ! GIT_PAGER=cat git log --oneline
 	co = checkout
 	d = diff
-	descend = ! git log --ancestry-path --reverse --format=%h $2 |\
+	descend = ! git log --ancestry-path --reverse --format=%h $(git merge-base @ $2)..$2 |\
 					sed -n $1p |\
 					( test -t 1 && xargs git show || cat ) &&\
 				true
