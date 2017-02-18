@@ -40,8 +40,13 @@
 #
 [alias]
 	alias = ! git config --get-regexp '^alias\\.' |\
-			  sed -e 's:^alias\\.::' -e '/^alias/d' -e 's:\\ :\\t:' |\
-			  column -ts '\t'
+		  	  sed -r 's:^alias\\.(\\S+)\\b:\\1\\n:' |\
+			  tr -s ' ' |\
+			  fmt |\
+			  awk -v width=$(git config --name-only --get-regexp '^alias\\.' |\
+			  	  	 	     sed -r 's:^.{4}::' |\
+							 wc -L) \
+				  '/^[^[:space:]]/ { prefix = $0 \" =\" } /^[[:space:]]/ { printf sprintf(\"%%%ds%%s\\n\", width), prefix, $0 } /^[[:space:]]/ { prefix = \"\" }'
 	apply-patch = !\
 		git apply --check \"$2\" &&\
 		git apply \"$2\" &&\
