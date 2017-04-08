@@ -336,6 +336,9 @@
     (indent-according-to-mode)))
 (defvar newline-and-indent t)
 
+(define-key gfm-mode-map (kbd "C-c C-s") 'sdcv-search-pointer+)
+(define-key gfm-mode-map (kbd "C-c C-d") 'sdcv-search-input)
+(setq sdcv-word-pronounce-command "true")
 
 ;; Define a minor mode with global always-on-top key bindings.
 ;; https://stackoverflow.com/questions/683425/globally-override-key-binding-in-emacs
