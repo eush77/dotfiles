@@ -297,6 +297,7 @@
 (ido-mode t)
 (require 'ido-hacks)
 (ido-hacks-mode t)
+(require 'helm-config)
 
 (require 'goto-last-change)
 
@@ -564,7 +565,7 @@
 (key-chord-define-global "xb" 'ido-switch-buffer)
 (key-chord-define-global "xk" 'ido-kill-buffer)
 (key-chord-define-global "xs" 'save-buffer)
-(key-chord-define-global "xf" 'ido-find-file)
+(key-chord-define-global "xf" 'helm-find-files)
 (key-chord-define-global "xv" 'ido-find-alternate-file)
 
 ;; http://stackoverflow.com/a/12934513/2424184
