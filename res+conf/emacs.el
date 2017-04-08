@@ -433,6 +433,24 @@
 (define-key k-minor-mode-map (kbd "C-o") 'open-previous-line)
 (define-key k-minor-mode-map (kbd "M-o") 'open-next-line)
 
+(defun duplicate-line-down ()
+  "Duplicate line and move cursor to the second copy."
+  (interactive)
+  (next-line 1)
+  (beginning-of-line)
+  (copy-from-above-command)
+  (newline)
+  (previous-line))
+
+(defun duplicate-line-up ()
+  "Duplicate line and move cursor to the first copy."
+  (interactive)
+  (duplicate-line-down)
+  (previous-line 1))
+
+(define-key k-minor-mode-map (kbd "C-c M-p") 'duplicate-line-up)
+(define-key k-minor-mode-map (kbd "C-c M-n") 'duplicate-line-down)
+
 (defun with-hs (command &rest arguments)
   "Load hs-minor-mode if it isn't loaded yet."
   (lambda ()
