@@ -345,8 +345,8 @@
     (indent-according-to-mode)))
 (defvar newline-and-indent t)
 
-(define-key gfm-mode-map (kbd "C-c C-s") 'sdcv-search-pointer+)
-(define-key gfm-mode-map (kbd "C-c C-d") 'sdcv-search-input)
+(global-set-key (kbd "C-c M-s") 'sdcv-search-pointer+)
+(global-set-key (kbd "C-c M-d") 'sdcv-search-input)
 (setq sdcv-word-pronounce-command "true")
 
 ;; Define a minor mode with global always-on-top key bindings.
