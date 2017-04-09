@@ -228,6 +228,14 @@
                (substring tmpl 3 -4))))
            ad-return-value))))
 
+;; [helm]
+;; Use case insensitive search.
+(require 'helm-grep)
+(setq-default helm-grep-git-grep-command
+              (replace-regexp-in-string "\\bgrep\\b"
+                                        "grep --ignore-case"
+                                        helm-grep-git-grep-command))
+
 ;; [doc-view-mode]
 (require 'doc-view)
 (setq doc-view-continuous t)
