@@ -114,6 +114,13 @@
 (require 'markdown-mode)
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
+(add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
+
+;; [pdf-view-mode]
+(add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
+(define-key pdf-view-mode-map (kbd "j") 'pdf-view-next-line-or-next-page)
+(define-key pdf-view-mode-map (kbd "k") 'pdf-view-previous-line-or-previous-page)
+
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
