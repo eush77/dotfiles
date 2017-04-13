@@ -243,6 +243,13 @@
                                         "grep --ignore-case"
                                         helm-grep-git-grep-command))
 
+;; [helm]
+(require 'helm-files)
+(define-key helm-find-files-map (kbd "C-s") 'helm-ff-run-git-grep)
+(define-key helm-find-files-map (kbd "C-/") 'helm-ff-run-find-sh-command)
+
+(define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
+
 ;; [doc-view-mode]
 (require 'doc-view)
 (setq doc-view-continuous t)
