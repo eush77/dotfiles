@@ -127,6 +127,12 @@
 (define-key image-mode-map (kbd "k") 'image-previous-line)
 
 
+;; [flycheck]
+(eval-after-load 'flycheck
+  '(define-key flycheck-mode-map (kbd "C-c ! l") 'helm-flycheck))
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
@@ -558,6 +564,7 @@
    dired-mode-hook
    doc-view-mode-hook
    eshell-mode-hook
+   flycheck-error-list-mode-hook
    grep-mode-hook
    help-mode-hook
    ibuffer-mode-hook
