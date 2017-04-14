@@ -121,6 +121,12 @@
 (define-key pdf-view-mode-map (kbd "j") 'pdf-view-next-line-or-next-page)
 (define-key pdf-view-mode-map (kbd "k") 'pdf-view-previous-line-or-previous-page)
 
+
+;; [image-mode]
+(define-key image-mode-map (kbd "j") 'image-next-line)
+(define-key image-mode-map (kbd "k") 'image-previous-line)
+
+
 (add-hook 'sgml-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook 'emmet-mode)
 
