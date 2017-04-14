@@ -565,6 +565,11 @@
    inferior-sml-mode-hook
    Info-mode-hook
    isearch-mode-hook
+   magit-blame-mode-hook
+   magit-diff-mode-hook
+   magit-log-mode-hook
+   magit-revision-mode-hook
+   magit-status-mode-hook
    Man-mode
    minibuffer-setup-hook
    package-menu-mode-hook
