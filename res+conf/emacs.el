@@ -98,10 +98,11 @@
  (kbd "<f7>")
  (lambda () (interactive)
    "Recompile and switch to compilation buffer."
-   (save-buffer)
+   (unless (compilation-buffer-p (current-buffer))
+     (save-buffer))
    (recompile)
-   (if (not (compilation-buffer-p (current-buffer)))
-       (switch-to-buffer-other-frame compilation-last-buffer))))
+   (unless (compilation-buffer-p (current-buffer))
+     (switch-to-buffer-other-frame compilation-last-buffer))))
 
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
