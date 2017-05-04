@@ -412,27 +412,19 @@
 
 (define-key k-minor-mode-map (kbd "M-p")
   (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode
-                              inferior-sml-mode
-                              shell-mode))
-           (comint-previous-input 1))
-          ((eq major-mode 'eshell-mode)
-           (eshell-previous-input 1))
-          ((eq major-mode 'doc-view-mode)
-           (doc-view-previous-page))
-          (t (scroll-down)))))
+    (let ((local (local-key-binding (kbd "M-p"))))
+      (cond ((equal local 'comint-previous-input) (comint-previous-input 1))
+            ((equal local 'eshell-previous-input) (eshell-previous-input 1))
+            ((eq major-mode 'doc-view-mode) (doc-view-previous-page))
+            (t (scroll-down))))))
 
 (define-key k-minor-mode-map (kbd "M-n")
   (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode
-                              inferior-sml-mode
-                              shell-mode))
-           (comint-next-input 1))
-          ((eq major-mode 'eshell-mode)
-           (eshell-next-input 1))
-          ((eq major-mode 'doc-view-mode)
-           (doc-view-next-page))
-          (t (scroll-up)))))
+    (let ((local (local-key-binding (kbd "M-n"))))
+      (cond ((equal local 'comint-next-input) (comint-next-input 1))
+            ((equal local 'eshell-next-input) (eshell-next-input 1))
+            ((eq major-mode 'doc-view-mode) (doc-view-next-page))
+            (t (scroll-up))))))
 
 (setq eshell-prompt-function
       (lambda nil
