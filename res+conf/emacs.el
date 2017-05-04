@@ -573,6 +573,7 @@
    Man-mode-hook
    minibuffer-setup-hook
    package-menu-mode-hook
+   racket-repl-mode-hook
    sbt-mode-hook
    shell-mode-hook
    vc-git-log-view-mode-hook
