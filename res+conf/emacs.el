@@ -560,8 +560,8 @@
  '(ack-mode-hook
    blackbox-mode-hook
    compilation-mode-hook
-   cscope-list-entry-mode
-   custom-mode-hook
+   cscope-list-entry-mode-hook
+   Custom-mode-hook
    dired-mode-hook
    doc-view-mode-hook
    eshell-mode-hook
@@ -578,12 +578,12 @@
    magit-log-mode-hook
    magit-revision-mode-hook
    magit-status-mode-hook
-   Man-mode
+   Man-mode-hook
    minibuffer-setup-hook
    package-menu-mode-hook
    sbt-mode-hook
    shell-mode-hook
-   vc-git-log-view-mode
+   vc-git-log-view-mode-hook
    w3m-mode-hook))
 
 (setq-default k-minor-dangerous-mode-stack nil)
