@@ -507,10 +507,6 @@
 (define-key k-minor-mode-map (kbd "<prior>") (recentered 'scroll-down))
 (define-key k-minor-mode-map (kbd "<next>") (recentered 'scroll-up))
 
-(define-key k-minor-mode-map (kbd "M-v")
-  (lambda () (interactive)
-    (insert (shell-command-to-string "xsel -b"))))
-
 (define-key k-minor-mode-map (kbd "M-\\")
   (lambda () (interactive)
     (let ((current-prefix-arg '(4)))
@@ -524,6 +520,10 @@
 
 (define-key k-minor-dangerous-mode-map (kbd "M-p") 'scroll-down)
 (define-key k-minor-dangerous-mode-map (kbd "M-n") 'scroll-up)
+
+(define-key k-minor-dangerous-mode-map (kbd "M-v")
+  (lambda () (interactive)
+    (insert (shell-command-to-string "xsel -b"))))
 
 
 ;; C-m and C-[ are synonymous to ENTER and ESC.
