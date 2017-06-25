@@ -18,6 +18,7 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq initial-scratch-message nil)
+(setq-default fill-column 78)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 5)
 (setq-default c-basic-offset 2)
@@ -35,6 +36,7 @@
 
 (c-set-offset 'topmost-intro-cont 0)
 (setq default-input-method 'russian-computer)
+(setq read-quoted-char-radix 16)
 
 ;; Backups and auto-save.
 (push (cons "." "~/.emacs.d/backups/") backup-directory-alist)
@@ -266,12 +268,18 @@
 ;; [doc-view-mode]
 (require 'doc-view)
 (setq doc-view-continuous t)
-(define-key doc-view-mode-map (kbd "<up>") 'doc-view-previous-line-or-previous-page)
-(define-key doc-view-mode-map (kbd "<down>") 'doc-view-next-line-or-next-page)
+(define-key doc-view-mode-map (kbd "k") 'doc-view-previous-line-or-previous-page)
+(define-key doc-view-mode-map (kbd "j") 'doc-view-next-line-or-next-page)
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
 (let ((default-directory "~/.emacs.d/elpa"))
   (normal-top-level-add-subdirs-to-load-path))
+
+;;
+;; Info mode
+;;
+(define-key Info-mode-map "j" #'scroll-up-line)
+(define-key Info-mode-map "k" #'scroll-down-line)
 
 (pending-delete-mode)
 (show-paren-mode)
@@ -372,6 +380,18 @@
     (indent-according-to-mode)))
 (defvar newline-and-indent t)
 
+;;
+;; GFM mode
+;;
+(add-hook 'gfm-mode-hook
+          (lambda ()
+            (face-remap-add-relative 'default :family "Droid Serif")
+            (text-scale-adjust 1)
+            (auto-fill-mode)))
+
+;;
+;; sdcv
+;;
 (global-set-key (kbd "C-c M-s") 'sdcv-search-pointer+)
 (global-set-key (kbd "C-c M-d") 'sdcv-search-input)
 (setq sdcv-word-pronounce-command "true")
