@@ -2,7 +2,33 @@
 
 ;; Fish-shell is not POSIX-compliant. Thus Emacs should stick to Bash.
 ;; https://github.com/lee-dohm/emacs/blob/fee920d6ce0c119cb58a419740bc3baf6170/init.d/shell.el
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
+(setq custom-file "~/.emacs-custom")
+(load custom-file)
+
+(defmacro custom-set (var value)
+  "Set VAR to VALUE using `custom-set-variables`.
+
+  See [1] and [2].
+
+[1]: https://emacs.stackexchange.com/questions/102/advantages-of-setting-variables-with-setq-instead-of-custom-el
+[2]: https://stackoverflow.com/questions/2079095/how-to-modularize-an-emacs-configuration
+"
+  (custom-set-variables
+   `(,var ,value nil nil
+          ,(format "!!! CAREFUL: CUSTOM-SET IN %s !!!" load-file-name))))
+
+;; Fix sentence-navigation commands (backward-sentence, forward-sentence).
+(custom-set sentence-end-double-space nil)
+
 (setq-default explicit-shell-file-name "/bin/bash")
+;; Upd: use fish for access to $PATH and custom functions.
 (setq-default shell-file-name "/usr/bin/fish")
 
 ;; FIX SHIFT-UP
@@ -20,28 +46,31 @@
 (setq initial-scratch-message nil)
 (setq-default fill-column 78)
 (setq-default indent-tabs-mode nil)
+(setq-default read-quoted-char-radix 16)
 (setq-default tab-width 5)
-(setq-default c-basic-offset 2)
+(setq-default c-basic-offset 4)
 (setq-default c-default-style "linux")
-(setq-default comment-multi-line t)
-(setq-default comment-style 'extra-line)
+(setq comment-style 'extra-line)
 (c-set-offset 'case-label '+)
 (c-set-offset 'access-label -1)
 (c-set-offset 'innamespace 0)
 (c-set-offset 'inline-open 0)
 ;; Use C99 one-line comments by default.
-(add-hook 'c-mode-hook (lambda ()
-                         (setq comment-start "// ")
-                         (setq comment-end "")))
+;; (add-hook 'c-mode-hook (lambda ()
+;;                          (setq comment-start "// ")
+;;                          (setq comment-end "")))
 
-(c-set-offset 'topmost-intro-cont 0)
-(setq default-input-method 'russian-computer)
-(setq read-quoted-char-radix 16)
+(add-hook 'c++-mode-hook (lambda () (setq c-basic-offset 2)))
 
 ;; Backups and auto-save.
 (push (cons "." "~/.emacs.d/backups/") backup-directory-alist)
 ;(push (list "." "~/.emacs.d/backups/" t) auto-save-file-name-transforms)
 
+;; Manual indentation
+;; (defun dotab nil (interactive) (insert "    "))
+;; (global-set-key (kbd "C-q") 'dotab)
+;; (defun untab nil (interactive) (delete-backward-char 4))
+;; (global-set-key (kbd "M-q") 'untab)
 (add-hook 'emacs-startup-hook 'column-number-mode)
 (add-hook 'before-save-hook
           (lambda ()
@@ -49,9 +78,13 @@
                 (delete-trailing-whitespace))))
 
 (setq truncate-partial-width-windows nil)
-(setq split-width-threshold 100)
+(setq split-width-threshold 80)
 
 (blink-cursor-mode -1)
+;; (add-hook 'post-command-hook
+;;           (lambda ()
+;;             (setq cursor-type 'hbar)
+;;             (set-cursor-color "yellow")))
 
 
 ;; Highlights current word on a page. Similar to "C-s C-w".
@@ -63,6 +96,41 @@
 (defun unhighlight ()
   (interactive)
   (hi-lock-mode 0))
+
+
+;; [macros]
+(fset 'i (lambda (&optional arg) "Keyboard macro." (interactive "p")
+           (kmacro-exec-ring-item
+            (quote ("LLVMIntType()" 0 "%d")) arg)))
+(fset 'pi (lambda (&optional arg) "Keyboard macro." (interactive "p")
+            (kmacro-exec-ring-item
+             (quote ("LLVMPointerType(LLVMIntType(), 0)"
+                     0 "%d")) arg)))
+(fset 'ci (lambda (&optional arg) "Keyboard macro." (interactive "p")
+            (kmacro-exec-ring-item
+             (quote ("LLVMConstInt(LLVMIntType(), "
+                     0 "%d")) arg)))
+(fset 'cn (lambda (&optional arg) "Keyboard macro." (interactive "p")
+            (kmacro-exec-ring-item
+             (quote ("LLVMConstNull(LLVMIntType())"
+                     0 "%d")) arg)))
+(fset 'c (lambda (&optional arg) "Keyboard macro." (interactive "p")
+           (kmacro-exec-ring-item (quote ("/*  */" 0 "%d")) arg)))
+(fset 'type (lambda (&optional arg) "Keyboard macro." (interactive "p")
+              (kmacro-exec-ring-item (quote ("LLVMTypeRef" 0 "%d")) arg)))
+(fset 'value (lambda (&optional arg) "Keyboard macro." (interactive "p")
+               (kmacro-exec-ring-item (quote ("LLVMValueRef" 0 "%d")) arg)))
+(fset 'b (lambda (&optional arg) "Keyboard macro." (interactive "p")
+           (kmacro-exec-ring-item (quote ("LLVMBuild(builder, " 0 "%d")) arg)))
+(fset 'l (lambda (&optional arg) "Keyboard macro." (interactive "p")
+           (kmacro-exec-ring-item (quote ("LLVM" 0 "%d")) arg)))
+(fset 'bb (lambda (&optional arg) "Keyboard macro." (interactive "p")
+            (kmacro-exec-ring-item (quote ([134217848 99 return 134217834 98 108 111 99 107 134217834 167772192 backspace 134217839 134217848 108 return 80 111 115 134217775 40 134217775 44 32 98 108 111 99 107 95 98 98 41 59 134217826 134217826 67108896 134217830 M-up] 0 "%d")) arg)))
+(fset 'bi (lambda (&optional arg) "Keyboard macro." (interactive "p")
+            (kmacro-exec-ring-item (quote ([16 134217837 67108896 14 5 134217847 134217839 25 2 2 2 67108896 18 34 6 M-up] 0 "%d")) arg)))
+(fset 'btt (lambda (&optional arg) "Keyboard macro." (interactive "p")
+             (kmacro-exec-ring-item (quote ([?\C-e ?\C-\M-b ?\C-f ?, ?\C-b ?\C-  ?\C-e ?\M-% ?, return ?, ?  ?  ?\; ?\C-q ?\C-j ?  ?  ?d ?y ?n ?a ?m ?i ?c return ?! ?\C-e ?\C-b ?  ?  ?\; ?\C-j ?\C-e ?\C-\M-b ?\C-f ?\C-k ?\C-n ?\C-e] 0 "%d")) arg)))
+
 
 
 ;; [etags]
@@ -80,8 +148,14 @@
   (interactive)
   (find-tag nil t))
 
+;(global-set-key [mouse-1]
 (global-set-key [double-mouse-1] 'find-tag-no-prompt)
 (global-set-key [mouse-2] 'pop-tag-mark)
+(global-set-key [drag-mouse-1] (lambda (click) (interactive "e")
+                                 (mouse-set-secondary click)
+                                 (message "up-mouse-1")))
+(global-set-key [drag-mouse-1] 'mouse-set-secondary)
+
 
 ;; Meant to be overriden. Makes sense only for Emacs configs.
 (global-set-key (kbd "C-x f")
@@ -89,9 +163,6 @@
                   (call-interactively 'eval-region)
                   (message "eval-region...ok")
                   (pop-mark)))
-
-;; Bound to backward-kill-word by default.
-(global-unset-key (kbd "C-<backspace>"))
 
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
@@ -111,37 +182,43 @@
 (add-to-list 'auto-mode-alist '("\\.json$" . js3-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("/break\\b[^.]*$" . gdb-script-mode))
-
-;; markdown-mode populates auto-mode-alist entries when loaded.
-;; In order to override those entries we need to load it right away.
-(require 'markdown-mode)
-(add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
-
 (add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
 
+
 ;; [pdf-view-mode]
+(require 'pdf-tools)
 (add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
 (define-key pdf-view-mode-map (kbd "j") 'pdf-view-next-line-or-next-page)
 (define-key pdf-view-mode-map (kbd "k") 'pdf-view-previous-line-or-previous-page)
+(define-key pdf-view-mode-map (kbd "h") 'image-backward-hscroll)
+(define-key pdf-view-mode-map (kbd "l") 'image-forward-hscroll)
 
 
 ;; [image-mode]
 (define-key image-mode-map (kbd "j") 'image-next-line)
 (define-key image-mode-map (kbd "k") 'image-previous-line)
+(define-key image-mode-map (kbd "h") 'image-backward-hscroll)
+(define-key image-mode-map (kbd "l") 'image-forward-hscroll)
 
+
+;; [Info-mode]
+(define-key Info-mode-map (kbd "j") 'scroll-up-line)
+(define-key Info-mode-map (kbd "k") 'scroll-down-line)
+
+
+;; [magit]
+(custom-set magit-repository-directories
+            '(("/home/eush/dev/postgres_project/llvm_jit" . 0)
+              ("/home/eush/dev/postgres_project/llvmmix" . 0)
+              ("/home/eush/dev/postgres_project/postgres" . 0)))
+
+;; [gnus]
 
 ;; [flycheck]
 (eval-after-load 'flycheck
-  '(define-key flycheck-mode-map (kbd "C-c ! l") 'helm-flycheck))
+  '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck))
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
-
-(add-hook 'sgml-mode-hook 'emmet-mode)
-(add-hook 'css-mode-hook 'emmet-mode)
-
-(custom-set-variables
- '(sort-fold-case t t)
-)
 
 (defvar after-load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -149,6 +226,8 @@
 (defadvice load-theme (after run-after-load-theme-hook activate)
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
+
+(require 'color-identifiers-mode)
 
 ;; Semantic highlighting - highlight identifiers, not syntax keywords.
 (add-hook 'after-init-hook 'global-color-identifiers-mode)
@@ -195,8 +274,9 @@
   (add-hook 'after-load-theme-hook
             (lambda ()
               (maphash (lambda (buffer entry)
-                         (with-current-buffer buffer
-                           (mapc 'face-remap-remove-relative (cdr entry))))
+                         (when (buffer-live-p buffer)
+                           (with-current-buffer buffer
+                             (mapc 'face-remap-remove-relative (cdr entry)))))
                        per-buffer-face-remapping-cookies)
               (clrhash per-buffer-face-remapping-cookies))))
 
@@ -206,10 +286,10 @@
 (require 'grep)
 ;; Put "cchh" grep files alias before anything else. This will make
 ;; interactive grep choose it by default for C/C++ files, which is
-;; what I usually want.
-(let ((cchh (assoc "cchh" grep-files-aliases)))
-  (setq grep-files-aliases
-        (cons cchh (remove cchh grep-files-aliases))))
+;; what I ~~usually want~~ used to want.
+;(let ((cchh (assoc "cchh" grep-files-aliases)))
+;;  (setq grep-files-aliases
+;;        (cons cchh (remove cchh grep-files-aliases))))
 
 (defun compile-goto-error-no-switch ()
   "Select grep result but don't switch window."
@@ -259,90 +339,39 @@
                                         helm-grep-git-grep-command))
 
 ;; [helm]
+;; Use git-grep search over anything else.
 (require 'helm-files)
 (define-key helm-find-files-map (kbd "C-s") 'helm-ff-run-git-grep)
 (define-key helm-find-files-map (kbd "C-/") 'helm-ff-run-find-sh-command)
 
 (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
 
-;; [doc-view-mode]
-(require 'doc-view)
-(setq doc-view-continuous t)
-(define-key doc-view-mode-map (kbd "k") 'doc-view-previous-line-or-previous-page)
-(define-key doc-view-mode-map (kbd "j") 'doc-view-next-line-or-next-page)
+;; [whitespace-mode]
+;; (require 'whitespace)
+;; (setq whitespace-line-column 78)
+;; (setq whitespace-style '(face lines-tail))
+;; (add-hook 'c-mode-hook (apply-partially 'whitespace-mode t))
+
 
 (set 'load-path (cons "~/.emacs.d/modules" load-path))
 (let ((default-directory "~/.emacs.d/elpa"))
   (normal-top-level-add-subdirs-to-load-path))
 
-;;
-;; Info mode
-;;
-(define-key Info-mode-map "j" #'scroll-up-line)
-(define-key Info-mode-map "k" #'scroll-down-line)
-
 (pending-delete-mode)
 (show-paren-mode)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ido-default-buffer-method (quote selected-window))
- '(ido-default-file-method (quote selected-window))
- '(inhibit-startup-screen t)
- '(js-indent-level 2)
- '(js2-basic-offset 2)
- '(js2-highlight-level 3)
- '(js2-include-node-externs t)
- '(js2-indent-switch-body t)
- '(js2-missing-semi-one-line-override t)
- '(js2-skip-preprocessor-directives t)
- '(js2-strict-cond-assign-warning nil)
- '(js2-strict-inconsistent-return-warning nil)
- '(js2-strict-trailing-comma-warning nil)
- '(js3-auto-indent-p t)
- '(js3-auto-insert-catch-block nil)
- '(js3-boring-indentation nil)
- '(js3-consistent-level-indent-inner-bracket t)
- '(js3-enter-indents-newline t)
- '(js3-highlight-level 3)
- '(js3-include-gears-externs nil)
- '(js3-include-rhino-externs nil)
- '(js3-indent-dots t)
- '(js3-max-columns 100)
- '(js3-pretty-vars nil)
- '(js3-strict-cond-assign-warning nil)
- '(js3-strict-missing-semi-warning t)
- '(js3-strict-trailing-comma-warning nil)
- '(package-archives
-   (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("marmalade" . "http://marmalade-repo.org/packages/")
-     ("melpa" . "http://melpa.milkbox.net/packages/")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(js3-jsdoc-html-tag-delimiter-face ((t (:foreground "green"))))
- '(js3-jsdoc-html-tag-name-face ((t (:foreground "green"))))
- '(js3-jsdoc-tag-face ((t (:foreground "green"))))
- '(js3-jsdoc-type-face ((t (:foreground "green"))))
- '(js3-jsdoc-value-face ((t (:foreground "green")))))
-
-(require 'sws-mode)
-(require 'jade-mode)
-(require 'stylus-mode)
+;; (require 'less-mode)
+;; (require 'sws-mode)
 
 (require 'ido)
 (ido-mode t)
 (require 'ido-hacks)
 (ido-hacks-mode t)
 (require 'helm-config)
+(require 'helm-ls-git)
 
 (require 'goto-last-change)
+(require 'haste)
 
 (require 'dired)
 (define-key dired-mode-map (kbd "SPC") 'dired-up-directory)
@@ -350,6 +379,10 @@
 (require 'dired-details)
 (dired-details-install)
 (setq dired-dwim-target t)
+
+;; [latex-mode]
+(eval-after-load 'latex-mode
+  '(define-key latex-mode-map (kbd "C-<return>") nil))
 
 (require 'hideshow)
 (require 'control-lock)
@@ -380,18 +413,7 @@
     (indent-according-to-mode)))
 (defvar newline-and-indent t)
 
-;;
-;; GFM mode
-;;
-(add-hook 'gfm-mode-hook
-          (lambda ()
-            (face-remap-add-relative 'default :family "Droid Serif")
-            (text-scale-adjust 1)
-            (auto-fill-mode)))
-
-;;
-;; sdcv
-;;
+;; [sdcv]
 (global-set-key (kbd "C-c M-s") 'sdcv-search-pointer+)
 (global-set-key (kbd "C-c M-d") 'sdcv-search-input)
 (setq sdcv-word-pronounce-command "true")
@@ -401,7 +423,11 @@
 
 (defvar k-minor-mode-map (make-keymap))
 
-(define-key k-minor-mode-map (kbd "C-c C-c") 'comment-dwim)
+(define-key k-minor-mode-map (kbd "C-c C-c")
+  (lambda () (interactive)
+    (if (eq major-mode 'message-mode)
+        (message-send-and-exit)
+        (call-interactively #'comment-dwim))))
 
 ;; Probably S-M-SPC in window mode.
 (define-key k-minor-mode-map (kbd "M-SPC") 'cycle-spacing)
@@ -409,6 +435,7 @@
 (define-key k-minor-mode-map (kbd "M-,") 'find-tag)
 (define-key k-minor-mode-map (kbd "M-.") 'find-tag-no-prompt)
 (define-key k-minor-mode-map (kbd "C-M-.") 'find-tag-no-prompt-next)
+(define-key k-minor-mode-map (kbd "M-*") 'pop-tag-mark)
 (define-key k-minor-mode-map (kbd "M-;") 'vc-git-grep)
 
 (define-key k-minor-mode-map (kbd "S-<down>") 'shrink-window)
@@ -420,31 +447,6 @@
 (define-key k-minor-mode-map (kbd "C-M-k") 'window-jump-right)
 (define-key k-minor-mode-map (kbd "C-M-p") 'window-jump-up)
 (define-key k-minor-mode-map (kbd "C-M-n") 'window-jump-down)
-
-;; Preserve input history navigation key bindings.
-(defun prefer-history-navigation (navfn comintfn eshellfn)
-  (lambda () (interactive)
-    (cond ((memq major-mode '(inferior-emacs-lisp-mode
-                              eshell-mode
-                              inferior-sml-mode))
-           (funcall comintfn 1))
-          (t (funcall navfn)))))
-
-(define-key k-minor-mode-map (kbd "M-p")
-  (lambda () (interactive)
-    (let ((local (local-key-binding (kbd "M-p"))))
-      (cond ((equal local 'comint-previous-input) (comint-previous-input 1))
-            ((equal local 'eshell-previous-input) (eshell-previous-input 1))
-            ((eq major-mode 'doc-view-mode) (doc-view-previous-page))
-            (t (scroll-down))))))
-
-(define-key k-minor-mode-map (kbd "M-n")
-  (lambda () (interactive)
-    (let ((local (local-key-binding (kbd "M-n"))))
-      (cond ((equal local 'comint-next-input) (comint-next-input 1))
-            ((equal local 'eshell-next-input) (eshell-next-input 1))
-            ((eq major-mode 'doc-view-mode) (doc-view-next-page))
-            (t (scroll-up))))))
 
 (setq eshell-prompt-function
       (lambda nil
@@ -458,7 +460,10 @@
         (dotimes (_ (- count)) (previous-line))
       (dotimes (_ count) (next-line)))))
 
-(define-key k-minor-mode-map (kbd "C-M-c") 'control-lock-toggle)
+(defvar jump-line-count 10)
+;(define-key k-minor-mode-map (kbd "C-q") (jump-line (- jump-line-count)))
+;(define-key k-minor-mode-map (kbd "C-v") (jump-line jump-line-count))
+
 (define-key k-minor-mode-map (kbd "M-c") 'control-lock-toggle)
 
 (define-key k-minor-mode-map (kbd "M-<right>") 'mc/edit-lines)
@@ -467,15 +472,12 @@
 (define-key k-minor-mode-map (kbd "C-M-<down>") 'mc/mark-all-like-this)
 (define-key k-minor-mode-map (kbd "C-x M-SPC") 'set-rectangular-region-anchor)
 
-(define-key k-minor-mode-map (kbd "C-c C-p") 'backward-paragraph)
-(define-key k-minor-mode-map (kbd "C-c C-n") 'forward-paragraph)
+(define-key k-minor-mode-map (kbd "C-c p") 'backward-paragraph)
+(define-key k-minor-mode-map (kbd "C-c n") 'forward-paragraph)
 (define-key k-minor-mode-map (kbd "C-S-b") 'backward-sexp)
 (define-key k-minor-mode-map (kbd "C-S-f") 'forward-sexp)
 (define-key k-minor-mode-map (kbd "M-=") 'er/expand-region)
 
-;; Should be "C-S-`".
-(define-key k-minor-mode-map (kbd "C-^") 'not-modified)
-(define-key k-minor-mode-map (kbd "C-~") 'not-modified)
 (define-key k-minor-mode-map (kbd "M-_") 'goto-last-change)
 (define-key k-minor-mode-map (kbd "C-o") 'open-previous-line)
 (define-key k-minor-mode-map (kbd "M-o") 'open-next-line)
@@ -526,11 +528,7 @@
 (define-key k-minor-mode-map (kbd "<down>") (recentered 'next-line))
 (define-key k-minor-mode-map (kbd "<prior>") (recentered 'scroll-down))
 (define-key k-minor-mode-map (kbd "<next>") (recentered 'scroll-up))
-
-(define-key k-minor-mode-map (kbd "M-\\")
-  (lambda () (interactive)
-    (let ((current-prefix-arg '(4)))
-      (call-interactively 'shell-command-on-region))))
+(define-key k-minor-mode-map (kbd "C-x g") 'magit-status)
 
 (define-minor-mode k-minor-mode
   "A minor mode so that my key settings work across all different major modes."
@@ -544,7 +542,6 @@
 (define-key k-minor-dangerous-mode-map (kbd "M-v")
   (lambda () (interactive)
     (insert (shell-command-to-string "xsel -b"))))
-
 
 ;; C-m and C-[ are synonymous to ENTER and ESC.
 ;; In the terminal it isn't possible to work around it at all.
@@ -563,38 +560,38 @@
   "Extension to k-minor-mode that should not be applied to all major modes."
   t "" 'k-minor-dangerous-mode-map)
 
-;; Preserve minibuffer history ring.
-(add-hook 'minibuffer-setup-hook (apply-partially 'k-minor-mode 0))
-
 (mapc
  (lambda (hook)
    (add-hook hook (apply-partially 'k-minor-dangerous-mode 0)))
  '(ack-mode-hook
    blackbox-mode-hook
    compilation-mode-hook
-   cscope-list-entry-mode-hook
+   cscope-list-entry-hook
    Custom-mode-hook
    dired-mode-hook
    doc-view-mode-hook
    eshell-mode-hook
    flycheck-error-list-mode-hook
+   gnus-article-mode-hook
+   gnus-group-mode-hook
+   gnus-summary-mode-hook
    grep-mode-hook
    help-mode-hook
    ibuffer-mode-hook
    ielm-mode-hook
-   inferior-sml-mode-hook
    Info-mode-hook
    isearch-mode-hook
    magit-blame-mode-hook
    magit-diff-mode-hook
    magit-log-mode-hook
+   magit-popup-mode-hook
+   magit-refs-mode-hook
+   magit-repolist-mode-hook
    magit-revision-mode-hook
    magit-status-mode-hook
    Man-mode-hook
    minibuffer-setup-hook
    package-menu-mode-hook
-   racket-repl-mode-hook
-   sbt-mode-hook
    shell-mode-hook
    vc-git-log-view-mode-hook
    w3m-mode-hook))
@@ -613,32 +610,36 @@
 (k-minor-mode 1)
 (k-minor-dangerous-mode 1)
 
-(defun balanced (command)
-  "Retain window balance after operation."
-  (lambda ()
-    (interactive)
-    (funcall command)
-    (balance-windows)))
+;;
+;; Keep windows balanced.
+;;
 
 (defun safe-delete-frame () (interactive)
   (if (yes-or-no-p "Delete this frame? ")
       (delete-frame)))
 
+(defun balanced (fun)
+  "Apply FUN and balances windows afterwards."
+  (lambda () (interactive)
+    (funcall fun)
+    (balance-windows)))
+
 (require 'key-chord)
 (key-chord-mode 1)
 ;; Windows, frames, and buffers.
-(key-chord-define-global "x1" 'delete-other-windows)
-(key-chord-define-global "x2" (balanced 'split-window-below))
-(key-chord-define-global "x3" (balanced 'split-window-right))
-(key-chord-define-global "x0" (balanced 'delete-window))
-(key-chord-define-global "5o" 'other-frame)
-(key-chord-define-global "52" 'make-frame-command)
-(key-chord-define-global "50" 'safe-delete-frame)
-(key-chord-define-global "xb" 'ido-switch-buffer)
-(key-chord-define-global "xk" 'ido-kill-buffer)
-(key-chord-define-global "xs" 'save-buffer)
-(key-chord-define-global "xf" 'helm-find-files)
-(key-chord-define-global "xv" 'ido-find-alternate-file)
+(key-chord-define-global "x1" #'delete-other-windows)
+(key-chord-define-global "x2" (balanced #'split-window-below))
+(key-chord-define-global "x3" (balanced #'split-window-right))
+(key-chord-define-global "x0" (balanced #'delete-window))
+(key-chord-define-global "5o" #'other-frame)
+(key-chord-define-global "52" #'make-frame-command)
+(key-chord-define-global "50" #'safe-delete-frame)
+(key-chord-define-global "xb" #'ido-switch-buffer)
+(key-chord-define-global "xk" #'ido-kill-buffer)
+(key-chord-define-global "xs" #'save-buffer)
+(key-chord-define-global "xf" #'helm-find-files)
+(key-chord-define-global "xg" #'helm-ls-git-ls)
+(key-chord-define-global "xv" #'ido-find-alternate-file)
 
 ;; http://stackoverflow.com/a/12934513/2424184
 (require 'font-lock)
@@ -675,11 +676,11 @@
            ))
         ) t)
 
-(defadvice load-theme (before theme-dont-propagate activate)
-  (mapcar #'disable-theme custom-enabled-themes))
+;; (defadvice load-theme (before theme-dont-propagate activate)
+;;   (mapc #'disable-theme custom-enabled-themes))
 
 (when window-system
-  (require 'solarized)
-  (load-theme 'solarized-dark)
-  (add-to-list 'default-frame-alist '(font . "Monoid 10"))
+  (load-theme 'sanityinc-solarized-dark)
+  (add-to-list 'default-frame-alist '(font . "Terminus 10"))
   (setq x-pointer-shape x-pointer-arrow))
+(put 'narrow-to-region 'disabled nil)
