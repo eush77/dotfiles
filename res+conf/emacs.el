@@ -342,6 +342,13 @@
 (ido-hacks-mode t)
 (require 'helm-config)
 
+;; Wipe out the initial-input and the position in the list.
+;; Initially written for w3m-switch-buffer which populates the initial input.
+(defadvice completing-read (before completing-read-ido-position activate)
+  (ad-set-arg 4 "")
+  (when (listp (ad-get-arg 5))
+    (ad-set-arg 5 (car (ad-get-arg 5)))))
+
 (require 'goto-last-change)
 
 (require 'dired)
