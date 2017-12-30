@@ -9,7 +9,7 @@
 [core]
 	excludesfile = ~/.gitignore
 	whitespace = trailing-space
-	editor = vi
+	editor = mg
 
 #
 # UI & interface settings.
