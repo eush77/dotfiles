@@ -73,6 +73,7 @@ bind 'SPACE: magic-space'
 #============================== Aliases ====================================
 alias bc='bc -q'
 alias catll='cat >/dev/null'
+alias cp='cp --reflink=auto'
 alias df='df -h'
 alias dirs='dirs -v'
 alias du='du -h'
