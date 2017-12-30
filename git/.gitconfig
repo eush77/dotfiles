@@ -19,9 +19,9 @@
 [column]
 	ui = auto
 [pager]
-	log = diff-highlight | less
-	show = diff-highlight | less
-	diff = diff-highlight | less
+	log = PATH="$PATH:/usr/share/git/diff-highlight" diff-highlight | less
+	show = PATH="$PATH:/usr/share/git/diff-highlight" diff-highlight | less
+	diff = PATH="$PATH:/usr/share/git/diff-highlight" diff-highlight | less
 
 #
 # Per-tool configuration.
