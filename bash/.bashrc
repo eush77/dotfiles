@@ -182,6 +182,11 @@ function timer {
 # 		  -option 'grp_led:caps' \
 # 		  -option 'compose:menu' \
 # 		  -option 'numpad:microsoft'
+
+# Show battery status if running on a TTY.
+[[ -z "$DISPLAY" ]] &&
+	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
+	acpi --battery
 #===========================================================================
 
 #======================= Host Config =======================================
