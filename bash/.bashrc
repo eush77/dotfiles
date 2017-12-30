@@ -11,6 +11,7 @@ export LESS_TERMCAP_so=$'\e[01;44;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
 export PAGER=less
+export WWW_HOME='https://ddg.gg/'
 #===========================================================================
 
 # If not running interactively, don't go any further.
