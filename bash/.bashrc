@@ -28,7 +28,7 @@ HISTSIZE=15000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
 PROMPT_COMMAND='history -a; [[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] && l; _LAST_PWD="$PWD"'
-PS1='!\! ${PS1_SHLVL}\[\e[36m\]\u@${PS1_HOSTNAME}\[\e[0m\]:\[\e[36m\]\[\e[36m\]\w\[\e[0m\]> '
+PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]\u@${PS1_HOSTNAME}\[\e[0m\]:\[\e[36m\]\[\e[36m\]\w\[\e[0m\]> '
 PS1_HOSTNAME="${HOSTNAME:0:2}"
 
 SHLVL_BASE=1
@@ -36,6 +36,17 @@ if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
 	PS1_SHLVL="(+$((SHLVL - SHLVL_BASE))) "
 else
 	PS1_SHLVL=""
+fi
+
+if type -P git >/dev/null; then
+	GIT_PS1_SHOWDIRTYSTATE=1
+	GIT_PS1_SHOWUNTRACKEDFILES=1
+	GIT_PS1_SHOWUPSTREAM=verbose
+	GIT_PS1_STATESEPARATOR=
+
+	source /usr/share/git/git-prompt.sh
+else
+	alias __git_ps1=true
 fi
 
 shopt -s \
