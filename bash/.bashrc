@@ -15,7 +15,7 @@ export PAGER=less
 #===========================================================================
 
 # If not running interactively, don't go any further.
-[[ -z "$PS1" ]] && return
+[[ $- != *i* ]] && return
 
 #============================ Shell Settings ===============================
 FIGNORE='~'
