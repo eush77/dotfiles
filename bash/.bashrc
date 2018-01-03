@@ -103,6 +103,7 @@ alias dirs='dirs -v'
 alias du='du -h'
 alias emacs='emacs -nw'
 alias g=git
+alias gg='git grep'
 alias hilite='source-highlight -fesc -i'
 alias l='ls -v --classify --group-directories-first --ignore-backups'
 alias la='ls -lv --all --classify --group-directories-first --human-readable'
