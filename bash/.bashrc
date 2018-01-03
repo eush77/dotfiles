@@ -30,7 +30,7 @@ HISTSIZE=15000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
 PROMPT_COMMAND='history -a; [[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] && l; _LAST_PWD="$PWD"'
-PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]\w\[\e[0m\]> '
+PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[0m\]> '
 
 SHLVL_BASE=1
 if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
@@ -57,6 +57,10 @@ if type -P git >/dev/null; then
 else
 	alias __git_ps1=true
 fi
+
+function __ps1_paths {
+	builtin dirs -p | sed '2,$ { s:.*/:: }' | tac | paste -sd,
+}
 
 shopt -s \
 	  autocd \
