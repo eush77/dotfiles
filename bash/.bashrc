@@ -93,9 +93,10 @@ alias du='du -h'
 alias emacs='emacs -nw'
 alias g=git
 alias hilite='source-highlight -fesc -i'
-alias l='ls -CF -BX --group-directories-first -v'
-alias la='ls -alhFX --group-directories-first'
-alias lc='ls -1 -BX -v --group-directories-first'
+alias l='ls -v --classify --group-directories-first --ignore-backups'
+alias la='ls -lv --all --classify --group-directories-first --human-readable'
+alias lc='ls -1v --group-directories-first --ignore-backups'
+alias ls='ls --color=auto'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias sudo='sudo '  # Expand aliases under `sudo'.
 #===========================================================================
