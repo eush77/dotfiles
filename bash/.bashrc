@@ -13,6 +13,8 @@ export LESS_TERMCAP_us=$'\e[01;32m'
 export MANWIDTH=78
 export PAGER=less
 export WWW_HOME='https://ddg.gg/'
+
+eval "$(dircolors)"
 #===========================================================================
 
 # If not running interactively, don't go any further.
