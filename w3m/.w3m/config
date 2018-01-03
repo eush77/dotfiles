@@ -1,0 +1,5 @@
+# Default blue is illegible on a black background.
+anchor_color yellow
+
+editor mg
+wrap_search
