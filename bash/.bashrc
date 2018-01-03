@@ -1,7 +1,7 @@
 # -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-#
 
 #======================== Environment Variables ============================
-export EDITOR=vi
+export EDITOR=mg
 export LESS='--ignore-case --RAW-CONTROL-CHARS --quit-if-one-screen --no-init --jump-target=6'
 export LESS_TERMCAP_mb=$'\e[01;31m'
 export LESS_TERMCAP_md=$'\e[01;31m'
