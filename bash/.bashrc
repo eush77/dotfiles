@@ -30,14 +30,21 @@ HISTSIZE=15000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
 PROMPT_COMMAND='history -a; [[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] && l; _LAST_PWD="$PWD"'
-PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]\u@${PS1_HOSTNAME}\[\e[0m\]:\[\e[36m\]\[\e[36m\]\w\[\e[0m\]> '
-PS1_HOSTNAME="${HOSTNAME:0:2}"
+PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]\w\[\e[0m\]> '
 
 SHLVL_BASE=1
 if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
 	PS1_SHLVL="(+$((SHLVL - SHLVL_BASE))) "
 else
-	PS1_SHLVL=""
+	PS1_SHLVL=
+fi
+
+if [[ -n "$SSH_CONNECTION" ]]; then
+	PS1_HOSTID="$USER@${HOSTNAME:0:2}"
+	PS1_HOSTID_SUFFIX=:
+else
+	PS1_HOSTID=
+	PS1_HOSTID_SUFFIX=
 fi
 
 if type -P git >/dev/null; then
