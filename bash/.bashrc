@@ -64,12 +64,12 @@ function __ps1_paths {
 
 shopt -s \
 	  autocd \
-      cdspell \
-      checkjobs \
-      checkwinsize \
-      cmdhist \
-      direxpand \
-      dirspell \
+	  cdspell \
+	  checkjobs \
+	  checkwinsize \
+	  cmdhist \
+	  direxpand \
+	  dirspell \
 	  extglob \
 	  failglob \
 	  globstar \
