@@ -1,1 +1,12 @@
 keymap	DEL	PREV_PAGE
+keymap	b	BACK
+keymap	B	VIEW_BOOKMARK
+keymap	h	HISTORY
+keymap	j	UP
+keymap	k	DOWN
+keymap	l	CENTER_V
+keymap	n	NEXT_LINK
+keymap	p	PREV_LINK
+keymap	=	LINE_INFO
+keymap	+	INFO
+keymap	C-c	SUBMIT
