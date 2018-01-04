@@ -2,4 +2,5 @@
 anchor_color yellow
 
 editor mg
+extbrowser bash -s
 wrap_search
