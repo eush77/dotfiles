@@ -214,6 +214,13 @@ function timer {
 [[ -z "$DISPLAY" ]] &&
 	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
 	acpi --battery
+
+# Hook up Commacd.
+[[ -r /usr/share/commacd/commacd.bash ]] &&
+	source /usr/share/commacd/commacd.bash
+
+# Hook up Z.
+[[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
 #===========================================================================
 
 #======================= Host Config =======================================
