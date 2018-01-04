@@ -9,6 +9,8 @@ keymap	m	EXTERN_LINK
 keymap	M	EXTERN
 keymap	n	NEXT_LINK
 keymap	p	PREV_LINK
+keymap	q	CLOSE_TAB
+keymap	Q	QUIT
 keymap	=	LINE_INFO
 keymap	+	INFO
 keymap	C-c	SUBMIT
