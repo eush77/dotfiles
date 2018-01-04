@@ -33,7 +33,7 @@
 	default = upstream
 [rebase]
 	autosquash = true
-	missingCommitsCheck = warn
+	missingCommitsCheck = error
 
 #
 # Aliases
