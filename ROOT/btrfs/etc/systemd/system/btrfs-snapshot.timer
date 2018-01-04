@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Btrfs snapshots
+
+[Timer]
+OnCalendar=06:00
+AccuracySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
