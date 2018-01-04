@@ -5,8 +5,11 @@ keymap	h	HISTORY
 keymap	j	UP
 keymap	k	DOWN
 keymap	l	CENTER_V
+keymap	m	EXTERN_LINK
+keymap	M	EXTERN
 keymap	n	NEXT_LINK
 keymap	p	PREV_LINK
 keymap	=	LINE_INFO
 keymap	+	INFO
 keymap	C-c	SUBMIT
+keymap	M-x	COMMAND
