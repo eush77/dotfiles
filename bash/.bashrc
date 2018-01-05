@@ -99,6 +99,9 @@ bind 'set match-hidden-files off'
 bind 'Meta-n: menu-complete'
 bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
+
+# Commacd
+bind 'C-]: ",,, "'
 #===========================================================================
 
 #============================== Aliases ====================================
