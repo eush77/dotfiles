@@ -31,7 +31,7 @@ IGNOREEOF=0
 PROMPT_COMMAND='history -a; [[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] && l; _LAST_PWD="$PWD"'
 PS1='!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[0m\]> '
 
-SHLVL_BASE=1
+SHLVL_BASE="$((${TMUX:+1}+1))"
 if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
 	PS1_SHLVL="(+$((SHLVL - SHLVL_BASE))) "
 else
