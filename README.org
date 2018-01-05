@@ -1,0 +1,22 @@
+* Dotfiles
+
+This is the repository with my personal config files and scripts.
+
+Use [[http://www.gnu.org/software/stow/][GNU Stow]] to install regular
+configs in the home directory
+
+#+BEGIN_SRC shell-script
+$ stow -t ~ bash
+#+END_SRC
+
+or root configs in the root directory:
+
+#+BEGIN_SRC shell-script
+$ ( cd ROOT; sudo stow -t / xkb )
+#+END_SRC
+
+Install Sudo config:
+
+#+BEGIN_SRC shell-script
+$ install -o root -g root -m 440 ROOT/sudo/etc/sudoers /etc/
+#+END_SRC
