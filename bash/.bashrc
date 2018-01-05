@@ -210,6 +210,17 @@ function timer {
         printf "\r%u:%02u" $M $S
     done
 }
+
+# i <command> [<index term>] - Display documentation.
+function i {
+	if [[ -n "$2" ]]; then
+		info "$1" --index-search="$2"
+	elif [[ $(info --where "$1") != '*manpages*' ]]; then
+		info "$1"
+	else
+		man "$1"
+	fi
+}
 #===========================================================================
 
 #======================= System Setup ======================================
