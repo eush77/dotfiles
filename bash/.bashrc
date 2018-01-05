@@ -98,16 +98,20 @@ alias bc='bc -q'
 alias catll='cat >/dev/null'
 alias cp='cp --reflink=auto'
 alias df='df -h'
+alias diff='diff --color=auto'
 alias dirs='dirs -v'
 alias du='du -h'
 alias emacs='emacs -nw'
 alias g=git
 alias gg='git grep'
+alias grep='grep --color=auto'
 alias hilite='source-highlight -fesc -i'
 alias l='ls -v --classify --group-directories-first --ignore-backups'
 alias la='ls -lv --all --classify --group-directories-first --human-readable'
 alias lc='ls -1v --group-directories-first --ignore-backups'
 alias ls='ls --color=auto'
+alias pacaur='pacaur --color=auto'
+alias pacman='pacman --color=auto'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias sudo='sudo '  # Expand aliases under `sudo'.
 #===========================================================================
