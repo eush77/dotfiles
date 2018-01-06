@@ -224,9 +224,8 @@ function timer {
 function i {
 	local topic="$1"
 	local term="$2"
-	local infofile="$(info --where "$topic")"
 
-	if [[ "$infofile" = "*manpages*" ]]; then
+	if [[ "$(info --where "$topic")" = "*manpages*" ]]; then
 		if [[ "$COLUMNS" -gt 78 ]]; then
 			local -x MANWIDTH=78
 		fi
@@ -243,7 +242,7 @@ function i {
 			args+=("--index-search=$term")
 		fi
 
-		info "$infofile" "${args[@]}"
+		info "$topic" "${args[@]}"
 	fi
 }
 #===========================================================================
