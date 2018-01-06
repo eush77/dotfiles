@@ -229,14 +229,24 @@ function timer {
     done
 }
 
-# i <command> [<index term>] - Display documentation.
+# i <topic> [<index term>] - Display documentation.
 function i {
-	if [[ -n "$2" ]]; then
-		info "$1" --index-search="$2"
-	elif [[ $(info --where "$1") != '*manpages*' ]]; then
-		info "$1"
+	local topic="$1"
+	local term="$2"
+	local infofile="$(info --where "$topic")"
+
+	if [[ "$infofile" = "*manpages*" ]]; then
+		if [[ -n "$term" ]]; then
+			MANPAGER="$PAGER --pattern='$term'" man "$topic"
+		else
+			man "$topic"
+		fi
 	else
-		man "$1"
+		if [[ -n "$term" ]]; then
+			info "$infofile" --index-search="$term"
+		else
+			info "$infofile"
+		fi
 	fi
 }
 #===========================================================================
