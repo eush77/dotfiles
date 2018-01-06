@@ -13,15 +13,6 @@ export LESS_TERMCAP_us=$'\e[01;32m'
 export PAGER=less
 export WWW_HOME='https://ddg.gg/'
 
-case "$TERM" in
-	linux)
-		export MANWIDTH=78
-		;;
-	screen)
-		unset MANWIDTH
-		;;
-esac
-
 eval "$(dircolors)"
 #===========================================================================
 
@@ -236,17 +227,23 @@ function i {
 	local infofile="$(info --where "$topic")"
 
 	if [[ "$infofile" = "*manpages*" ]]; then
-		if [[ -n "$term" ]]; then
-			MANPAGER="$PAGER --pattern='$term'" man "$topic"
-		else
-			man "$topic"
+		if [[ "$COLUMNS" -gt 78 ]]; then
+			local -x MANWIDTH=78
 		fi
+
+		if [[ -n "$term" ]]; then
+			local -x MANPAGER="$PAGER --pattern='$term'"
+		fi
+
+		man "$topic"
 	else
+		local args=()
+
 		if [[ -n "$term" ]]; then
-			info "$infofile" --index-search="$term"
-		else
-			info "$infofile"
+			args+=("--index-search=$term")
 		fi
+
+		info "$infofile" "${args[@]}"
 	fi
 }
 #===========================================================================
