@@ -1,5 +1,9 @@
+# Timestamp
+regexp=^\s*[\d:.]+
+colours=dark white
+-------
 # Syscall
-regexp=^(\d+\s+)?\w+
+regexp=\w+(?=\()
 colours=yellow
 -------
 # Punctuation
@@ -7,5 +11,9 @@ regexp=\(|\)|,
 colours=dark magenta
 -------
 # Exit code
-regexp==[^=]+$
+regexp==\s[^=<]+(?=(?:<[\d.]+>)?$)
 colours=cyan
+-------
+# Time spent
+regexp=<[\d.]+>$
+colours=dark white
