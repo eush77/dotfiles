@@ -109,6 +109,9 @@ bind '"\C-]": ",,, "'
 #===========================================================================
 
 #============================== Aliases ====================================
+# Include Grc aliases.
+[[ -r /etc/profile.d/grc.bashrc ]] && source /etc/profile.d/grc.bashrc
+
 alias bc='bc -q'
 alias catll='cat >/dev/null'
 alias cp='cp --reflink=auto'
