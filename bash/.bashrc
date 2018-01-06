@@ -252,15 +252,6 @@ function i {
 #===========================================================================
 
 #======================= System Setup ======================================
-# setxkbmap -model pc104 \
-# 		  -layout 'us,ru' \
-# 		  -variant ',winkeys' \
-# 		  -option 'grp:caps_toggle' \
-# 		  -option 'grp:win_switch' \
-# 		  -option 'grp_led:caps' \
-# 		  -option 'compose:menu' \
-# 		  -option 'numpad:microsoft'
-
 # Show battery status if running on a TTY.
 [[ -z "$DISPLAY" ]] &&
 	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
