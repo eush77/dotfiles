@@ -1,3 +1,7 @@
 #info
 j	down-line
 k	up-line
+\mu	clear-search
+
+#var
+active-link-style=yellow
