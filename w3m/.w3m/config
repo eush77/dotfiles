@@ -1,6 +1,6 @@
 # Default blue is illegible on a black background.
 anchor_color yellow
 
-editor mg
-extbrowser bash -s
+editor $EDITOR
+extbrowser $SHELL -s
 wrap_search
