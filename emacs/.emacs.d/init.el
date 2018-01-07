@@ -65,3 +65,5 @@ and URL
 (load "config-markdown")
 (load "config-org")
 (load "config-shr")
+
+(server-start)
