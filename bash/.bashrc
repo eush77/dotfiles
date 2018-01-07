@@ -131,6 +131,11 @@ alias pacaur='pacaur --color=auto'
 alias pacman='pacman --color=auto'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias sudo='sudo '  # Expand aliases under `sudo'.
+
+# Use indirection to allow EDITOR to be redefined by the host.
+function e {
+	$EDITOR "$@"
+}
 #===========================================================================
 
 #================================= Functions ===============================
