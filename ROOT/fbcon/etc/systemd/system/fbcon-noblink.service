@@ -1,0 +1,9 @@
+[Unit]
+Description=Disable cursor blinking
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo 0 >/sys/class/graphics/fbcon/cursor_blink'
+
+[Install]
+WantedBy=default.target
