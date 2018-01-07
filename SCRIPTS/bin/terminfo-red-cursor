@@ -1,0 +1,60 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-#
+set -euo pipefail
+IFS=$'\n'
+
+#> terminfo-red-cursor <termname>
+#>
+#> Updates terminfo `cnorm' and `cvvis' entries to use a red cursor block
+#> instead of whatever is the default.
+#>
+#> If run by a regular user, will create local `.terminfo' entries that
+#> override the system entries, so no back-ups are necessary.
+#>
+#> See https://www.emacswiki.org/emacs/CursorOnLinuxConsole
+
+# Show the above help message.
+function help {
+	sed -nr '/^#>/ { s|^#> ?||; p }' "$0"
+}
+
+#
+# Dispatch options.
+#
+
+OPT="$(getopt -n "${0##*/}" -o '' -l 'help,debug' -- "$@")"
+if [[ "$?" -ne 0 ]]; then
+	exit 1
+fi
+
+unset TERMNAME
+
+for opt in $(eval printf '%s\\n' "$OPT"); do
+	case "$opt" in
+		--help)
+			help
+			exit
+			;;
+		--debug)
+			set -x
+			;;
+		--)
+			;;
+		*)
+			if [[ -v TERMNAME ]]; then
+				help
+				exit 1
+			else
+				TERMNAME="$opt"
+			fi
+	esac
+done
+
+if [[ ! -v TERMNAME ]]; then
+	help
+	exit 1
+fi
+
+infocmp -1 "$TERMNAME" |
+	sed -r '/\b(cnorm|cvvis)=/ s:\\E[\?[0-9;]*c:\\E[?17;0;64c:' |
+	tic -
