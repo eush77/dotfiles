@@ -226,22 +226,78 @@ function timer {
     done
 }
 
-# i <topic> [<index term>] - Display documentation.
+# Man wrapper that sets MANWIDTH dynamically.
+function man {
+	if [[ "$COLUMNS" -gt 78 ]]; then
+		local -x MANWIDTH=78
+	fi
+
+	command man "$@"
+}
+
+# i [-s | --select] <topic> [<index term>] - Display documentation.
+#
+# Chooses between Info and W3MMAN.
+#
+# With `--select', asks for the manual to display, otherwise selects the first
+# found.
 function i {
-	local topic="$1"
-	local term="$2"
+	local opt="$(getopt -n 'i' -o 's' -l 'select' -- "$@")"
+	if [[ "$?" -ne 0 ]]; then
+		return 1
+	fi
 
-	if [[ "$(info --where "$topic")" = "*manpages*" ]]; then
-		if [[ "$COLUMNS" -gt 78 ]]; then
-			local -x MANWIDTH=78
-		fi
+	local select topic term
 
-		if [[ -n "$term" ]]; then
-			local -x MANPAGER="$PAGER --pattern='$term'"
-		fi
+	for opt in $(eval printf '%s\\n' "$opt"); do
+		case "$opt" in
+			--select | -s)
+				select=1
+				;;
+			--)
+				;;
+			*)
+				if [[ ! -v topic ]]; then
+					topic="$opt"
+				elif [[ ! -v term ]]; then
+					term="$opt"
+				else
+					_fmt error 'i <topic> [<term>]'
+					return 2
+				fi
+		esac
+	done
 
-		man "$topic"
-	else
+	local docfiles
+	mapfile -t docfiles < <(cat <(cd /; info --where --all "$topic" |
+									  sed '/^\*manpages\*$/ d') \
+								<(man --where --all "$topic" 2>/dev/null))
+
+	local docfile
+	case "${#docfiles[@]}" in
+		0)
+			_fmt error "Not found"
+			return 1
+			;;
+		1)
+			docfile="$docfiles"
+			;;
+		*)
+			if [[ -v select ]]; then
+				local PS3='Select documentation: '
+				select sel in "${docfiles[@]}"; do
+					if [[ -n "$sel" ]]; then
+						docfile="$sel"
+						break
+					fi
+				done
+			else
+				docfile="${docfiles[0]}"
+			fi
+			;;
+	esac
+
+	if [[ "$(basename "$docfile")" = *.info?(.gz) ]]; then
 		local args=()
 
 		if [[ -n "$term" ]]; then
@@ -249,6 +305,10 @@ function i {
 		fi
 
 		info "$topic" "${args[@]}"
+	elif [[ -z "$term" ]]; then
+		w3mman -l "$docfile"
+	else
+		MANPAGER="$PAGER --pattern='$term'" man "$topic"
 	fi
 }
 #===========================================================================
