@@ -48,11 +48,6 @@ and URL
 (custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load-file custom-file)
 
-;; Host file - keep it to a minimum.
-(let ((host-file (expand-file-name "host.el" user-emacs-directory)))
-  (when (file-exists-p host-file)
-    (load-file host-file)))
-
 ;; The rest of the config is split into separate files.
 (push (expand-file-name "config" user-emacs-directory) load-path)
 (load "config-utils")
@@ -65,5 +60,10 @@ and URL
 (load "config-markdown")
 (load "config-org")
 (load "config-shr")
+
+;; Host file - tweak things if necessary.
+(let ((host-file (expand-file-name "host.el" user-emacs-directory)))
+  (when (file-exists-p host-file)
+    (load-file host-file)))
 
 (server-start)
