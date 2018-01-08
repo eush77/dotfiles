@@ -13,3 +13,6 @@ shift alt keycode 39 = Meta_colon
 # Fix BackTab.
 shift keycode 15 = F100
 string F100 = "\033[Z"
+
+# Fix `C-M-\'.
+control alt keycode 43 = Meta_Control_backslash
