@@ -5,3 +5,5 @@ k	up-line
 
 #var
 active-link-style=yellow
+match-style=bold,bgblue
+search-skip-screen=On
