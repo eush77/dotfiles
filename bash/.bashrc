@@ -89,6 +89,10 @@ shopt -s \
 	  lithist \
 	  no_empty_cmd_completion \
 	  nocaseglob
+
+# Load bash-completion, if available.
+[[ -r /usr/share/bash-completion/bash_completion ]] &&
+	source /usr/share/bash-completion/bash_completion
 #===========================================================================
 
 #============================ Readline =====================================
