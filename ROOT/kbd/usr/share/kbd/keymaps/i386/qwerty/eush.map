@@ -6,3 +6,10 @@ keycode 58 = Control
 
 # Windows key
 keycode 125 = Control
+
+# Fix `M-:'.
+shift alt keycode 39 = Meta_colon
+
+# Fix BackTab.
+shift keycode 15 = F100
+string F100 = "\033[Z"
