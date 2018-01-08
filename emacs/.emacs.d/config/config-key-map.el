@@ -9,6 +9,9 @@
 ;; Expand-region.
 (global-set-key (kbd "M-=") #'er/expand-region)
 
+;; Frames.
+(global-set-key (kbd "M-`") #'other-frame)
+
 ;; IBuffer.
 (my-global-redefine-key 'list-buffers #'ibuffer)
 
