@@ -11,6 +11,7 @@ export LESS_TERMCAP_so=$'\e[01;44;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
 export PAGER=less
+export W3MMAN_W3M='w3m -o confirm_qq=false'
 export WWW_HOME='https://ddg.gg/'
 
 eval "$(dircolors)"

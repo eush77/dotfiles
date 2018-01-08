@@ -17,7 +17,7 @@ keymap	m	EXTERN_LINK
 keymap	M	EXTERN
 keymap	n	NEXT_LINK
 keymap	p	PREV_LINK
-keymap	q	CLOSE_TAB
+keymap	q	QUIT
 keymap	Q	QUIT
 keymap	r	RELOAD
 keymap	x	CLOSE_TAB
