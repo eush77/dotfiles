@@ -1,3 +1,17 @@
+(require 'cl-lib)
+
+;;
+;; Package installation.
+;;
+(defun my-install-packages (&rest packages)
+  "Confirm and install missing PACKAGES."
+  (let ((missing-packages (cl-remove-if #'package-installed-p packages)))
+    (when (and missing-packages
+               (yes-or-no-p (format "Missing packages: %s. Install? "
+                                    missing-packages)))
+      (package-refresh-contents)
+      (mapc #'package-install missing-packages))))
+
 ;;
 ;; This is used for redefining some bound command to something else, staying
 ;; away from an actual key sequence which is subject to change.

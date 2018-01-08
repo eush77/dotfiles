@@ -1,7 +1,10 @@
 ;;; -*- lexical-binding: t -*-
 (package-initialize)
-(require 'cl-lib)
 (require 'misc)
+
+;; Load basic utilities.
+(push (expand-file-name "config" user-emacs-directory) load-path)
+(load "config-utils")
 
 ;; Custom-set macro - use instead of `setq' for customization variables.
 (defmacro custom-set (var value)
@@ -18,43 +21,36 @@ and URL
    `(,var ,value nil nil
           ,(format "!!! CAREFUL: CUSTOM-SET IN %s !!!" load-file-name))))
 
+;; Customization file.
+(custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load-file custom-file)
+
 ;; Package archives.
 (custom-set package-archives
 	    '(("gnu" . "http://elpa.gnu.org/packages/")
 	      ("melpa" . "http://melpa.org/packages/")))
 
 ;; Check and install missing packages.
-(let* ((wanted-packages '(counsel
-                          expand-region
-                          gnus-desktop-notify
-			  ivy
-                          js2-mode
-			  key-chord
-                          magit
-			  multiple-cursors
-			  org
-			  swiper
-			  w3m
-			  window-jump))
-       (missing-packages (cl-remove-if #'package-installed-p
-				       wanted-packages)))
-  (when (and missing-packages
-	     (yes-or-no-p (format "Missing packages: %s. Install? "
-				  missing-packages)))
-    (package-refresh-contents)
-    (mapc #'package-install missing-packages)))
-
-;; Customization file.
-(custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load-file custom-file)
+(my-install-packages 'counsel
+                     'expand-region
+                     'gnus-desktop-notify
+                     'ivy
+                     'key-chord
+                     'magit
+                     'multiple-cursors
+                     'org
+                     'swiper
+                     'w3m
+                     'window-jump)
 
 ;; The rest of the config is split into separate files.
-(push (expand-file-name "config" user-emacs-directory) load-path)
-(load "config-utils")
+;;
+;; Not all of the configuration is included here - see the config directory
+;; for more configuration (typically requiring additional packages installed)
+;; and load corresponding entries in the host file.
 (load "config-base")
 (load "config-c++")
 (load "config-dired")
-(load "config-js2")
 (load "config-key-chord")
 (load "config-key-map")
 (load "config-markdown")
