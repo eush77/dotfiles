@@ -16,3 +16,6 @@ string F100 = "\033[Z"
 
 # Fix `C-M-\'.
 control alt keycode 43 = Meta_Control_backslash
+
+# Fix `M-_'.
+shift alt keycode 12 = Meta_underscore
