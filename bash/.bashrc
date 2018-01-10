@@ -78,7 +78,6 @@ shopt -s \
 	  direxpand \
 	  dirspell \
 	  extglob \
-	  failglob \
 	  globstar \
 	  gnu_errfmt \
 	  histappend \
