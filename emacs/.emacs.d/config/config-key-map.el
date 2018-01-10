@@ -12,6 +12,9 @@
 ;; Frames.
 (global-set-key (kbd "M-`") #'other-frame)
 
+;; Goto-last-change.
+(global-set-key (kbd "M-_") #'goto-last-change)
+
 ;; IBuffer.
 (my-global-redefine-key 'list-buffers #'ibuffer)
 

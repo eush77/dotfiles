@@ -34,6 +34,7 @@ and URL
 (my-install-packages 'counsel
                      'expand-region
                      'gnus-desktop-notify
+                     'goto-last-change
                      'ivy
                      'key-chord
                      'magit
@@ -51,11 +52,17 @@ and URL
 (load "config-base")
 (load "config-c++")
 (load "config-dired")
+(load "config-doc-view")
+(load "config-hideshow")
+(load "config-info")
 (load "config-key-chord")
 (load "config-key-map")
+(load "config-man")
 (load "config-markdown")
 (load "config-org")
 (load "config-shr")
+(load "config-vc")
+(load "config-w3m")
 
 ;; Host file - tweak things if necessary.
 (let ((host-file (expand-file-name "host.el" user-emacs-directory)))
