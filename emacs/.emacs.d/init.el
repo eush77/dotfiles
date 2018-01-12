@@ -58,6 +58,7 @@ and URL
 (load "config-info")
 (load "config-key-chord")
 (load "config-key-map")
+(load "config-magit")
 (load "config-man")
 (load "config-markdown")
 (load "config-org")
