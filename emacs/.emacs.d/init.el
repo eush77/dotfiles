@@ -53,6 +53,7 @@ and URL
 (load "config-c++")
 (load "config-dired")
 (load "config-doc-view")
+(load "config-help")
 (load "config-hideshow")
 (load "config-info")
 (load "config-key-chord")
