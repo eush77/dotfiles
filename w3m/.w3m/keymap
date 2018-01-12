@@ -1,8 +1,8 @@
 keymap	DEL	PREV_PAGE
 keymap	=	LINE_INFO
 keymap	+	INFO
+keymap	\\	SOURCE
 keymap	b	BACK
-keymap	B	VIEW_BOOKMARK
 keymap	C-c	SUBMIT
 keymap	M-c	COOKIE
 keymap	h	HISTORY
@@ -20,6 +20,7 @@ keymap	p	PREV_LINK
 keymap	q	QUIT
 keymap	Q	QUIT
 keymap	r	RELOAD
+keymap	v	VIEW_BOOKMARK
 keymap	x	CLOSE_TAB
 keymap	M-x	COMMAND
 keymap	M-z	DEFINE_KEY
