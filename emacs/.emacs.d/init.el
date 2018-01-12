@@ -62,6 +62,7 @@ and URL
 (load "config-org")
 (load "config-shr")
 (load "config-vc")
+(load "config-view")
 (load "config-w3m")
 
 ;; Host file - tweak things if necessary.

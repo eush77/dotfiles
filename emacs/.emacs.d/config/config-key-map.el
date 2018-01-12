@@ -42,6 +42,9 @@
 (global-set-key (kbd "C-M-<down>") #'mc/mark-next-like-this)
 (global-set-key (kbd "C-M-<up>") #'mc/mark-previous-like-this)
 
+;; Scroll lock.
+(global-set-key (kbd "<Scroll_Lock>") #'scroll-lock-mode)
+
 ;; Scrolling.
 (global-set-key (kbd "M-p") #'scroll-down)
 (global-set-key (kbd "M-n") #'scroll-up)
@@ -51,6 +54,11 @@
 (global-set-key (kbd "C-s") #'swiper)
 (global-set-key (kbd "C-S-s") #'swiper-all)
 (global-set-key (kbd "C-M-s") #'swiper-multi)
+
+;; View mode.
+(global-set-key (kbd "<pause>") #'view-mode)
+(when (not window-system)
+  (define-key key-translation-map (kbd "M-[ P") (kbd "<pause>")))
 
 ;; Window jump.
 (global-set-key (kbd "C-M-j") #'window-jump-left)
