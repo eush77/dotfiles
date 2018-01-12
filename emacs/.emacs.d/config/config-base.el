@@ -33,6 +33,9 @@
 ;; `quoted-insert' radix.
 (custom-set read-quoted-char-radix 16)
 
+;; Set a minimal scroll margin for `recenter-top-bottom'.
+(custom-set scroll-margin 1)
+
 ;; Fix sentence boundaries (used for e.g. navigation commands
 ;; `backward-sentence' and `forward-sentence').
 (custom-set sentence-end-double-space nil)
