@@ -1,3 +1,6 @@
+;; Browse-web.
+(global-set-key (kbd "C-x M-3") #'browse-web)
+
 ;; Counsel overloads.
 (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
 (my-global-redefine-key 'describe-function #'counsel-describe-function)

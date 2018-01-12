@@ -1,3 +1,5 @@
+(defalias 'browse-web #'w3m)
+
 (custom-set browse-url-browser-function #'w3m-browse-url)
 (custom-set browse-url-generic-program nil)
 (custom-set browse-url-new-window-flag t)
