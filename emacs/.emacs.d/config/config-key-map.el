@@ -15,6 +15,9 @@
 ;; Frames.
 (global-set-key (kbd "M-`") #'other-frame)
 
+;; Git grep.
+(global-set-key (kbd "C-x v /") #'counsel-git-grep)
+
 ;; Goto-last-change.
 (global-set-key (kbd "M-_") #'goto-last-change)
 
