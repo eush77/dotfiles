@@ -40,6 +40,7 @@ and URL
                      'magit
                      'multiple-cursors
                      'org
+                     'paredit
                      'swiper
                      'w3m
                      'window-jump)
@@ -62,6 +63,7 @@ and URL
 (load "config-man")
 (load "config-markdown")
 (load "config-org")
+(load "config-paredit")
 (load "config-shr")
 (load "config-vc")
 (load "config-view")
