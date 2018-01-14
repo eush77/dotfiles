@@ -43,6 +43,9 @@
 ;; Ignore case when sorting lines.
 (custom-set sort-fold-case t)
 
+;; View mode.
+(custom-set view-read-only t)
+
 ;; Enable basic modes.
 (ivy-mode 1)
 (pending-delete-mode 1)
