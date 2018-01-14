@@ -24,8 +24,31 @@
 ;; Recursive minibuffer - use minibuffer while in minibuffer.
 (custom-set enable-recursive-minibuffers t)
 
+;; Do not expand HTTP URLs with `expand-file-name'. This is needed for opening
+;; a URL with `emacsclient'.
+(defun expand-file-name--http-url (func name &rest rest)
+  "Do not expand HTTP URLs."
+  (if (string-match "^https?://" name)
+      name
+    (apply func name rest)))
+(advice-add 'expand-file-name :around #'expand-file-name--http-url)
+
 ;; Paragraph filling.
 (custom-set fill-column 78)
+
+;; Advice `find-file' to use `browse-url' to open HTTP URLs.
+(defun find-file--browse-url (func filename &rest rest)
+  "Open HTTP URLs with `browse-url'."
+  (if (string-match "^https?://" filename)
+      (browse-url filename)
+    (apply func filename rest)))
+(defun find-file-noselect--browse-url (func filename &rest rest)
+  "Open HTTP URLs with `browse-url'."
+  (if (string-match "^https?://" filename)
+      (progn (browse-url filename) (current-buffer))
+    (apply func filename rest)))
+(advice-add 'find-file :around #'find-file--browse-url)
+(advice-add 'find-file-noselect :around #'find-file-noselect--browse-url)
 
 ;; Indentation.
 (custom-set indent-tabs-mode nil)
