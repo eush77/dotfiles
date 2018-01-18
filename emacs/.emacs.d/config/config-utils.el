@@ -13,17 +13,6 @@
       (mapc #'package-install missing-packages))))
 
 ;;
-;; This is used for redefining some bound command to something else, staying
-;; away from an actual key sequence which is subject to change.
-;;
-(defun my-global-redefine-key (old-command new-command)
-  "Set the key currently bound to OLD-COMMAND to NEW-COMMAND."
-  (let ((key (where-is-internal old-command
-				(current-global-map)
-				t)))
-    (global-set-key key new-command)))
-
-;;
 ;; Interactive commands and custom variables follow.
 ;;
 

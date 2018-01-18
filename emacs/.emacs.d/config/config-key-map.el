@@ -3,11 +3,11 @@
 
 ;; Counsel overloads.
 (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
-(my-global-redefine-key 'describe-function #'counsel-describe-function)
-(my-global-redefine-key 'describe-variable #'counsel-describe-variable)
-(my-global-redefine-key 'execute-extended-command #'counsel-M-x)
-(my-global-redefine-key 'info-lookup-symbol #'counsel-info-lookup-symbol)
-(my-global-redefine-key 'insert-char #'counsel-unicode-char)
+(global-set-key [remap describe-function] #'counsel-describe-function)
+(global-set-key [remap describe-variable] #'counsel-describe-variable)
+(global-set-key [remap execute-extended-command] #'counsel-M-x)
+(global-set-key [remap info-lookup-symbol] #'counsel-info-lookup-symbol)
+(global-set-key [remap insert-char] #'counsel-unicode-char)
 
 ;; Expand-region.
 (global-set-key (kbd "M-=") #'er/expand-region)
@@ -22,7 +22,7 @@
 (global-set-key (kbd "M-_") #'goto-last-change)
 
 ;; IBuffer.
-(my-global-redefine-key 'list-buffers #'ibuffer)
+(global-set-key [remap list-buffers] #'ibuffer)
 
 ;; Ivy.
 (global-set-key (kbd "C-c C-r") #'ivy-resume)
@@ -74,14 +74,14 @@
 (global-set-key (kbd "C-M-n") #'window-jump-down)
 
 ;; Window sizing.
-(my-global-redefine-key 'enlarge-window #'my-enlarge-window)
-(my-global-redefine-key 'enlarge-window-horizontally
-			#'my-enlarge-window-horizontally)
-(my-global-redefine-key 'shrink-window-horizontally
-			#'my-shrink-window-horizontally)
+(global-set-key [remap enlarge-window] #'my-enlarge-window)
+(global-set-key [remap enlarge-window-horizontally]
+                #'my-enlarge-window-horizontally)
+(global-set-key [remap shrink-window-horizontally]
+                #'my-shrink-window-horizontally)
 
 ;; Whitespace.
-(my-global-redefine-key 'just-one-space #'cycle-spacing)
+(global-set-key [remap just-one-space] #'cycle-spacing)
 
 ;; Zap-to-char behavior.
-(my-global-redefine-key 'zap-to-char #'zap-up-to-char)
+(global-set-key [remap zap-to-char] #'zap-up-to-char)
