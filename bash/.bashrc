@@ -2,14 +2,16 @@
 
 #======================== Environment Variables ============================
 export EDITOR=mg
-export LESS='--ignore-case --jump-target=6 --no-init --quit-if-one-screen --RAW-CONTROL-CHARS --search-skip-screen'
-export LESS_TERMCAP_mb=$'\e[01;31m'
-export LESS_TERMCAP_md=$'\e[01;31m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;44;33m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[01;32m'
+
+# LESS_TERMCAP variables can't be put in a `.lesskey' file in Less 487.
+# https://unix.stackexchange.com/questions/328597/how-to-make-lesskey-terminal-independent
+export LESS_TERMCAP_md="$(tput bold; tput setaf 6)"
+export LESS_TERMCAP_me="$(tput sgr0)"
+export LESS_TERMCAP_so="$(tput bold; tput setaf 3; tput setab 4)"
+export LESS_TERMCAP_se="$(tput sgr0)"
+export LESS_TERMCAP_us="$(tput setaf 3)"
+export LESS_TERMCAP_ue="$(tput sgr0)"
+
 export PAGER=less
 export W3MMAN_W3M='w3m -o confirm_qq=false'
 export WWW_HOME='https://ddg.gg/'
