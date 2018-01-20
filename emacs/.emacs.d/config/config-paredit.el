@@ -14,8 +14,11 @@
                                   (lookup-key view-mode-map (kbd "DEL"))
                                   paredit-func))))))
 
-  ;; Solve conflicts with global `window-jump' keys.
-  (dolist (keys '(("C-M-n" . "C-c C-n") ("C-M-p" . "C-c C-p")))
+  ;; Redefine keys to solve conflicts with `window-jump', or simply for
+  ;; consistency's sake.
+  (dolist (keys '(("C-M-n" . "C-c C-n")
+                  ("C-M-p" . "C-c C-p")
+                  ("C-M-u" . "C-c C-u")))
     (let* ((old-key (car keys))
            (new-key (cdr keys))
            (paredit-func (lookup-key paredit-mode-map (kbd old-key))))
