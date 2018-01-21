@@ -1,7 +1,9 @@
 # Default blue is illegible on a black background.
 anchor_color yellow
 
+disable_secret_security_check true
 editor $EDITOR
 emacs_like_lineedit true
 extbrowser $SHELL -s
+history 1000
 wrap_search
