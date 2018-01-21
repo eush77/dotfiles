@@ -2,5 +2,5 @@ root ALL = (ALL) ALL
 
 # Allow members of the `wheel' group to execute any command, but
 # prompt them for a password every time.
-%wheel ALL = (ALL) ALL
+%wheel ALL = (ALL : ALL) ALL
 Defaults:%wheel timestamp_timeout=0
