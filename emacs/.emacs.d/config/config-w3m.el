@@ -25,11 +25,22 @@
 
   ;; Wipe out the initial-input and the position in the list.
   ;; A hack against `w3m-switch-buffer' populating the initial input.
-  (defadvice completing-read (before completing-read-ido-position activate)
+  (defun completing-read--w3m-switch-buffer
+      (func prompt collection &optional predicate require-match &rest rest)
+    "Wipe out the initial input populated by `w3m-switch-buffer'."
     (when (eq major-mode 'w3m-mode)
-      (ad-set-arg 4 "")
-      (when (listp (ad-get-arg 5))
-        (ad-set-arg 5 (car (ad-get-arg 5))))))
+      (setq rest nil))
+    (apply func prompt collection predicate require-match rest))
+  (advice-add 'completing-read :around #'completing-read--w3m-switch-buffer)
+
+  ;; Follow symbolic links in `w3m-bookmark-file' when checking the file's
+  ;; modification time.
+  (defun w3m-bookmark-file-modtime--chase-links (func &rest args)
+    "Follow symbolic links in `w3m-bookmark-file'."
+    (let ((w3m-bookmark-file (file-chase-links w3m-bookmark-file)))
+      (apply func args)))
+  (advice-add 'w3m-bookmark-file-modtime
+              :around #'w3m-bookmark-file-modtime--chase-links)
 
   (define-key w3m-mode-map (kbd "b") #'w3m-view-previous-page)
   (define-key w3m-mode-map (kbd "B") #'w3m-view-next-page)
@@ -45,4 +56,5 @@
   (define-key w3m-mode-map (kbd "n") #'w3m-next-anchor)
   (define-key w3m-mode-map (kbd "C-c M-n") #'w3m-tab-move-right)
   (define-key w3m-mode-map (kbd "p") #'w3m-previous-anchor)
-  (define-key w3m-mode-map (kbd "C-c M-p") #'w3m-tab-move-left))
+  (define-key w3m-mode-map (kbd "C-c M-p") #'w3m-tab-move-left)
+  (define-key w3m-mode-map (kbd "w") #'w3m-lnum-universal))
