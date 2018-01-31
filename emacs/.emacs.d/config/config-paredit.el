@@ -27,6 +27,7 @@
         (define-key paredit-mode-map (kbd new-key) paredit-func))))
 
   (define-key paredit-mode-map (kbd "C-c C-b") #'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "C-c C-d") #'paredit-focus-on-defun)
   (define-key paredit-mode-map (kbd "C-c C-f") #'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "C-c C-M-b") #'paredit-backward-barf-sexp)
   (define-key paredit-mode-map (kbd "C-c C-M-f") #'paredit-forward-barf-sexp))
