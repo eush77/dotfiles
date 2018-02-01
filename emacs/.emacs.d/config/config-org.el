@@ -28,10 +28,10 @@ Otherwise hide it, and show the previous sibling subtree."
 
   (define-key org-mode-map (kbd "C-c C-r") #'ivy-resume)
 
-  (define-key org-mode-map (kbd "C-c j") #'org-promote-subtree)
-  (define-key org-mode-map (kbd "C-c k") #'org-demote-subtree)
-  (define-key org-mode-map (kbd "C-c n") #'org-move-subtree-down)
-  (define-key org-mode-map (kbd "C-c p") #'org-move-subtree-up)
+  (define-key org-mode-map (kbd "C-c j") #'org-metaleft)
+  (define-key org-mode-map (kbd "C-c k") #'org-metaright)
+  (define-key org-mode-map (kbd "C-c n") #'org-metadown)
+  (define-key org-mode-map (kbd "C-c p") #'org-metaup)
   (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
   (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
   (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree))
