@@ -136,6 +136,7 @@ alias ls='ls --color=auto'
 alias pacaur='pacaur --color=auto'
 alias pacman='pacman --color=auto'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
+alias reinit='source ~/.bashrc'
 alias sudo='sudo '  # Expand aliases under `sudo'.
 
 # Mplayer profiles.
