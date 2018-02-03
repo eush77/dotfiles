@@ -138,6 +138,15 @@ alias pacman='pacman --color=auto'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias sudo='sudo '  # Expand aliases under `sudo'.
 
+# Mplayer profiles.
+alias mplayer.fs='mplayer -profile fs'
+alias mplayer.top='mplayer -profile top'
+alias mplayer.bottom='mplayer -profile bottom'
+alias mplayer.tl='mplayer -profile tl'
+alias mplayer.tr='mplayer -profile tr'
+alias mplayer.bl='mplayer -profile bl'
+alias mplayer.br='mplayer -profile br'
+
 # Use indirection to allow EDITOR to be redefined by the host.
 function e {
 	$EDITOR "$@"
