@@ -9,7 +9,6 @@
   (custom-set w3m-default-display-inline-images t)
   (custom-set w3m-add-referer nil)
   (custom-set w3m-make-new-session t)
-  (custom-set w3m-new-session-in-background t)
   (custom-set w3m-home-page "about:")
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode)
