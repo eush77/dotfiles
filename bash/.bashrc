@@ -326,6 +326,17 @@ function i {
 		MANPAGER="$PAGER --pattern='$term'" man "$topic"
 	fi
 }
+
+# youtube-watched <filename> - Mark the video file downloaded with YouTube-dl
+# watched on YouTube.
+function youtube-watched {
+	local id="$(grep --perl-regexp --only-matching '(?<=-)[\w-]{11}(?=\.)' \
+		  		<<<"$1")"
+	[[ -n "$id" ]] &&
+		_fmt note "Marking watched $id"
+		youtube-dl --simulate --mark-watched \
+				   --username="$YOUTUBE_USERNAME" -- "$id"
+}
 #===========================================================================
 
 #======================= System Setup ======================================
