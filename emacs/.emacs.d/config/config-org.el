@@ -28,8 +28,8 @@ Otherwise hide it, and show the previous sibling subtree."
 
   (define-key org-mode-map (kbd "C-c C-r") #'ivy-resume)
 
-  (define-key org-mode-map (kbd "C-c j") #'org-metaleft)
-  (define-key org-mode-map (kbd "C-c k") #'org-metaright)
+  (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
+  (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
   (define-key org-mode-map (kbd "C-c n") #'org-metadown)
   (define-key org-mode-map (kbd "C-c p") #'org-metaup)
   (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
