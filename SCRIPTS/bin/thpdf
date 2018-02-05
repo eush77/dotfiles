@@ -1,0 +1,113 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-#
+set -euo pipefail
+
+#> thpdf [--invert|--monokai|--solarized-dark] <filename>
+#>
+#> Open PDF file in a specified color theme.
+#> If the theme is not specified on the command line, the value of
+#> "$THPDF_THEME" is used.
+
+# Default theme.
+function default {
+	gencolortransfer '1 0' '1 0' '1 0'
+}
+
+# Invert theme.
+function invert {
+	gencolortransfer '0 1' '0 1' '0 1'
+}
+
+# Monokai theme.
+function monokai {
+	gencolortransfer '.153 .973' '.157 .973' '.133 .949'
+}
+
+# Solarized-dark theme.
+function solarized-dark {
+	gencolortransfer '0 .933' '.169 .910' '.212 .835'
+}
+
+# gencolortransfer <red> <green> <blue> - Generate PostScript commands for
+# transforming colors.
+#
+# Each argument is a space-separated pair of background and foreground values
+# on a corresponding color channel.
+function gencolortransfer {
+	# PostScript commands to map white/black color values to
+	# background/foreground.
+	local transfer=' dup 4 1 roll sub mul add'
+
+	printf '{%s}{%s}{%s}{pop 0} setcolortransfer' \
+		   "$1$transfer" "$2$transfer" "$3$transfer"
+}
+
+# help - Print help output.
+function help {
+	sed -nr '/^#>/ { s|^#> ?||; p }' "$0"
+}
+
+unset PDF_IN
+unset THEME
+
+OPTS="$(getopt -n "${0##*/}" -o '' \
+		-l 'invert,monokai,solarized-dark,help,debug' -- "$@")"
+eval set -- "$OPTS"
+while [[ "$#" -gt 0 ]]; do
+	case "$1" in
+		--invert|--monokai|--solarized-dark)
+			if [[ -v THEME ]]; then
+				help
+				exit 1
+			fi
+			THEME="${1#--}"
+			;;
+		--help)
+			help
+			exit
+			;;
+		--debug)
+			set -x
+			;;
+		--)
+			;;
+		*)
+			if [[ -v PDF_IN ]]; then
+				help
+				exit 1
+			fi
+			PDF_IN="$1"
+			;;
+	esac
+	shift
+done
+
+if [[ ! -v PDF_IN ]]; then
+	help
+	exit 1
+fi
+
+if [[ ! -v THEME ]]; then
+	if [[ -v THPDF_THEME ]]; then
+		THEME="$THPDF_THEME"
+	else
+		THEME='default'
+	fi
+fi
+
+if [[ "$(type -t "$THEME")" != 'function' ]]; then
+	printf 'No such theme: %s\n' "$THEME"
+	exit 1
+fi
+
+declare PDF_OUT="$(mktemp)"
+trap 'rm "$PDF_OUT"' EXIT
+
+gs -q -o "$PDF_OUT" -sDEVICE=pdfwrite -c "$("$THEME")" -f "$PDF_IN"
+
+# Open transformed PDF file in a default application.
+if [[ -v DISPLAY ]]; then
+	xdg-open "$PDF_OUT"
+else
+	mimeopen "$PDF_OUT"
+fi
