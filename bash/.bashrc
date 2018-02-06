@@ -14,7 +14,7 @@ export LESS_TERMCAP_ue="$(tput sgr0)"
 
 export PAGER=less
 export W3MMAN_W3M='w3m -o confirm_qq=false'
-export WWW_HOME='https://ddg.gg/'
+export WWW_HOME='https://google.com/'
 
 eval "$(dircolors)"
 #===========================================================================
