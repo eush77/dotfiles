@@ -21,6 +21,9 @@
 ;; Commenting style.
 (custom-set comment-style 'extra-line)
 
+;; Input method.
+(custom-set default-input-method "russian-computer")
+
 ;; Recursive minibuffer - use minibuffer while in minibuffer.
 (custom-set enable-recursive-minibuffers t)
 
