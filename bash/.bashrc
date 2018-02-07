@@ -327,9 +327,9 @@ function i {
 	fi
 }
 
-# youtube-watched <filename> - Mark the video file downloaded with YouTube-dl
-# watched on YouTube.
-function youtube-watched {
+# youtube-mw <filename> - Mark the video watched on YouTube, assuming it has
+# been downloaded with YouTube-dl (and not renamed).
+function youtube-mw {
 	local id="$(grep --perl-regexp --only-matching '(?<=-)[\w-]{11}(?=\.)' \
 		  		<<<"$1")"
 	[[ -n "$id" ]] &&
