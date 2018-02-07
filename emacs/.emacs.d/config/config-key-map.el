@@ -28,6 +28,11 @@
 (global-set-key (kbd "C-c C-r") #'ivy-resume)
 (define-key ivy-minibuffer-map (kbd "C-w") #'ivy-yank-word)
 
+;; Keyboard-escape-quit.
+;; `C-[ C-[ C-[' is too easy to hit by an accident.
+(global-unset-key (kbd "C-[ C-[ C-["))
+(global-set-key (kbd "M-C-]") #'keyboard-escape-quit)
+
 ;; Line editing.
 (global-set-key (kbd "C-c M-n") #'my-duplicate-line-down)
 (global-set-key (kbd "C-c M-p") #'my-duplicate-line-up)
