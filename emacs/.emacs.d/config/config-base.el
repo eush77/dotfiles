@@ -72,9 +72,11 @@
 ;; View mode.
 (custom-set view-read-only t)
 
-;; Enable basic modes.
+;; Enable and configure base modes.
 (ivy-mode 1)
 (pending-delete-mode 1)
+(rich-minority-mode 1)
 (show-paren-mode 1)
 (custom-set ivy-use-selectable-prompt t)
 (custom-set ivy-use-virtual-buffers t)
+(custom-set rm-blacklist '(" $" " ivy"))
