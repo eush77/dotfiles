@@ -24,7 +24,8 @@ Otherwise hide it, and show the previous sibling section."
 
   (define-key magit-mode-map (kbd "C-c f") #'magit-find-file)
   (define-key magit-mode-map (kbd "M-N") #'my-magit-section-show-next)
-  (define-key magit-mode-map (kbd "M-P") #'my-magit-section-show-previous)
+  (define-key magit-mode-map (kbd "M-P") #'my-magit-section-show-previous))
 
-  ; `C-M-i' equals `M-TAB' on TTY.
+(with-eval-after-load "magit-status"
+  ;; `C-M-i' equals `M-TAB' on TTY.
   (define-key magit-status-mode-map (kbd "C-M-i") #'magit-section-cycle))
