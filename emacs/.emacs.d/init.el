@@ -41,7 +41,7 @@ and URL
                      'multiple-cursors
                      'org
                      'paredit
-                     'rich-minority
+                     'smart-mode-line
                      'swiper
                      'w3m
                      'window-jump)

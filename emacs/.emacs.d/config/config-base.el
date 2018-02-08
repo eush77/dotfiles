@@ -56,6 +56,10 @@
 ;; Indentation.
 (custom-set indent-tabs-mode nil)
 
+;; Ivy.
+(custom-set ivy-use-selectable-prompt t)
+(custom-set ivy-use-virtual-buffers t)
+
 ;; `quoted-insert' radix.
 (custom-set read-quoted-char-radix 16)
 
@@ -66,17 +70,43 @@
 ;; `backward-sentence' and `forward-sentence').
 (custom-set sentence-end-double-space nil)
 
+;; Mode line format.
+(custom-set mode-line-format '("%e%p of "
+                               mode-line-front-space
+                               mode-line-mule-info
+                               mode-line-client
+                               mode-line-modified
+                               mode-line-remote
+                               mode-line-frame-identification
+                               mode-line-buffer-identification
+                               "   "
+                               mode-line-position
+                               (vc-mode vc-mode)
+                               "  "
+                               mode-line-modes
+                               mode-line-misc-info
+                               mode-line-end-spaces))
+(custom-set rm-blacklist '(" $" " ivy"))
+(custom-set sml/mode-width 'full)
+(custom-set sml/name-width 20)
+(custom-set sml/position-percentage-format "")
+(custom-set sml/replacer-regexp-list
+            '(("^~/\\.emacs\\.d/elpa/" ":elpa:")
+              ("^~/Dropbox/notes/" ":notes:")
+              ("^~/Dropbox/org/" ":org:")
+              ("^~/src/" ":src:")
+              ("^:src:\\([^/]\\)[^/]*/" ":src/\\1:")
+              ("^:src/\\(.\\):\\([^/]+\\)/" ":\\1/\\2:")))
+(custom-set sml/theme 'respectful)
+
 ;; Ignore case when sorting lines.
 (custom-set sort-fold-case t)
 
 ;; View mode.
 (custom-set view-read-only t)
 
-;; Enable and configure base modes.
+;; Enable base modes.
 (ivy-mode 1)
 (pending-delete-mode 1)
-(rich-minority-mode 1)
 (show-paren-mode 1)
-(custom-set ivy-use-selectable-prompt t)
-(custom-set ivy-use-virtual-buffers t)
-(custom-set rm-blacklist '(" $" " ivy"))
+(sml/setup)                             ; Uses `rich-minority-mode' internally.
