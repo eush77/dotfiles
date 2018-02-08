@@ -90,6 +90,7 @@
 (custom-set sml/mode-width 'full)
 (custom-set sml/name-width 20)
 (custom-set sml/position-percentage-format "")
+(custom-set sml/prefix-face-list '(("" sml/prefix)))
 (custom-set sml/replacer-regexp-list
             '(("^~/\\.emacs\\.d/elpa/" ":elpa:")
               ("^~/Dropbox/notes/" ":notes:")
