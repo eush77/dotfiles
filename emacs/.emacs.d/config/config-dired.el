@@ -1,6 +1,6 @@
-(with-eval-after-load "dired"
-  (require 'dired-x)
+(require 'dired-x)
 
+(with-eval-after-load "dired"
   (custom-set dired-dwim-target t)
   (add-hook 'dired-after-readin-hook #'dired-hide-details-mode)
 
