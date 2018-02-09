@@ -71,7 +71,7 @@
 (custom-set sentence-end-double-space nil)
 
 ;; Mode line format.
-(custom-set mode-line-format '("%e%p of "
+(custom-set mode-line-format '("%e"
                                mode-line-front-space
                                mode-line-mule-info
                                mode-line-client
@@ -98,6 +98,7 @@
               ("^~/src/" ":src:")
               ("^:src:\\([^/]\\)[^/]*/" ":src/\\1:")
               ("^:src/\\(.\\):\\([^/]+\\)/" ":\\1/\\2:")))
+(custom-set sml/size-indication-format "%p of %I ")
 (custom-set sml/theme 'respectful)
 
 ;; Ignore case when sorting lines.
