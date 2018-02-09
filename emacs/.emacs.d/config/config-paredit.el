@@ -3,6 +3,36 @@
 (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
 
 (with-eval-after-load "paredit"
+  (defun my-paredit-forward-duplicate-sexp ()
+    "Duplicate current sexp forward."
+    (interactive)
+    (cond ((looking-back ")") (backward-sexp))
+          ((looking-at "(") t)
+          (t (backward-up-list)))
+    (let ((saved-kill-ring kill-ring))
+      (let ((start (point)))
+        (forward-sexp 1)
+        (kill-ring-save start (point)))
+      (newline-and-indent)
+      (yank)
+      (backward-sexp)
+      (setq kill-ring saved-kill-ring)))
+
+  (defun my-paredit-backward-duplicate-sexp ()
+    "Duplicate current sexp backward."
+    (interactive)
+    (cond ((looking-at "(") (forward-sexp))
+          ((looking-back ")") t)
+          (t (up-list)))
+    (let ((saved-kill-ring kill-ring))
+      (let ((end (point)))
+        (backward-sexp 1)
+        (kill-ring-save (point) end))
+      (yank)
+      (newline-and-indent)
+      (backward-sexp)
+      (setq kill-ring saved-kill-ring)))
+
   ;; Solve the conflict with `view-mode' which manifests itself when
   ;; `view-mode' is entered first (because of e.g. the value of
   ;; `view-read-only').
@@ -30,4 +60,8 @@
   (define-key paredit-mode-map (kbd "C-c C-d") #'paredit-focus-on-defun)
   (define-key paredit-mode-map (kbd "C-c C-f") #'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "C-c C-M-b") #'paredit-backward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-c C-M-f") #'paredit-forward-barf-sexp))
+  (define-key paredit-mode-map (kbd "C-c C-M-f") #'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-c C-v")
+    #'my-paredit-forward-duplicate-sexp)
+  (define-key paredit-mode-map (kbd "C-c C-M-v")
+    #'my-paredit-backward-duplicate-sexp))
