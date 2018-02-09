@@ -38,6 +38,7 @@ and URL
                      'ivy
                      'key-chord
                      'magit
+                     'minibuffer-line
                      'multiple-cursors
                      'org
                      'paredit

@@ -3,7 +3,6 @@
 (custom-set initial-scratch-message nil)
 (blink-cursor-mode 0)
 (column-number-mode 1)
-(display-time-mode 1)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (size-indication-mode 1)
@@ -70,7 +69,16 @@
 ;; `backward-sentence' and `forward-sentence').
 (custom-set sentence-end-double-space nil)
 
-;; Mode line format.
+;; Minibuffer line.
+(custom-set minibuffer-line-format
+            '(:eval (let ((time-string (format-time-string "%R")))
+                      (concat (make-string (- (frame-text-cols)
+                                              (string-width time-string)
+                                              1)
+                                           ? )
+                              time-string))))
+
+;; Mode line.
 (custom-set mode-line-format '("%e"
                                mode-line-front-space
                                mode-line-mule-info
@@ -87,7 +95,7 @@
                                mode-line-misc-info
                                mode-line-end-spaces))
 (custom-set rm-blacklist '(" $" " ivy"))
-(custom-set sml/mode-width 'full)
+(custom-set sml/mode-width 'right)
 (custom-set sml/name-width 20)
 (custom-set sml/position-percentage-format "")
 (custom-set sml/prefix-face-list '(("" sml/prefix)))
@@ -109,6 +117,7 @@
 
 ;; Enable base modes.
 (ivy-mode 1)
+(minibuffer-line-mode 1)
 (pending-delete-mode 1)
 (show-paren-mode 1)
 (sml/setup)                             ; Uses `rich-minority-mode' internally.
