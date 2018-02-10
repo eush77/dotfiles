@@ -230,6 +230,45 @@ function to {
 	mkdir -p "$DIR" && cd "$DIR"
 }
 
+# cdtree [<tree>] - Change current directory to the corresponding directory in
+# the other directory tree.
+#
+# Paths to directory trees must be specified in the array CDTREE.
+function cdtree {
+	# Determine the current directory tree.
+	local intree
+	local tree
+	local treeindex=0
+	for tree in "${CDTREE[@]}"; do
+		if [[ "${PWD#$tree/}" != "$PWD" ]]; then
+			intree=yes
+			break
+		else
+			let ++treeindex
+		fi
+	done
+	if [[ -z "$intree" ]]; then
+		_fmt error 'Not in a directory tree'
+		return 1
+	fi
+
+	# Check if the other tree is specified explicitly as a function parameter,
+	# or else choose the next tree in the list.
+	local othertree
+	if [[ -n "$1" ]]; then
+		othertree="$1"
+	else
+		othertree="${CDTREE[$(((treeindex + 1) % ${#CDTREE[@]}))]}"
+	fi
+
+	# Change to a directory in the other tree. Traverse up any subdirectories
+	# that exist in one subtree but not the other.
+	local otherdir="$othertree${PWD#$tree}"
+	while ! cd "$otherdir" 2>/dev/null; do
+		otherdir="${otherdir%/*}"
+	done
+}
+
 # Simple timer with precision of one second.
 function timer {
     local S=0 M=0
