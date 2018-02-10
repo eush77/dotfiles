@@ -41,9 +41,8 @@ function __ps1_success {
 	[[ "$PS1_STATUS" -eq 0 ]] && echo '>'
 }
 
-SHLVL_BASE="$((${TMUX:+1}+1))"
-if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
-	PS1_SHLVL="(+$((SHLVL - SHLVL_BASE))) "
+if [[ "$SHLVL" -gt 1 ]]; then
+	PS1_SHLVL="(+$((SHLVL - 1))) "
 else
 	PS1_SHLVL=
 fi
