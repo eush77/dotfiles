@@ -116,6 +116,7 @@ bind '"\C-]": ",,, "'
 #============================== Aliases ====================================
 # Include Grc aliases.
 [[ -r /etc/profile.d/grc.bashrc ]] && source /etc/profile.d/grc.bashrc
+unalias make  # The alias discards CMake coloring.
 
 alias bc='bc -q'
 alias catll='cat >/dev/null'
