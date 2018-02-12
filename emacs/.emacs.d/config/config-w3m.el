@@ -22,15 +22,15 @@
     (when (string-match "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+$" (ad-get-arg 0))
       (ad-set-arg 0 (concat "http://" (ad-get-arg 0)))))
 
-  ;; Wipe out the initial-input and the position in the list.
-  ;; A hack against `w3m-switch-buffer' populating the initial input.
-  (defun completing-read--w3m-switch-buffer
-      (func prompt collection &optional predicate require-match &rest rest)
-    "Wipe out the initial input populated by `w3m-switch-buffer'."
-    (when (eq major-mode 'w3m-mode)
-      (setq rest nil))
-    (apply func prompt collection predicate require-match rest))
-  (advice-add 'completing-read :around #'completing-read--w3m-switch-buffer)
+  (defun completing-read--w3m-switch-buffer (args)
+    "Wipe out initial input and position populated by `w3m-switch-buffer'."
+    (if (and (eq major-mode 'w3m-mode)
+             (stringp (nth 4 args))
+             (string-match "\*w3m\*" (nth 4 args)))
+        (butlast args 3)
+      args))
+  (advice-add 'completing-read :filter-args
+              #'completing-read--w3m-switch-buffer)
 
   ;; Follow symbolic links in `w3m-bookmark-file' when checking the file's
   ;; modification time.
