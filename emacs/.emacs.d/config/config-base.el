@@ -77,6 +77,10 @@
                                               1)
                                            ? )
                               time-string))))
+(defun keyboard-quit--minibuffer-line (func)
+  "Restore minibuffer line after quit."
+  (condition-case nil (funcall func) (quit (minibuffer-line--update))))
+(advice-add 'keyboard-quit :around #'keyboard-quit--minibuffer-line)
 
 ;; Mode line.
 (custom-set mode-line-format '("%e"
