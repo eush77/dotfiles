@@ -234,19 +234,19 @@ function to {
 #
 # Paths to directory trees must be specified in the array CDTREE.
 function cdtree {
-	# Determine the current directory tree.
-	local intree
 	local tree
+
+	# Determine the current directory tree.
 	local treeindex=0
 	for tree in "${CDTREE[@]}"; do
-		if [[ "${PWD#$tree/}" != "$PWD" ]]; then
-			intree=yes
+		if [[ "$PWD" = "$tree"/* ]]; then
+			local thistree="$tree"
 			break
 		else
-			let ++treeindex
+			(( ++treeindex ))
 		fi
 	done
-	if [[ -z "$intree" ]]; then
+	if [[ ! -v thistree ]]; then
 		_fmt error 'Not in a directory tree'
 		return 1
 	fi
@@ -255,14 +255,28 @@ function cdtree {
 	# or else choose the next tree in the list.
 	local othertree
 	if [[ -n "$1" ]]; then
-		othertree="$1"
+		if [[ -d "$1" ]]; then
+			othertree="$1"
+		else
+			# Try to resolve the argument against paths in CDTREE.
+			for tree in "${CDTREE[@]}"; do
+				if [[ "$tree" = */"$1" ]]; then
+					othertree="$tree"
+					break
+				fi
+			done
+			if [[ -z "$othertree" ]]; then
+				_fmt error "Directory tree not found: $1"
+				return 1
+			fi
+		fi
 	else
 		othertree="${CDTREE[$(((treeindex + 1) % ${#CDTREE[@]}))]}"
 	fi
 
 	# Change to a directory in the other tree. Traverse up any subdirectories
 	# that exist in one subtree but not the other.
-	local otherdir="$othertree${PWD#$tree}"
+	local otherdir="$othertree${PWD#$thistree}"
 	while ! cd "$otherdir" 2>/dev/null; do
 		otherdir="${otherdir%/*}"
 	done
