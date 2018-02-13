@@ -1,6 +1,7 @@
 (require 'dired-x)
 
 (with-eval-after-load "dired"
+  (custom-set dired-listing-switches "-al --group-directories-first")
   (custom-set dired-dwim-target t)
   (add-hook 'dired-after-readin-hook #'dired-hide-details-mode)
 
