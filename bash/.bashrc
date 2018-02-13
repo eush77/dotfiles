@@ -402,6 +402,10 @@ function youtube-mw {
 [[ -r /usr/share/commacd/commacd.bash ]] &&
 	source /usr/share/commacd/commacd.bash
 
+# Hook up Direnv.
+[[ "$(type -t direnv)" = "file" ]] &&
+	eval "$(direnv hook bash)"
+
 # Hook up Z.
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
 #===========================================================================
