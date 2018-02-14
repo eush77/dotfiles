@@ -17,6 +17,7 @@
 
 ;; Git grep.
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)
+(global-set-key (kbd "C-x v ?") #'my-git-grep-at-point)
 
 ;; Goto-last-change.
 (global-set-key (kbd "M-_") #'goto-last-change)

@@ -13,7 +13,15 @@
       (mapc #'package-install missing-packages))))
 
 ;;
-;; Interactive commands and custom variables follow.
+;; Grepping.
+;;
+(defun my-git-grep-at-point ()
+  "Grep for the symbol at point in the current Git repository."
+  (interactive)
+  (counsel-git-grep nil (thing-at-point 'symbol)))
+
+;;
+;; Editing.
 ;;
 
 (defun my-duplicate-line-down ()
@@ -64,6 +72,10 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (open-line count)
   (when my-open-line-and-indent
     (indent-according-to-mode)))
+
+;;
+;; Window sizing.
+;;
 
 (defcustom my-window-size-delta 1
   "Default delta for `my-window-*' family of commands.
