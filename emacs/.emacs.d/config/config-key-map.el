@@ -25,7 +25,7 @@
 (global-set-key [remap list-buffers] #'ibuffer)
 
 ;; Ivy.
-(global-set-key (kbd "C-c C-r") #'ivy-resume)
+(global-set-key (kbd "C-x C-r") #'ivy-resume)
 (define-key ivy-minibuffer-map (kbd "C-w") #'ivy-yank-word)
 
 ;; Keyboard-escape-quit.
