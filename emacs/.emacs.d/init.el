@@ -54,6 +54,7 @@ and URL
 ;; and load corresponding entries in the host file.
 (load "config-base")
 (load "config-c++")
+(load "config-counsel")
 (load "config-dired")
 (load "config-doc-view")
 (load "config-help")
