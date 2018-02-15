@@ -15,10 +15,10 @@
 ;;
 ;; Grepping.
 ;;
-(defun my-git-grep-at-point ()
+(defun my-git-grep-at-point (&optional cmd)
   "Grep for the symbol at point in the current Git repository."
-  (interactive)
-  (counsel-git-grep nil (thing-at-point 'symbol)))
+  (interactive "P")
+  (counsel-git-grep cmd (thing-at-point 'symbol)))
 
 ;;
 ;; Editing.
