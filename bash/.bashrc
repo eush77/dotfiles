@@ -114,7 +114,7 @@ bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
 
 bind -x '"\M-i": READLINE_LINE="i $READLINE_LINE"; let READLINE_POINT+=2'
-bind -x '"\M-g": READLINE_LINE+=" | $PAGER"'
+bind -x '"\M-g": READLINE_LINE+=" |& $PAGER"'
 bind -x '"\M-s": READLINE_LINE="sudo $READLINE_LINE"; let READLINE_POINT+=5'
 
 # Commacd
