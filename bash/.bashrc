@@ -30,8 +30,17 @@ HISTIGNORE='l:la:lc:ll:fg:fg *:bg:bg *:cd:cd *:pushd:pushd *:popd:popd *'
 HISTSIZE=15000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
-PROMPT_COMMAND='history -a; [[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] && l; _LAST_PWD="$PWD"'
+PROMPT_COMMAND='history -a; __prompt_listing'
+PROMPT_LISTING_LIMIT=20
 PS1='\[$((PS1_STATUS=$?))\r\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[31m\]$(__ps1_failure)\[\e[0m\]$(__ps1_success) '
+
+# List files on directory change.
+function __prompt_listing {
+	[[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] &&
+		[[ "$(find -maxdepth 1 | wc -l)" -le "$PROMPT_LISTING_LIMIT" ]] &&
+		l
+	_LAST_PWD="$PWD"
+}
 
 function __ps1_failure {
 	[[ "$PS1_STATUS" -ne 0 ]] && echo '>'
