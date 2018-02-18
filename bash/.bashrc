@@ -34,22 +34,6 @@ PROMPT_COMMAND='history -a; __prompt_listing'
 PROMPT_LISTING_LIMIT=20
 PS1='\[$((PS1_STATUS=$?))\r\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[31m\]$(__ps1_failure)\[\e[0m\]$(__ps1_success) '
 
-# List files on directory change.
-function __prompt_listing {
-	[[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] &&
-		[[ "$(find -maxdepth 1 | wc -l)" -le "$PROMPT_LISTING_LIMIT" ]] &&
-		l
-	_LAST_PWD="$PWD"
-}
-
-function __ps1_failure {
-	[[ "$PS1_STATUS" -ne 0 ]] && echo '>'
-}
-
-function __ps1_success {
-	[[ "$PS1_STATUS" -eq 0 ]] && echo '>'
-}
-
 if [[ "$SHLVL" -gt 1 ]]; then
 	PS1_SHLVL="(+$((SHLVL - 1))) "
 else
@@ -74,10 +58,6 @@ if type -P git >/dev/null; then
 else
 	alias __git_ps1=true
 fi
-
-function __ps1_paths {
-	builtin dirs -p | sed '2,$ { s:.*/:: }' | tac | paste -sd,
-}
 
 shopt -s \
 	  autocd \
@@ -156,14 +136,39 @@ alias mplayer.tl='mplayer -profile tl'
 alias mplayer.tr='mplayer -profile tr'
 alias mplayer.bl='mplayer -profile bl'
 alias mplayer.br='mplayer -profile br'
-
-# Use indirection to allow EDITOR to be redefined by the host.
-function e {
-	$EDITOR "$@"
-}
 #===========================================================================
 
 #================================= Functions ===============================
+function e {
+	# Use indirection to allow EDITOR to be redefined by the host.
+	$EDITOR "$@"
+}
+
+# List files on directory change.
+function __prompt_listing {
+	[[ "${_LAST_PWD:=$PWD}" != "$PWD" ]] &&
+		[[ "$(find -maxdepth 1 | wc -l)" -le "$PROMPT_LISTING_LIMIT" ]] &&
+		l
+	_LAST_PWD="$PWD"
+}
+
+# This function is called from PS1 to print a prompt sigil after a failed
+# command.
+function __ps1_failure {
+	[[ "$PS1_STATUS" -ne 0 ]] && echo '>'
+}
+
+# This function is called from PS1 to print a prompt sigil after a succeeded
+# command.
+function __ps1_success {
+	[[ "$PS1_STATUS" -eq 0 ]] && echo '>'
+}
+
+# This function is called from PS1 to print the directory stack.
+function __ps1_paths {
+	builtin dirs -p | sed '2,$ { s:.*/:: }' | tac | paste -sd,
+}
+
 # Simple message formatter.
 function _fmt {
 	local TYPE="$1"
