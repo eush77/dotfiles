@@ -26,7 +26,7 @@ eval "$(dircolors)"
 FIGNORE='~'
 HISTCONTROL=ignoreboth
 HISTFILESIZE=20000
-HISTIGNORE='l:la:lc:ll:fg:fg *:bg:bg *:cd:cd *:pushd:pushd *:popd:popd *'
+HISTIGNORE='l:la:lc:ll:fg:fg *:bg:bg *:cd:cd *:pushd:popd:popd *'
 HISTSIZE=15000
 HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
