@@ -18,6 +18,7 @@
 	      (delete-trailing-whitespace))))
 
 ;; Commenting style.
+(custom-set comment-multi-line t)
 (custom-set comment-style 'extra-line)
 
 ;; Input method.
