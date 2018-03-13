@@ -1,0 +1,12 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-
+set -euo pipefail
+IFS=$'\n'
+
+MAKE="$(type -ap "$(basename "$0")" | sed -n 2p)"
+
+if egrep -q '(^|\s)-j' <<<"${MAKEFLAGS}"; then
+	"${MAKE}" "$@"
+else
+	"${MAKE}" -j9 "$@"
+fi
