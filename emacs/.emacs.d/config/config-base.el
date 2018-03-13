@@ -99,7 +99,10 @@
                                mode-line-modes
                                mode-line-misc-info
                                mode-line-end-spaces))
-(custom-set rm-blacklist '(" $" " ivy"))
+(custom-set rm-blacklist '(" $"         ; rich-minority-mode
+                           " FlyC-"     ; flycheck-mode (no-checker)
+                           " ivy"       ; ivy-mode
+                           "[ln]"))     ; w3m-lnum-mode
 (custom-set sml/mode-width 'right)
 (custom-set sml/name-width 20)
 (custom-set sml/position-percentage-format "")
