@@ -1,3 +1,5 @@
+(custom-set counsel-git-grep-skip-counting-lines t) ; Shave off extra latency.
+
 (defun counsel-git-grep--projects (args)
   "Use `counsel-git-grep-projects' configuration when the
 `default-directory' resides in a project. With a prefix argument,
