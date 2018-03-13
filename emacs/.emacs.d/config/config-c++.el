@@ -14,4 +14,6 @@
     (c-set-offset 'innamespace '-)
     (c-set-offset 'arglist-cont-nonempty
                   (list #'my-c++-lineup-lambda #'c-lineup-arglist)))
-  (add-hook 'c++-mode-hook #'my-c++-hook))
+  (add-hook 'c++-mode-hook #'my-c++-hook)
+
+  (define-key c++-mode-map [remap indent-region] #'clang-format-region))

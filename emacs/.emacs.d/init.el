@@ -31,7 +31,8 @@ and URL
 	      ("melpa" . "http://melpa.org/packages/")))
 
 ;; Check and install missing packages.
-(my-install-packages 'counsel
+(my-install-packages 'clang-format
+                     'counsel
                      'expand-region
                      'gnus-desktop-notify
                      'goto-last-change
