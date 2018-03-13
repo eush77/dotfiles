@@ -85,6 +85,7 @@ shopt -s \
 #===========================================================================
 
 #============================ Readline =====================================
+bind 'set colored-stats on'
 bind 'set completion-ignore-case on'
 bind 'set convert-meta on'
 bind 'set match-hidden-files off'
