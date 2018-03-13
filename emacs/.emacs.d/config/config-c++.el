@@ -9,6 +9,8 @@
 
   (defun my-c++-hook ()
     "My hook for C++ mode."
+    (c-set-offset 'arglist-intro '+)
+    (c-set-offset 'inextern-lang 0)
     (c-set-offset 'innamespace '-)
     (c-set-offset 'arglist-cont-nonempty
                   (list #'my-c++-lineup-lambda #'c-lineup-arglist)))
