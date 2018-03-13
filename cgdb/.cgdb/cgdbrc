@@ -1,6 +1,7 @@
 set cgdbmodekey=<Insert>
 set winsplit=top_big
 set arrowstyle=long
+set autosourcereload
 
 map q iquit<CR>
 
@@ -11,15 +12,18 @@ map h <C-d>
 # Control flow.
 map <F9> <F10>
 map n inext<CR><Insert>
+map N ireverse-next<CR><Insert>
 map s istep<CR><Insert>
+map S ireverse-step<CR><Insert>
 map u iup<CR><Insert>
 map d idown<CR><Insert>
 map f ifinish<CR><Insert>
+map F ireverse-finish<CR><Insert>
 map c icontinue<CR><Insert>
+map C ireverse-continue<CR><Insert>
 
 # Run / reset from breakfile.
 map r ipy<Space>gdb.execute("run")<CR><Insert>
-map e isource<Space>break<CR><Insert>
 
 # Command shortcuts.
 map p ip<Space>
