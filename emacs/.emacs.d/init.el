@@ -34,6 +34,7 @@ and URL
 (my-install-packages 'clang-format
                      'counsel
                      'expand-region
+                     'flycheck
                      'gnus-desktop-notify
                      'goto-last-change
                      'ivy
@@ -58,6 +59,7 @@ and URL
 (load "config-counsel")
 (load "config-dired")
 (load "config-doc-view")
+(load "config-flycheck")
 (load "config-help")
 (load "config-hideshow")
 (load "config-info")
