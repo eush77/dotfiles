@@ -28,6 +28,8 @@
 [grep]
 	patternType = perl
 	lineNumber = true
+[merge]
+	conflictStyle = diff3
 [push]
 	default = upstream
 [rebase]
