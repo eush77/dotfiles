@@ -78,3 +78,4 @@ and URL
     (load-file host-file)))
 
 (server-start)
+(pinentry-start)
