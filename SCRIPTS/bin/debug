@@ -1,0 +1,8 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-
+set -euo pipefail
+
+: ${GDB:=cgdb}
+: ${GDB_FLAGS:=}
+
+"$GDB" $GDB_FLAGS --args "$@"

@@ -1,0 +1,21 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-
+set -euo pipefail
+
+#
+# rebug <cmd>
+#
+# Run Gdb in remote debugging mode.
+#
+
+: ${GDB:=cgdb}
+: ${GDB_FLAGS:=}
+: ${GDB_PORT:=4040}
+
+CMD="$1"
+
+"$GDB" $GDB_FLAGS \
+	   -l 10000 \
+	   -ex 'set sysroot /' \
+	   -ex "target extended-remote localhost:${GDB_PORT}" \
+	   "$(type -p "$CMD")"
