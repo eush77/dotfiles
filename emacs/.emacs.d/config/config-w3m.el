@@ -13,10 +13,11 @@
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode)
 
-  (add-hook 'w3m-mode-hook
-            (lambda ()
-              (face-remap-add-relative 'default :family "Droid Serif")
-              (text-scale-adjust 1)))
+  (when window-system
+    (add-hook 'w3m-mode-hook
+              (lambda ()
+                (face-remap-add-relative 'default :family "Droid Serif")
+                (text-scale-adjust 1))))
 
   (defadvice w3m-canonicalize-url (before w3m-canonicalize-domain-name activate)
     (when (string-match "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+$" (ad-get-arg 0))
