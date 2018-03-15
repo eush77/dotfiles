@@ -1,6 +1,6 @@
 #!/bin/bash
 # -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-
-set -euo pipefail
+set -eo pipefail
 IFS=$'\n'
 
 MAKE="$(type -ap "$(basename "$0")" | sed -n 2p)"
