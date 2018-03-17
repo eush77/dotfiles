@@ -33,6 +33,7 @@ and URL
 ;; Check and install missing packages.
 (my-install-packages 'clang-format
                      'counsel
+                     'direnv
                      'expand-region
                      'flycheck
                      'gnus-desktop-notify
@@ -82,3 +83,4 @@ and URL
 
 (server-start)
 (pinentry-start)
+(direnv-mode)
