@@ -46,6 +46,7 @@ and URL
                      'multiple-cursors
                      'org-plus-contrib
                      'paredit
+                     'pass
                      'pocket-reader
                      'smart-mode-line
                      'swiper
