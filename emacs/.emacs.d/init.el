@@ -28,7 +28,8 @@ and URL
 ;; Package archives.
 (custom-set package-archives
 	    '(("gnu" . "http://elpa.gnu.org/packages/")
-	      ("melpa" . "http://melpa.org/packages/")))
+	      ("melpa" . "http://melpa.org/packages/")
+              ("org" . "https://orgmode.org/elpa/")))
 
 ;; Check and install missing packages.
 (my-install-packages 'clang-format
@@ -43,8 +44,9 @@ and URL
                      'magit
                      'minibuffer-line
                      'multiple-cursors
-                     'org
+                     'org-plus-contrib
                      'paredit
+                     'pocket-reader
                      'smart-mode-line
                      'swiper
                      'w3m
@@ -71,6 +73,7 @@ and URL
 (load "config-markdown")
 (load "config-org")
 (load "config-paredit")
+(load "config-pocket-reader")
 (load "config-shr")
 (load "config-vc")
 (load "config-view")
