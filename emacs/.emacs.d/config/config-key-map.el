@@ -1,6 +1,3 @@
-;; Browse-web.
-(global-set-key (kbd "C-x M-3") #'browse-web)
-
 ;; Counsel overloads.
 (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
 (global-set-key [remap describe-function] #'counsel-describe-function)
@@ -18,6 +15,11 @@
 ;; Git grep.
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)
 (global-set-key (kbd "C-x v ?") #'my-git-grep-at-point)
+
+;; Global shortcuts.
+(global-set-key (kbd "C-x M-2") #'gnus)
+(global-set-key (kbd "C-x M-3") #'browse-web)
+(global-set-key (kbd "C-x M-4") #'pocket-reader)
 
 ;; Goto-last-change.
 (global-set-key (kbd "M-_") #'goto-last-change)
