@@ -39,6 +39,7 @@ and URL
                      'flycheck
                      'gnus-desktop-notify
                      'goto-last-change
+                     'guide-key
                      'ivy
                      'key-chord
                      'magit
@@ -64,6 +65,7 @@ and URL
 (load "config-dired")
 (load "config-doc-view")
 (load "config-flycheck")
+(load "config-guide-key")
 (load "config-help")
 (load "config-hideshow")
 (load "config-info")

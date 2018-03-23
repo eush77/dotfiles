@@ -101,6 +101,7 @@
                                mode-line-end-spaces))
 (custom-set rm-blacklist '(" $"         ; rich-minority-mode
                            " FlyC-"     ; flycheck-mode (no-checker)
+                           " Guide"     ; guide-key-mode
                            " ivy"       ; ivy-mode
                            "[ln]"))     ; w3m-lnum-mode
 (custom-set sml/mode-width 'right)
