@@ -42,12 +42,14 @@
   (advice-add 'w3m-bookmark-file-modtime
               :around #'w3m-bookmark-file-modtime--chase-links)
 
-  (defun my-w3m-pocket-add-current-url ()
-    "Add current URL to Pocket."
-    (interactive)
+  (defun my-w3m-pocket-add-url (&optional this-url)
+    "Add current URL to Pocket. If THIS-URL is not nil, add URL at
+point instead."
+    (interactive "P")
     (require 'pocket-lib)
-    (when (pocket-lib-add-urls w3m-current-url)
-      (message "Added: %s" w3m-current-url)))
+    (let ((url (if this-url (w3m-anchor) w3m-current-url)))
+      (when (pocket-lib-add-urls url)
+        (message "Added: %s" url))))
 
   (define-key w3m-mode-map (kbd "b") #'w3m-view-previous-page)
   (define-key w3m-mode-map (kbd "B") #'w3m-view-next-page)
@@ -63,7 +65,7 @@
   (define-key w3m-mode-map (kbd "n") #'w3m-next-anchor)
   (define-key w3m-mode-map (kbd "C-c M-n") #'w3m-tab-move-right)
   (define-key w3m-mode-map (kbd "p") #'w3m-previous-anchor)
-  (define-key w3m-mode-map (kbd "P") #'my-w3m-pocket-add-current-url)
+  (define-key w3m-mode-map (kbd "P") #'my-w3m-pocket-add-url)
   (define-key w3m-mode-map (kbd "C-c M-p") #'w3m-tab-move-left)
   (define-key w3m-mode-map (kbd "w") #'w3m-lnum-universal))
 
