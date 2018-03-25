@@ -17,6 +17,7 @@
 (global-set-key (kbd "C-x v ?") #'my-git-grep-at-point)
 
 ;; Global shortcuts.
+(global-set-key (kbd "C-x M-1") #'eshell)
 (global-set-key (kbd "C-x M-2") #'gnus)
 (global-set-key (kbd "C-x M-3") #'browse-web)
 (global-set-key (kbd "C-x M-4") #'pocket-reader)

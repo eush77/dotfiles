@@ -35,6 +35,7 @@ and URL
 (my-install-packages 'clang-format
                      'counsel
                      'direnv
+                     'eshell-z
                      'expand-region
                      'flycheck
                      'gnus-desktop-notify
@@ -64,6 +65,7 @@ and URL
 (load "config-counsel")
 (load "config-dired")
 (load "config-doc-view")
+(load "config-eshell")
 (load "config-flycheck")
 (load "config-guide-key")
 (load "config-help")
