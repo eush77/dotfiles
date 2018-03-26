@@ -3,14 +3,28 @@
 (with-eval-after-load "eshell"
   (require 'eshell-z)
 
+  ;; My Eshell prompt is already propertized.
+  (custom-set eshell-highlight-prompt nil)
+
   (defvar my-eshell-prompt-length 20
     "Length of the Eshell prompt string (as computed by
 `my-eshell-prompt-function'). The prompt string will be reduced
 until it fits and then aligned to be exactly this length.")
 
+  (defface my-eshell-prompt-sigil-failure
+  '((default :weight bold)
+    (((class color) (background light)) :foreground "Pink")
+    (((class color) (background dark))  :foreground "Red"))
+  "The face used to highlight sigil when
+`eshell-last-command-status' is not 0.")
+
   (defun my-eshell-prompt-sigil-function ()
     "Return trailing sigil for my Eshell prompt."
-    (if (zerop (user-uid)) " # " " $ "))
+    (propertize (if (zerop (user-uid)) " # " " $ ")
+                'face
+                (if (zerop eshell-last-command-status)
+                    'eshell-prompt
+                  'my-eshell-prompt-sigil-failure)))
 
   ;; My Eshell prompt has a fixed length.
   ;;
@@ -158,27 +172,41 @@ leads starting from the rightmost lead to fill available width."
     (should (string= (my-eshell-prompt/format-leads '("abc" "xyz") 0)
                      "")))
 
-  (defun my-eshell-prompt-function ()
-    "Return my Eshell prompt string for `default-directory'."
+  (defun my-eshell-prompt-leads-function ()
+    "Return my Eshell prompt string for `default-directory', not
+including the sigil."
     (let* ((directory (abbreviate-file-name
                        (directory-file-name default-directory)))
            (last-lead (file-name-nondirectory directory))
            (leads (butlast (split-string directory "/")))
            (sigil (my-eshell-prompt-sigil-function)))
-      (cond ((< my-eshell-prompt-length (length sigil))
-             (error "`my-eshell-prompt-length' is too small."))
-            ((<= my-eshell-prompt-length (+ (length last-lead)
-                                            (length sigil)))
-             (concat (my-eshell-prompt/format-lead last-lead
-                                                   (- my-eshell-prompt-length
-                                                      (length sigil)))
-                     sigil))
-            (t (concat (my-eshell-prompt/format-leads
-                        leads
-                        (- my-eshell-prompt-length
-                           (length last-lead)
-                           (length sigil)))
-                       last-lead
-                       sigil)))))
+      (propertize
+       (cond ((< my-eshell-prompt-length (length sigil))
+              (error "`my-eshell-prompt-length' is too small."))
+             ((<= my-eshell-prompt-length (+ (length last-lead)
+                                             (length sigil)))
+              (my-eshell-prompt/format-lead last-lead
+                                            (- my-eshell-prompt-length
+                                               (length sigil))))
+             (t (concat (my-eshell-prompt/format-leads
+                         leads
+                         (- my-eshell-prompt-length
+                            (length last-lead)
+                            (length sigil)))
+                        last-lead)))
+       'face 'eshell-prompt)))
+
+  (defun my-eshell-prompt-function ()
+    "Return my Eshell prompt propertized string for `default-directory'."
+    (let ((prompt (concat (my-eshell-prompt-leads-function)
+                          (my-eshell-prompt-sigil-function))))
+      (add-text-properties
+       0
+       (length prompt)
+       '(read-only t
+         front-sticky (face font-lock-face read-only)
+         rear-nonsticky (face font-lock-face read-only))
+       prompt)
+      prompt))
 
   (custom-set eshell-prompt-function #'my-eshell-prompt-function))
