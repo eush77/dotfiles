@@ -2,6 +2,10 @@
 
 (with-eval-after-load "org"
   (require 'org-depend)
+  (custom-set org-todo-keywords
+              '((sequence "TODO" "NEXT" "|" "DONE" "DROP")
+                (sequence "PLAN" "|" "PASS" "FAIL")
+                (sequence "|" "GONE")))
   (custom-set org-enforce-todo-dependencies t)
   (custom-set org-enforce-todo-checkbox-dependencies t)
 
