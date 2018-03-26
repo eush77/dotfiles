@@ -1,6 +1,10 @@
 ;;; -*- lexical-binding: t -*-
 
 (with-eval-after-load "org"
+  (require 'org-depend)
+  (custom-set org-enforce-todo-dependencies t)
+  (custom-set org-enforce-todo-checkbox-dependencies t)
+
   (add-hook 'org-mode-hook #'auto-fill-mode)
 
   (let ((show-and-move
