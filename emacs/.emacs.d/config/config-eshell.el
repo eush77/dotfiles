@@ -3,9 +3,6 @@
 (with-eval-after-load "eshell"
   (require 'eshell-z)
 
-  ;; My Eshell prompt is already propertized.
-  (custom-set eshell-highlight-prompt nil)
-
   (defvar my-eshell-prompt-length 20
     "Length of the Eshell prompt string (as computed by
 `my-eshell-prompt-function'). The prompt string will be reduced
@@ -209,4 +206,11 @@ including the sigil."
        prompt)
       prompt))
 
-  (custom-set eshell-prompt-function #'my-eshell-prompt-function))
+  (custom-set eshell-highlight-prompt nil) ; The prompt is already propertized.
+  (custom-set eshell-prompt-function #'my-eshell-prompt-function)
+
+  (custom-set eshell-ls-initial-args '("--classify"
+                                       "--color=auto"
+                                       "--group-directories-first"
+                                       "--ignore-backups"
+                                       "-v")))
