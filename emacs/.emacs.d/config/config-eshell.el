@@ -12,16 +12,16 @@
 until it fits and then aligned to be exactly this length.")
 
   (defface my-eshell-prompt-sigil-failure
-  '((default :weight bold)
-    (((class color) (background light)) :foreground "Pink")
-    (((class color) (background dark))  :foreground "Red"))
-  "The face used to highlight sigil when
+    '((default :weight bold)
+      (((class color) (background light)) :foreground "Pink")
+      (((class color) (background dark))  :foreground "Red"))
+    "The face used to highlight sigil when
 `eshell-last-command-status' is not 0.")
 
   (defun my-eshell-prompt-sigil-function ()
     "Return trailing sigil for my Eshell prompt."
     (propertize (if (zerop (user-uid)) " # " " $ ")
-                'face
+                'font-lock-face
                 (if (zerop eshell-last-command-status)
                     'eshell-prompt
                   'my-eshell-prompt-sigil-failure)))
@@ -194,7 +194,7 @@ including the sigil."
                             (length last-lead)
                             (length sigil)))
                         last-lead)))
-       'face 'eshell-prompt)))
+       'font-lock-face 'eshell-prompt)))
 
   (defun my-eshell-prompt-function ()
     "Return my Eshell prompt propertized string for `default-directory'."
@@ -204,8 +204,8 @@ including the sigil."
        0
        (length prompt)
        '(read-only t
-         front-sticky (face font-lock-face read-only)
-         rear-nonsticky (face font-lock-face read-only))
+         front-sticky (font-lock-face read-only)
+         rear-nonsticky (font-lock-face read-only))
        prompt)
       prompt))
 
