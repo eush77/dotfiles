@@ -66,7 +66,7 @@ New LEAD is added if OP is '+ and subtracted if it is '-."
             (funcall update-op
                      min-length
                      (+ (my-eshell-prompt/lead-min-length lead) 1))))
-      (assert (>= updated-min-length 0))
+      (cl-assert (>= updated-min-length 0))
       updated-min-length))
 
   (ert-deftest my-eshell-prompt/update-min-length ()
