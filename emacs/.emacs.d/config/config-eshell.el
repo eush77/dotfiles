@@ -3,6 +3,13 @@
 (with-eval-after-load "eshell"
   (require 'eshell-z)
 
+  ;; My Eshell prompt has a fixed length.
+  ;;
+  ;; It is composed of "leads" - nondirectory parts of the full name of the
+  ;; current working directory. The last lead is always displayed in full or
+  ;; truncated to fill all the available space, even if to the detriment of
+  ;; other leads.
+
   (defvar my-eshell-prompt-length 20
     "Length of the Eshell prompt string (as computed by
 `my-eshell-prompt-function'). The prompt string will be reduced
@@ -22,13 +29,6 @@ until it fits and then aligned to be exactly this length.")
                 (if (zerop eshell-last-command-status)
                     'eshell-prompt
                   'my-eshell-prompt-sigil-failure)))
-
-  ;; My Eshell prompt has a fixed length.
-  ;;
-  ;; It is composed of "leads" - nondirectory parts of the full name of the
-  ;; current working directory. The last lead is always displayed in full or
-  ;; truncated to fill all the available space, even if to the detriment of
-  ;; other leads.
 
   (defun my-eshell-prompt/lead-min-length (lead)
     "Minimum length a lead can be displayed in.
@@ -206,11 +206,22 @@ including the sigil."
        prompt)
       prompt))
 
-  (custom-set eshell-highlight-prompt nil) ; The prompt is already propertized.
+  ;; Set up the prompt.
+  ;; It is already propertized, so turn off built-in highlighting.
+  (custom-set eshell-highlight-prompt nil)
   (custom-set eshell-prompt-function #'my-eshell-prompt-function)
 
+  ;; Set up `emacs/ls'.
   (custom-set eshell-ls-initial-args '("--classify"
                                        "--color=auto"
                                        "--group-directories-first"
                                        "--ignore-backups"
-                                       "-v")))
+                                       "-v"))
+
+  ;; Set up key bindings.
+  ;; `eshell-mode-map' is local to the buffer, so do it in a hook.
+  (defun my-eshell-mode-hook ()
+    "My hook for Eshell mode."
+    (define-key eshell-mode-map (kbd "C-l") #'eshell/clear)
+    (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much))
+  (add-hook 'eshell-mode-hook #'my-eshell-mode-hook))
