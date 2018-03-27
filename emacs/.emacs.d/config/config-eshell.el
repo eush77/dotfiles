@@ -218,6 +218,25 @@ including the sigil."
                                        "--ignore-backups"
                                        "-v"))
 
+  ;; Advice `eshell-dirs-substitute-cd' to list directory contents.
+  (defun eshell-dirs-substitute-cd--ls (func &rest args)
+    "List directory contents after executing it in the command position.
+
+Like setting `eshell-list-files-after-cd', but applies only when
+`eshell/cd' is called implicitly. It also works correctly when
+`eshell/ls' launches an external process (in which case
+`eshell-list-files-after-cd' would show its output after the
+prompt)."
+    (let* ((cd (catch 'eshell-replace-command (apply func args)))
+           ;; The resulting command will be destructively modified by Eshell,
+           ;; so don't `quote' it.
+           (cd+ls (list 'progn
+                        (list 'eshell-commands ,cd)
+                        (list 'eshell-named-command "ls"))))
+      (throw 'eshell-replace-command cd+ls)))
+  (advice-add 'eshell-dirs-substitute-cd
+              :around #'eshell-dirs-substitute-cd--ls)
+
   ;; Set up key bindings.
   ;; `eshell-mode-map' is local to the buffer, so do it in a hook.
   (defun my-eshell-mode-hook ()
