@@ -83,6 +83,7 @@ and URL
 (load "config-vc")
 (load "config-view")
 (load "config-w3m")
+(load "config-window-jump")
 
 ;; Host file - tweak things if necessary.
 (let ((host-file (expand-file-name "host.el" user-emacs-directory)))
