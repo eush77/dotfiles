@@ -231,7 +231,7 @@ prompt)."
            ;; The resulting command will be destructively modified by Eshell,
            ;; so don't `quote' it.
            (cd+ls (list 'progn
-                        (list 'eshell-commands ,cd)
+                        (list 'eshell-commands cd)
                         (list 'eshell-named-command "ls"))))
       (throw 'eshell-replace-command cd+ls)))
   (advice-add 'eshell-dirs-substitute-cd
