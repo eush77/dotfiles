@@ -33,6 +33,7 @@ and URL
 
 ;; Check and install missing packages.
 (my-install-packages 'clang-format
+                     'color-identifiers-mode
                      'counsel
                      'direnv
                      'eshell-z
@@ -62,6 +63,7 @@ and URL
 ;; and load corresponding entries in the host file.
 (load "config-base")
 (load "config-c++")
+(load "config-color-identifiers-mode")
 (load "config-counsel")
 (load "config-dired")
 (load "config-doc-view")
