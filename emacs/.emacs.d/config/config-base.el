@@ -15,7 +15,7 @@
 (add-hook 'before-save-hook
           (lambda ()
             (unless (eq major-mode 'diff-mode)
-	      (delete-trailing-whitespace))))
+              (delete-trailing-whitespace))))
 
 ;; Commenting style.
 (custom-set comment-multi-line t)
@@ -59,16 +59,6 @@
 ;; Ivy.
 (custom-set ivy-use-selectable-prompt t)
 (custom-set ivy-use-virtual-buffers t)
-
-;; `quoted-insert' radix.
-(custom-set read-quoted-char-radix 16)
-
-;; Set a minimal scroll margin for `recenter-top-bottom'.
-(custom-set scroll-margin 1)
-
-;; Fix sentence boundaries (used for e.g. navigation commands
-;; `backward-sentence' and `forward-sentence').
-(custom-set sentence-end-double-space nil)
 
 ;; Minibuffer line.
 (custom-set minibuffer-line-format
@@ -117,6 +107,16 @@
               ("^:src/\\(.\\):\\([^/]+\\)/" ":\\1/\\2:")))
 (custom-set sml/size-indication-format "%p of %I ")
 (custom-set sml/theme 'respectful)
+
+;; `quoted-insert' radix.
+(custom-set read-quoted-char-radix 16)
+
+;; Set a minimal scroll margin for `recenter-top-bottom'.
+(custom-set scroll-margin 1)
+
+;; Fix sentence boundaries (used for e.g. navigation commands
+;; `backward-sentence' and `forward-sentence').
+(custom-set sentence-end-double-space nil)
 
 ;; Ignore case when sorting lines.
 (custom-set sort-fold-case t)
