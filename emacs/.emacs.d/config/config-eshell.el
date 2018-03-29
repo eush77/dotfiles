@@ -215,7 +215,6 @@ including the sigil."
   (custom-set eshell-ls-initial-args '("--classify"
                                        "--color=auto"
                                        "--group-directories-first"
-                                       "--ignore-backups"
                                        "-v"))
 
   ;; Advice `eshell-dirs-substitute-cd' to list directory contents.
