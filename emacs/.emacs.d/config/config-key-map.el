@@ -47,6 +47,9 @@
 (global-set-key (kbd "C-x g") #'magit-status)
 (global-set-key (kbd "C-x M-g") #'magit-list-repositories)
 
+;; Man.
+(global-set-key (kbd "C-h M") #'man)
+
 ;; Movement.
 ;; Unbinding `C-m' from `RET' does not work in a terminal.
 (when window-system
