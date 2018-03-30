@@ -6,6 +6,10 @@
               '((sequence "TODO" "NEXT" "|" "DONE" "DROP")
                 (sequence "PLAN" "|" "PASS" "FAIL")
                 (sequence "|" "GONE")))
+  (custom-set org-todo-keyword-faces
+              '(("PLAN" . "yellow")
+                ("PASS" . "green")
+                ("FAIL" . "red")))
   (custom-set org-enforce-todo-dependencies t)
   (custom-set org-enforce-todo-checkbox-dependencies t)
 
