@@ -52,6 +52,7 @@ and URL
                      'pass
                      'pocket-reader
                      'smart-mode-line
+                     'smartscan
                      'swiper
                      'w3m
                      'window-jump)
@@ -82,6 +83,7 @@ and URL
 (load "config-paredit")
 (load "config-pocket-reader")
 (load "config-shr")
+(load "config-smartscan")
 (load "config-vc")
 (load "config-view")
 (load "config-w3m")
