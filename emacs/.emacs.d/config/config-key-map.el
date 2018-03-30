@@ -61,6 +61,12 @@
 (global-set-key (kbd "C-M-<down>") #'mc/mark-next-like-this)
 (global-set-key (kbd "C-M-<up>") #'mc/mark-previous-like-this)
 
+;; Org.
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c b") #'org-switchb)
+(global-set-key (kbd "C-c c") #'org-capture)
+(global-set-key (kbd "C-c l") #'org-store-link)
+
 ;; Scroll lock.
 (global-set-key (kbd "<Scroll_Lock>") #'scroll-lock-mode)
 
