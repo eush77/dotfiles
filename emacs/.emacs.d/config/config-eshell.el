@@ -206,6 +206,12 @@ including the sigil."
        prompt)
       prompt))
 
+  (defun my-eshell-insert-sudo ()
+    "Prefix current command with prefix."
+    (interactive)
+    (eshell-bol)
+    (insert "sudo "))
+
   ;; Set up the prompt.
   ;; It is already propertized, so turn off built-in highlighting.
   (custom-set eshell-highlight-prompt nil)
@@ -240,6 +246,7 @@ prompt)."
   ;; `eshell-mode-map' is local to the buffer, so do it in a hook.
   (defun my-eshell-mode-hook ()
     "My hook for Eshell mode."
-    (define-key eshell-mode-map (kbd "C-l") #'eshell/clear)
-    (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much))
+    (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
+    (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo)
+    (define-key eshell-mode-map (kbd "C-l") #'eshell/clear))
   (add-hook 'eshell-mode-hook #'my-eshell-mode-hook))
