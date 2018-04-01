@@ -48,10 +48,10 @@ and URL
                      'minibuffer-line
                      'multiple-cursors
                      'org-plus-contrib
-                     'paredit
                      'pass
                      'pocket-reader
                      'smart-mode-line
+                     'smartparens
                      'smartscan
                      'swiper
                      'w3m
@@ -80,9 +80,9 @@ and URL
 (load "config-man")
 (load "config-markdown")
 (load "config-org")
-(load "config-paredit")
 (load "config-pocket-reader")
 (load "config-shr")
+(load "config-smartparens")
 (load "config-smartscan")
 (load "config-vc")
 (load "config-view")

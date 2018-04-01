@@ -74,6 +74,18 @@
 (global-set-key (kbd "M-p") #'scroll-down)
 (global-set-key (kbd "M-n") #'scroll-up)
 
+;; Smartparens.
+(global-set-key (kbd "C-c C-M-b") #'sp-backward-slurp-sexp)
+(global-set-key (kbd "C-c C-M-f") #'sp-forward-slurp-sexp)
+(global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-slurp-sexp)
+(global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
+(global-set-key (kbd "C-c M-d") #'sp-kill-sexp)
+(global-set-key (kbd "C-M-y") #'sp-up-sexp)
+(global-set-key [remap backward-sexp] #'sp-backward-sexp)
+(global-set-key [remap backward-up-list] #'sp-backward-up-sexp)
+(global-set-key [remap down-list] #'sp-down-sexp)
+(global-set-key [remap forward-sexp] #'sp-forward-sexp)
+
 ;; Swiper.
 ;; Complementary to `isearch-backward' on C-r.
 (global-set-key (kbd "C-s") #'swiper)
