@@ -129,6 +129,9 @@
 ;; `backward-sentence' and `forward-sentence').
 (custom-set sentence-end-double-space nil)
 
+;; Repeatedly pop mark with `C-SPC' after single `C-u C-SPC'.
+(custom-set set-mark-command-repeat-pop t)
+
 ;; Ignore case when sorting lines.
 (custom-set sort-fold-case t)
 
