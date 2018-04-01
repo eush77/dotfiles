@@ -3,7 +3,7 @@
 (with-eval-after-load "org"
   (require 'org-depend)
   (custom-set org-todo-keywords
-              '((sequence "TODO" "NEXT" "|" "DONE" "DROP")
+              '((sequence "TODO(!)" "NEXT(!)" "|" "DONE" "DROP")
                 (sequence "PLAN" "|" "PASS" "FAIL")
                 (sequence "|" "GONE")))
   (custom-set org-todo-keyword-faces
@@ -12,6 +12,8 @@
                 ("FAIL" . "red")))
   (custom-set org-enforce-todo-dependencies t)
   (custom-set org-enforce-todo-checkbox-dependencies t)
+  (custom-set org-log-done 'time)
+  (custom-set org-log-into-drawer t)
 
   (add-hook 'org-mode-hook #'auto-fill-mode)
 
