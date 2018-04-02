@@ -13,6 +13,7 @@
 
 ;; Expand-region.
 (global-set-key (kbd "M-=") #'er/expand-region)
+(global-set-key (kbd "M-+") #'er/mark-sentence)
 
 ;; Frames.
 (global-set-key (kbd "M-`") #'other-frame)
@@ -84,6 +85,7 @@
 (global-set-key (kbd "C-c C-M-f") #'sp-forward-slurp-sexp)
 (global-set-key (kbd "C-c C-M-r") #'sp-raise-sexp)
 (global-set-key (kbd "C-c C-M-s") #'sp-split-sexp)
+(global-set-key (kbd "C-c C-M-t") #'sp-splice-sexp)
 (global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-barf-sexp)
 (global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
 (global-set-key (kbd "C-c M-a") #'sp-beginning-of-sexp)
