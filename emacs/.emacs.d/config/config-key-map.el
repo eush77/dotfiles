@@ -1,3 +1,8 @@
+;; Case conversion.
+(global-set-key (kbd "C-x M-c") #'capitalize-region)
+(global-set-key (kbd "C-x M-l") #'downcase-region)
+(global-set-key (kbd "C-x M-u") #'upcase-region)
+
 ;; Counsel overloads.
 (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
 (global-set-key [remap describe-function] #'counsel-describe-function)
