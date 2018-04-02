@@ -77,14 +77,22 @@
 ;; Smartparens.
 (global-set-key (kbd "C-c C-M-b") #'sp-backward-slurp-sexp)
 (global-set-key (kbd "C-c C-M-f") #'sp-forward-slurp-sexp)
-(global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-slurp-sexp)
+(global-set-key (kbd "C-c C-M-r") #'sp-raise-sexp)
+(global-set-key (kbd "C-c C-M-s") #'sp-split-sexp)
+(global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-barf-sexp)
 (global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
+(global-set-key (kbd "C-c M-a") #'sp-beginning-of-sexp)
+(global-set-key (kbd "C-c M-b") #'sp-backward-sexp)
 (global-set-key (kbd "C-c M-d") #'sp-kill-sexp)
+(global-set-key (kbd "C-c M-e") #'sp-end-of-sexp)
+(global-set-key (kbd "C-c M-f") #'sp-forward-sexp)
+(global-set-key (kbd "C-M-b") #'sp-previous-sexp)
+(global-set-key (kbd "C-M-d") #'sp-down-sexp)
+(global-set-key (kbd "C-M-f") #'sp-next-sexp)
+(global-set-key (kbd "C-M-r") #'sp-backward-down-sexp)
+(global-set-key (kbd "C-M-u") #'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-y") #'sp-up-sexp)
-(global-set-key [remap backward-sexp] #'sp-backward-sexp)
-(global-set-key [remap backward-up-list] #'sp-backward-up-sexp)
-(global-set-key [remap down-list] #'sp-down-sexp)
-(global-set-key [remap forward-sexp] #'sp-forward-sexp)
+(global-set-key (kbd "M-(") #'my-sp-wrap-with-pair)
 
 ;; Swiper.
 ;; Complementary to `isearch-backward' on C-r.
