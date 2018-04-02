@@ -4,6 +4,9 @@
   (require 'smartparens-config)
   (custom-set sp-highlight-pair-overlay nil)
 
+  ;; Use asymmetric single quotes.
+  (sp-pair "`" "'")
+
   (defun my-sp-wrap-with-pair (&optional arg)
     "Wrap the following expression in parentheses.
 
