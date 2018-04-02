@@ -6,7 +6,7 @@ IFS=$'\n'
 MAKE="$(type -ap "$(basename "$0")" | sed -n 2p)"
 
 if egrep -q '(^|\s)-j' <<<"${MAKEFLAGS}"; then
-	"${MAKE}" "$@"
+	exec "${MAKE}" "$@"
 else
-	"${MAKE}" -j9 "$@"
+	exec "${MAKE}" -j9 "$@"
 fi
