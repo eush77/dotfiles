@@ -83,6 +83,7 @@
 ;; Smartparens.
 (global-set-key (kbd "C-c C-M-b") #'sp-backward-slurp-sexp)
 (global-set-key (kbd "C-c C-M-f") #'sp-forward-slurp-sexp)
+(global-set-key (kbd "C-c C-M-j") #'sp-join-sexp)
 (global-set-key (kbd "C-c C-M-r") #'sp-raise-sexp)
 (global-set-key (kbd "C-c C-M-s") #'sp-split-sexp)
 (global-set-key (kbd "C-c C-M-t") #'sp-splice-sexp)
