@@ -119,8 +119,15 @@
 (custom-set sml/size-indication-format "%p of %I ")
 (custom-set sml/theme 'respectful)
 
+;; Enable narrowing.
+(put 'narrow-to-region 'disabled nil)
+
 ;; `quoted-insert' radix.
 (custom-set read-quoted-char-radix 16)
+
+;; Enable region case conversion commands.
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
 
 ;; Set a minimal scroll margin for `recenter-top-bottom'.
 (custom-set scroll-margin 1)
