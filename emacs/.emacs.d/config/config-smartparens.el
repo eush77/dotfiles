@@ -4,6 +4,16 @@
   (require 'smartparens-config)
   (custom-set sp-highlight-pair-overlay nil)
 
+  (defun my-sp-kill-hybrid-sexp--kill-line (arg)
+    "If called with the prefix argument (but not raw prefix `C-u
+C-u'), call `kill-line', otherwise proceed to
+`sp-kill-hybrid-sexp'."
+    (when (and arg (/= (prefix-numeric-value arg) 16))
+      (kill-line arg)
+      t))
+  (advice-add 'sp-kill-hybrid-sexp
+              :before-until #'my-sp-kill-hybrid-sexp--kill-line)
+
   (defun my-sp-wrap-with-pair (&optional arg)
     "Wrap the following expression in parentheses.
 
