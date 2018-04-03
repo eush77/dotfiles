@@ -39,7 +39,6 @@ and URL
                      'eshell-z
                      'expand-region
                      'flycheck
-                     'gnus-desktop-notify
                      'goto-last-change
                      'guide-key
                      'ivy
@@ -57,6 +56,9 @@ and URL
                      'w3m
                      'window-jump)
 
+(when window-system (my-install-packages 'gnus-desktop-notify
+                                         'pdf-tools))
+
 ;; The rest of the config is split into separate files.
 ;;
 ;; Not all of the configuration is included here - see the config directory
@@ -67,7 +69,6 @@ and URL
 (load "config-color-identifiers-mode")
 (load "config-counsel")
 (load "config-dired")
-(load "config-doc-view")
 (load "config-eshell")
 (load "config-flycheck")
 (load "config-guide-key")
@@ -88,6 +89,10 @@ and URL
 (load "config-view")
 (load "config-w3m")
 (load "config-window-jump")
+
+(when window-system
+  (load "config-doc-view")
+  (load "config-pdf-tools"))
 
 ;; Host file - tweak things if necessary.
 (let ((host-file (expand-file-name "host.el" user-emacs-directory)))
