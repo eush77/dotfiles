@@ -4,6 +4,17 @@
   (require 'smartparens-config)
   (custom-set sp-highlight-pair-overlay nil)
 
+  (defun my-set-mark-command--sp-mark-sexp (arg)
+    "Continue marking sexps with `sp-mark-sexp'."
+    (when (and transient-mark-mode mark-active
+               (or (eq last-command 'sp-mark-sexp)
+                   (and (eq last-command 'set-mark-command)
+                        (/= (mark) (point)))))
+      (sp-mark-sexp arg t)
+      t))
+  (advice-add 'set-mark-command
+              :before-until #'my-set-mark-command--sp-mark-sexp)
+
   (defun my-sp-kill-hybrid-sexp--kill-line (arg)
     "If called with the prefix argument (but not raw prefix `C-u
 C-u'), call `kill-line', otherwise proceed to
