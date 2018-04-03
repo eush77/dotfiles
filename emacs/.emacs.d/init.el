@@ -75,6 +75,7 @@ and URL
 (load "config-guide-key")
 (load "config-help")
 (load "config-hideshow")
+(load "config-hippie-expand")
 (load "config-info")
 (load "config-key-chord")
 (load "config-key-map")
