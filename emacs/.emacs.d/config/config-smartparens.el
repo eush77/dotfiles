@@ -4,6 +4,19 @@
   (require 'smartparens-config)
   (custom-set sp-highlight-pair-overlay nil)
 
+  (defun my-hippie-expand--smartparens (&rest args)
+    "Fix Smartparens' integration with Hippie-Expand. See [1].
+
+\[1]: URL `https://github.com/Fuco1/smartparens/issues/479'"
+    (when smartparens-mode
+      (cond ((and (eq (nth he-num hippie-expand-try-functions-list)
+                      'try-expand-list)
+                  (= (char-before he-string-end) 41)) ; ?)
+             (delete-char -1))
+            ((equal he-string-beg he-string-end)
+             (delete-char 1)))))
+  (advice-add 'hippie-expand :after #'my-hippie-expand--smartparens)
+
   (defun my-set-mark-command--sp-mark-sexp (arg)
     "Continue marking sexps with `sp-mark-sexp'."
     (when (and transient-mark-mode mark-active

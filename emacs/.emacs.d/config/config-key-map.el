@@ -31,6 +31,9 @@
 ;; Goto-last-change.
 (global-set-key (kbd "M-_") #'goto-last-change)
 
+;; Hippie-expand.
+(global-set-key [remap dabbrev-expand] #'hippie-expand)
+
 ;; IBuffer.
 (global-set-key [remap list-buffers] #'ibuffer)
 
