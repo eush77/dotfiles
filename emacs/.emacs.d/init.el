@@ -42,6 +42,7 @@ and URL
                      'goto-last-change
                      'guide-key
                      'ivy
+                     'ivy-xref
                      'key-chord
                      'magit
                      'minibuffer-line
