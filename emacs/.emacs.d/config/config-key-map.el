@@ -95,7 +95,7 @@
 (global-set-key (kbd "C-c C-SPC") #'sp-mark-sexp)
 (global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
 (global-set-key (kbd "C-c C-b") #'sp-backward-sexp)
-(global-set-key (kbd "C-c d-d") #'sp-kill-sexp)
+(global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
 (global-set-key (kbd "C-c C-e") #'sp-end-of-sexp)
 (global-set-key (kbd "C-c C-f") #'sp-forward-sexp)
 (global-set-key (kbd "C-M-b") #'sp-previous-sexp)
