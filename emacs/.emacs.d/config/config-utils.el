@@ -103,3 +103,27 @@ instead of 1."
   (interactive "P")
   (setq delta (or delta my-window-size-delta))
   (shrink-window-horizontally delta))
+
+;;
+;; Window splitting.
+;;
+
+(defun my-balanced-split-window-vertically ()
+  "Split window vertically and maintain balance."
+  (interactive)
+  (let ((window-min-height window-safe-min-height))
+    (split-window-vertically))
+  (balance-windows))
+
+(defun my-balanced-split-window-horizontally ()
+  "Split window horizontally and maintain balance."
+  (interactive)
+  (let ((window-min-width window-safe-min-width))
+    (split-window-horizontally))
+  (balance-windows))
+
+(defun my-balanced-delete-window ()
+  "Delete current window and maintain balance."
+  (interactive)
+  (delete-window)
+  (balance-windows))
