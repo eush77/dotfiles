@@ -1,2 +1,2 @@
 alias l ls --ignore-backups $*
-alias la ls -l --all --human-readable
+alias la ls -l --all --human-readable $*
