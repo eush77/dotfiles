@@ -44,4 +44,7 @@
     (define-key tablegen-mode-map "\es" 'center-line)
     (define-key tablegen-mode-map "\eS" 'center-paragraph))
 
-  (define-key tablegen-mode-map [remap indent-region] #'clang-format-region))
+  (define-key tablegen-mode-map [remap indent-region] #'clang-format-region)
+
+  (with-eval-after-load "smartparens"
+    (sp-local-pair 'tablegen-mode "<" ">")))
