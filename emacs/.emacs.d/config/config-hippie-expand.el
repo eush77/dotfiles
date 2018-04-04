@@ -2,7 +2,9 @@
   (custom-set hippie-expand-try-functions-list
               '(try-expand-all-abbrevs
                 try-expand-list
+                try-expand-list-all-buffers
                 try-expand-line
+                try-expand-line-all-buffers
                 try-expand-dabbrev-visible
                 try-expand-dabbrev
                 try-expand-dabbrev-all-buffers

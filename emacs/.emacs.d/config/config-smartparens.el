@@ -9,8 +9,8 @@
 
 \[1]: URL `https://github.com/Fuco1/smartparens/issues/479'"
     (when smartparens-mode
-      (cond ((and (eq (nth he-num hippie-expand-try-functions-list)
-                      'try-expand-list)
+      (cond ((and (memq (nth he-num hippie-expand-try-functions-list)
+                        '(try-expand-list try-expand-list-all-buffers))
                   (= (char-before he-string-end) 41)) ; ?)
              (delete-char -1))
             ((equal he-string-beg he-string-end)
