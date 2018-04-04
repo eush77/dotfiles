@@ -21,4 +21,28 @@
   (define-key c++-mode-map (kbd "C-c C-e") #'sp-end-of-sexp)
   (define-key c++-mode-map (kbd "C-c C-f") #'sp-forward-sexp)
   (define-key c++-mode-map (kbd "C-c C-d") #'sp-kill-sexp)
-  (define-key c++-mode-map [remap indent-region] #'clang-format-region))
+  (define-key c++-mode-map [remap indent-region] #'clang-format-region)
+
+  (with-eval-after-load "smartparens"
+    (defun my-sp-c++-point-at-arrow-operator-p (id action context)
+      "True if angle bracket is part of the arrow operator."
+      (looking-back "->" nil))
+
+    (defun my-sp-c++-point-at-comparison-operator-p (id action context)
+      "True if angle bracket is part of the comparison operator."
+      (and (string= id "<")
+           (looking-back " ." nil)
+           (not (looking-back "\\(template\\|#include\\) <" nil))))
+
+    (defun my-sp-c++-point-at-shift-operator-p (id action context)
+      "True if angle bracket is part of the comparison operator."
+      (looking-back "<<\\|>>" nil))
+
+    ;; C++ angle brackets are overloaded for different things. Disable
+    ;; strictness checks (by not listing the `navigate' action) and add some
+    ;; filters.
+    (sp-local-pair 'c++-mode "<" ">"
+                   :actions '(insert wrap autoskip)
+                   :unless '(my-sp-c++-point-at-arrow-operator-p
+                             my-sp-c++-point-at-comparison-operator-p
+                             my-sp-c++-point-at-shift-operator-p))))
