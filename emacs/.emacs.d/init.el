@@ -35,6 +35,7 @@ and URL
 (my-install-packages 'clang-format
                      'color-identifiers-mode
                      'counsel
+                     'dired-hide-dotfiles
                      'direnv
                      'eshell-z
                      'expand-region
