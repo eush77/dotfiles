@@ -106,3 +106,4 @@ and URL
 (server-start)
 (pinentry-start)
 (direnv-mode)
+(setenv "EDITOR" "emacsclient")
