@@ -134,9 +134,6 @@
 ;; View mode.
 (custom-set view-read-only t)
 
-;; Xref.
-(custom-set xref-show-xrefs-function #'ivy-xref-show-xrefs)
-
 ;; Enable base modes.
 (ivy-mode 1)
 (minibuffer-line-mode 1)

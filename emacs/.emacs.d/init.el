@@ -93,6 +93,7 @@ and URL
 (load "config-view")
 (load "config-w3m")
 (load "config-window-jump")
+(load "config-xref")
 
 (when window-system
   (load "config-doc-view")
