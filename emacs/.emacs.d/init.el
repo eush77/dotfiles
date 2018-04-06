@@ -32,34 +32,36 @@ and URL
               ("org" . "https://orgmode.org/elpa/")))
 
 ;; Check and install missing packages.
-(my-install-packages 'clang-format
-                     'color-identifiers-mode
-                     'counsel
-                     'dired-hide-dotfiles
-                     'direnv
-                     'eshell-z
-                     'expand-region
-                     'flycheck
-                     'goto-last-change
-                     'guide-key
-                     'ivy
-                     'ivy-xref
-                     'key-chord
-                     'magit
-                     'minibuffer-line
-                     'multiple-cursors
-                     'org-plus-contrib
-                     'pass
-                     'pocket-reader
-                     'smart-mode-line
-                     'smartparens
-                     'smartscan
-                     'swiper
-                     'w3m
-                     'window-jump)
+(add-to-list 'package-selected-packages 'clang-format)
+(add-to-list 'package-selected-packages 'color-identifiers-mode)
+(add-to-list 'package-selected-packages 'counsel)
+(add-to-list 'package-selected-packages 'dired-hide-dotfiles)
+(add-to-list 'package-selected-packages 'direnv)
+(add-to-list 'package-selected-packages 'eshell-z)
+(add-to-list 'package-selected-packages 'expand-region)
+(add-to-list 'package-selected-packages 'flycheck)
+(add-to-list 'package-selected-packages 'goto-last-change)
+(add-to-list 'package-selected-packages 'guide-key)
+(add-to-list 'package-selected-packages 'ivy)
+(add-to-list 'package-selected-packages 'ivy-xref)
+(add-to-list 'package-selected-packages 'key-chord)
+(add-to-list 'package-selected-packages 'magit)
+(add-to-list 'package-selected-packages 'minibuffer-line)
+(add-to-list 'package-selected-packages 'multiple-cursors)
+(add-to-list 'package-selected-packages 'org-plus-contrib)
+(add-to-list 'package-selected-packages 'pass)
+(add-to-list 'package-selected-packages 'pocket-reader)
+(add-to-list 'package-selected-packages 'smart-mode-line)
+(add-to-list 'package-selected-packages 'smartparens)
+(add-to-list 'package-selected-packages 'smartscan)
+(add-to-list 'package-selected-packages 'swiper)
+(add-to-list 'package-selected-packages 'w3m)
+(add-to-list 'package-selected-packages 'window-jump)
 
-(when window-system (my-install-packages 'gnus-desktop-notify
-                                         'pdf-tools))
+(when window-system
+  (add-to-list 'package-selected-packages 'gnus-desktop-notify)
+  (add-to-list 'package-selected-packages 'pdf-tools))
+(package-install-selected-packages)
 
 ;; The rest of the config is split into separate files.
 ;;

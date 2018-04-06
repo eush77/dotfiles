@@ -1,4 +1,5 @@
-(my-install-packages 'sdcv)
+(add-to-list 'package-selected-packages 'sdcv)
+(package-install-selected-packages)
 (require 'sdcv)
 
 (custom-set sdcv-word-pronounce-command "true")
