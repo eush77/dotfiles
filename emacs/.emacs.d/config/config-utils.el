@@ -1,12 +1,4 @@
 ;;
-;; Grepping.
-;;
-(defun my-git-grep-at-point (&optional cmd)
-  "Grep for the symbol at point in the current Git repository."
-  (interactive "P")
-  (counsel-git-grep cmd (thing-at-point 'symbol)))
-
-;;
 ;; Editing.
 ;;
 

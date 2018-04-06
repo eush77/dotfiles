@@ -20,7 +20,7 @@
 
 ;; Git grep.
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)
-(global-set-key (kbd "C-x v ?") #'my-git-grep-at-point)
+(global-set-key (kbd "C-x v ?") #'my-counsel-git-grep-at-point)
 
 ;; Global shortcuts.
 (global-set-key (kbd "C-x M-1") #'eshell)
