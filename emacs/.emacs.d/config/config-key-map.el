@@ -72,7 +72,6 @@
 
 ;; Org.
 (global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c b") #'org-switchb)
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c l") #'org-store-link)
 
@@ -105,6 +104,9 @@
 (global-set-key (kbd "C-M-u") #'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-y") #'sp-up-sexp)
 (global-set-key (kbd "M-(") #'my-sp-wrap-with-pair)
+
+;; Swap buffers.
+(global-set-key (kbd "C-c b") #'swap-buffers)
 
 ;; Swiper.
 ;; Complementary to `isearch-backward' on C-r.
