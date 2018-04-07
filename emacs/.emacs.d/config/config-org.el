@@ -18,12 +18,33 @@
 
   (add-hook 'org-mode-hook #'auto-fill-mode)
 
+  (defun my-org-drop-headings (end)
+    "Drop headings from point to END."
+    (when (< (point) end)
+      (when (not (member (org-get-todo-state) org-done-keywords))
+        (org-todo "DROP"))
+      (org-next-visible-heading 1)
+      (my-org-drop-headings end)))
+
+  (defun my-org-drop-subtree ()
+    "Drop subtree at point, circumventing any state blocking."
+    (interactive)
+    (let ((subtree-end (save-excursion (org-end-of-subtree)
+                                       (point)))
+          (org-blocker-hook nil))
+      (save-excursion (my-org-drop-headings subtree-end))
+      (outline-hide-subtree)))
+
   (defun my-org-todo--circumventing-blocking (func arg)
     "Use completion to determine the new state when circumventing
-state blocking with a `\\[universal-argument] \\[universal-argument] \\[universal-argument]'."
+state blocking with a `\\[universal-argument] \\[universal-argument] \\[universal-argument]'.
+
+If the new state is `DROP', drop the whole subtree."
     (if (equal arg '(64))
         (let ((org-blocker-hook nil))
-          (funcall func '(4)))
+          (funcall func '(4))
+          (when (string= (org-get-todo-state) "DROP")
+            (my-org-drop-subtree)))
       (funcall func arg)))
   (advice-add 'org-todo
               :around #'my-org-todo--circumventing-blocking)
