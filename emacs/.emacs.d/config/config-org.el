@@ -18,6 +18,16 @@
 
   (add-hook 'org-mode-hook #'auto-fill-mode)
 
+  (defun my-org-todo--circumventing-blocking (func arg)
+    "Use completion to determine the new state when circumventing
+state blocking with a `\\[universal-argument] \\[universal-argument] \\[universal-argument]'."
+    (if (equal arg '(64))
+        (let ((org-blocker-hook nil))
+          (funcall func '(4)))
+      (funcall func arg)))
+  (advice-add 'org-todo
+              :around #'my-org-todo--circumventing-blocking)
+
   (let ((show-and-move
          (lambda (move-next)
            (outline-back-to-heading)
