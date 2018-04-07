@@ -37,6 +37,32 @@ C-u'), call `kill-line', otherwise proceed to
   (advice-add 'sp-kill-hybrid-sexp
               :before-until #'my-sp-kill-hybrid-sexp--kill-line)
 
+  (defun my-sp-forward-duplicate-sexp ()
+    "Duplicate current sexp forward. If the point is not at the
+end of a sexp, scan backward and upward."
+    (interactive)
+    (let ((sexp (sp-get-sexp t))
+          (saved-kill-ring kill-ring))
+      (kill-ring-save (sp-get sexp :beg) (sp-get sexp :end))
+      (goto-char (sp-get sexp :end))
+      (newline-and-indent)
+      (yank)
+      (sp-backward-sexp)
+      (setq kill-ring saved-kill-ring)))
+
+  (defun my-sp-backward-duplicate-sexp ()
+    "Duplicate current sexp backward. If the point is not at the
+beginning of a sexp, scan forward and upward."
+    (interactive)
+    (let ((sexp (sp-get-sexp))
+          (saved-kill-ring kill-ring))
+      (kill-ring-save (sp-get sexp :beg) (sp-get sexp :end))
+      (goto-char (sp-get sexp :beg))
+      (yank)
+      (newline-and-indent)
+      (sp-backward-sexp)
+      (setq kill-ring saved-kill-ring)))
+
   (defun my-sp-wrap-with-pair (&optional arg)
     "Wrap the following expression in parentheses.
 

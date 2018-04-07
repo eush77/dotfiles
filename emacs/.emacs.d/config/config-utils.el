@@ -2,20 +2,38 @@
 ;; Editing.
 ;;
 
-(defun my-duplicate-line-down ()
-  "Duplicate line and move cursor to the second copy."
+(defun my-forward-duplicate-line ()
+  "Duplicate current line forward, moving the cursor to the
+second copy."
   (interactive)
-  (next-line 1)
+  (forward-line 1)
   (beginning-of-line)
   (copy-from-above-command)
   (newline)
-  (previous-line))
+  (forward-line -1))
 
-(defun my-duplicate-line-up ()
-  "Duplicate line and move cursor to the first copy."
+(defun my-backward-duplicate-line ()
+  "Duplicate current line backward, moving the cursor to the
+first copy."
   (interactive)
-  (my-duplicate-line-down)
-  (previous-line 1))
+  (my-forward-duplicate-line)
+  (forward-line -1))
+
+(defun my-forward-duplicate-sexp-or-line ()
+  "Duplicate current sexp forward, unless the point is at the
+beginning of line, in which case duplicate the line forward."
+  (interactive)
+  (if (zerop (current-column))
+      (my-forward-duplicate-line)
+    (my-sp-forward-duplicate-sexp)))
+
+(defun my-backward-duplicate-sexp-or-line ()
+  "Duplicate current sexp backward, unless the point is at the
+beginning of line, in which case duplicate the line backward."
+  (interactive)
+  (if (zerop (current-column))
+      (my-backward-duplicate-line)
+    (my-sp-backward-duplicate-sexp)))
 
 (defcustom my-open-line-and-indent t
   "Non-nil indicates that `my-open-next-line' and

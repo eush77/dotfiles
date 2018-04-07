@@ -47,8 +47,6 @@
 (global-set-key (kbd "M-C-]") #'keyboard-escape-quit)
 
 ;; Line editing.
-(global-set-key (kbd "C-c M-n") #'my-duplicate-line-down)
-(global-set-key (kbd "C-c M-p") #'my-duplicate-line-up)
 (global-set-key (kbd "M-o") #'my-open-next-line)
 (global-set-key (kbd "C-o") #'my-open-previous-line)
 
@@ -83,20 +81,22 @@
 (global-set-key (kbd "M-n") #'scroll-up)
 
 ;; Smartparens.
+(global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
+(global-set-key (kbd "C-c C-b") #'sp-backward-sexp)
+(global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
+(global-set-key (kbd "C-c C-e") #'sp-end-of-sexp)
+(global-set-key (kbd "C-c C-f") #'sp-forward-sexp)
 (global-set-key (kbd "C-c C-M-b") #'sp-backward-slurp-sexp)
 (global-set-key (kbd "C-c C-M-f") #'sp-forward-slurp-sexp)
 (global-set-key (kbd "C-c C-M-j") #'sp-join-sexp)
 (global-set-key (kbd "C-c C-M-r") #'sp-raise-sexp)
 (global-set-key (kbd "C-c C-M-s") #'sp-split-sexp)
 (global-set-key (kbd "C-c C-M-t") #'sp-splice-sexp)
+(global-set-key (kbd "C-c C-SPC") #'sp-mark-sexp)
 (global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-barf-sexp)
 (global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
-(global-set-key (kbd "C-c C-SPC") #'sp-mark-sexp)
-(global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
-(global-set-key (kbd "C-c C-b") #'sp-backward-sexp)
-(global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
-(global-set-key (kbd "C-c C-e") #'sp-end-of-sexp)
-(global-set-key (kbd "C-c C-f") #'sp-forward-sexp)
+(global-set-key (kbd "C-c M-n") #'my-forward-duplicate-sexp-or-line)
+(global-set-key (kbd "C-c M-p") #'my-backward-duplicate-sexp-or-line)
 (global-set-key (kbd "C-M-b") #'sp-previous-sexp)
 (global-set-key (kbd "C-M-d") #'sp-down-sexp)
 (global-set-key (kbd "C-M-f") #'sp-next-sexp)
