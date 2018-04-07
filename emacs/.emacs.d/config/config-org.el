@@ -10,6 +10,7 @@
               '(("PLAN" . "yellow")
                 ("PASS" . "green")
                 ("FAIL" . "red")))
+  (custom-set org-agenda-todo-list-sublevels nil)
   (custom-set org-enforce-todo-dependencies t)
   (custom-set org-enforce-todo-checkbox-dependencies t)
   (custom-set org-log-done 'time)
