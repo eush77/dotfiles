@@ -91,6 +91,7 @@ and URL
 (load "config-markdown")
 (load "config-org")
 (load "config-pocket-reader")
+(load "config-scroll-all")
 (load "config-shr")
 (load "config-smartparens")
 (load "config-smartscan")
