@@ -16,7 +16,7 @@
 (global-set-key (kbd "M-+") #'er/mark-sentence)
 
 ;; Frames.
-(global-set-key (kbd "M-`") #'other-frame)
+(global-set-key (kbd "M-`") #'my-select-frame-by-open-buffers)
 
 ;; Git grep.
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)

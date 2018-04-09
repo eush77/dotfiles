@@ -1,3 +1,49 @@
+(add-to-list 'package-selected-packages 'dash)
+(add-to-list 'package-selected-packages 'dash-functional)
+(package-install-selected-packages)
+(require 'dash)                         ; `-rotate', `-unfold'
+(require 'dash-functional)              ; `-compose'
+
+;;
+;; Frame switching.
+;;
+
+(defun my-iterate-to-list (first get-next)
+  "Collect all objects starting from FIRST, with each next object
+computed from the last by function GET-NEXT. Iteration ends when
+GET-NEXT returns FIRST."
+  (--unfold (if it
+                (cons it
+                      (let ((next (funcall get-next it)))
+                        (if (equal first next) nil next)))
+              nil)
+            first))
+
+(defun my-select-frame-by-open-buffers ()
+  "Interactively select a frame by names of buffers that are open
+in it.
+
+If there are only 2 frames open, switch immediately."
+  (interactive)
+  (let ((frame-alist
+         (mapcar (lambda (frame)
+                   (cons (mapconcat
+                          (-compose #'buffer-name #'window-buffer)
+                          (my-iterate-to-list (frame-first-window frame)
+                                              #'next-window)
+                          ", ")
+                         frame))
+                 (-rotate -1            ; Bring selected frame to back.
+                          (my-iterate-to-list (selected-frame)
+                                              #'next-frame)))))
+    (if (<= (length frame-alist) 2)
+        (other-frame 1)
+      (select-frame (cdr (assoc (completing-read "Select frame: "
+                                                 frame-alist
+                                                 nil
+                                                 t)
+                                frame-alist))))))
+
 ;;
 ;; Editing.
 ;;
