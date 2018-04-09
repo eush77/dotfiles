@@ -73,6 +73,14 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c l") #'org-store-link)
 
+;; Rotate.
+(global-set-key (kbd "C-c r r") #'rotate-window)
+(global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)
+(global-set-key (kbd "C-c r ev") #'rotate:even-vertical)
+(global-set-key (kbd "C-c r h") #'rotate:main-horizontal)
+(global-set-key (kbd "C-c r m") #'rotate:main-vertical)
+(global-set-key (kbd "C-c r t") #'rotate:tiled)
+
 ;; Scroll lock.
 (global-set-key (kbd "<Scroll_Lock>") #'scroll-lock-mode)
 

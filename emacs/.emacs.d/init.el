@@ -51,6 +51,7 @@ and URL
 (add-to-list 'package-selected-packages 'org-plus-contrib)
 (add-to-list 'package-selected-packages 'pass)
 (add-to-list 'package-selected-packages 'pocket-reader)
+(add-to-list 'package-selected-packages 'rotate)
 (add-to-list 'package-selected-packages 'smart-mode-line)
 (add-to-list 'package-selected-packages 'smartparens)
 (add-to-list 'package-selected-packages 'smartscan)
