@@ -23,7 +23,7 @@
     (when (string-match "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+$" (ad-get-arg 0))
       (ad-set-arg 0 (concat "http://" (ad-get-arg 0)))))
 
-  (defun completing-read--w3m-switch-buffer (args)
+  (defun my-completing-read--w3m-switch-buffer (args)
     "Wipe out initial input and position populated by `w3m-switch-buffer'."
     (if (and (eq major-mode 'w3m-mode)
              (stringp (nth 4 args))
@@ -31,7 +31,16 @@
         (butlast args 3)
       args))
   (advice-add 'completing-read :filter-args
-              #'completing-read--w3m-switch-buffer)
+              #'my-completing-read--w3m-switch-buffer)
+
+  (defun my-completing-read--w3m-session-save (func &rest args)
+    "Wipe out initial input inserted via `minibuffer-setup-hook'."
+    (if (eq major-mode 'w3m-mode)
+        (let ((minibuffer-setup-hook nil))
+          (apply func args))
+      (apply func args)))
+  (advice-add 'completing-read :around
+              #'my-completing-read--w3m-session-save)
 
   ;; Follow symbolic links in `w3m-bookmark-file' when checking the file's
   ;; modification time.
