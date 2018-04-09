@@ -1,4 +1,7 @@
 (with-eval-after-load "counsel"
+  (custom-set counsel-find-file-at-point t)
+  (custom-set counsel-preselect-current-file t)
+
   (defun my-counsel-git-grep-at-point (&optional cmd)
     "Grep for the symbol at point in the current Git repository.
 
