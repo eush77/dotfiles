@@ -76,6 +76,7 @@ and URL
 (load "config-counsel")
 (load "config-dired")
 (load "config-eshell")
+(load "config-ffap")
 (load "config-flycheck")
 (load "config-guide-key")
 (load "config-help")
