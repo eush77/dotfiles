@@ -76,6 +76,7 @@ and URL
 (load "config-color-identifiers-mode")
 (load "config-counsel")
 (load "config-dired")
+(load "config-direnv")
 (load "config-eshell")
 (load "config-ffap")
 (load "config-flycheck")
@@ -113,5 +114,4 @@ and URL
 
 (server-start)
 (pinentry-start)
-(direnv-mode)
 (setenv "EDITOR" "emacsclient")
