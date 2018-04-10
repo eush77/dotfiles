@@ -12,6 +12,13 @@
                                  (summary 1.0 point))
                        (article 1.0))))
 
+(defun my-gnus-delete-article-window ()
+  "Delete Article window."
+  (when (gnus-buffer-live-p gnus-article-buffer)
+    (when-let (article-window (get-buffer-window gnus-article-buffer))
+      (delete-window article-window))))
+(add-hook 'gnus-exit-group-hook #'my-gnus-delete-article-window)
+
 (with-eval-after-load "gnus-sum"
   (define-key gnus-summary-mode-map (kbd "C-M-j") #'window-jump-left)
   (define-key gnus-summary-mode-map (kbd "C-M-k") #'window-jump-right)
