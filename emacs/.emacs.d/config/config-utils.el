@@ -1,47 +1,42 @@
 (add-to-list 'package-selected-packages 'dash)
 (add-to-list 'package-selected-packages 'dash-functional)
 (package-install-selected-packages)
-(require 'dash)                         ; `-rotate', `-unfold'
+(require 'dash)
 (require 'dash-functional)              ; `-compose'
 
 ;;
 ;; Frame switching.
 ;;
 
-(defun my-iterate-to-list (first get-next)
-  "Collect all objects starting from FIRST, with each next object
-computed from the last by function GET-NEXT. Iteration ends when
-GET-NEXT returns FIRST."
-  (--unfold (if it
-                (cons it
-                      (let ((next (funcall get-next it)))
-                        (if (equal first next) nil next)))
-              nil)
-            first))
-
 (defun my-select-frame-by-open-buffers ()
-  "Interactively select a frame by names of buffers that are open
-in it.
+  "Interactively select a frame from names of buffers that are
+open in it, with frames ordered from the most recently used to
+the least recently used and the default selection pointing at the
+most recently used other frame.
 
-If there are only 2 frames open, switch immediately."
+If there are only 2 frames open, switch to the other frame
+immediately."
   (interactive)
-  (let ((frame-alist
-         (mapcar (lambda (frame)
-                   (cons (mapconcat
-                          (-compose #'buffer-name #'window-buffer)
-                          (my-iterate-to-list (frame-first-window frame)
-                                              #'next-window)
-                          ", ")
-                         frame))
-                 (-rotate -1            ; Bring selected frame to back.
-                          (my-iterate-to-list (selected-frame)
-                                              #'next-frame)))))
+  (let* ((frame-list                     ; List of frames in MRU order
+          (-distinct (--map (window-frame it)
+                            (--mapcat (get-buffer-window-list it nil 'visible)
+                                      (buffer-list)))))
+         (frame-alist                    ; List of frames with labels
+          (--map (cons (mapconcat (-compose #'buffer-name #'window-buffer)
+                                  (window-list it)
+                                  ", ")
+                       it)
+                 frame-list)))
     (if (<= (length frame-alist) 2)
         (other-frame 1)
       (select-frame (cdr (assoc (completing-read "Select frame: "
                                                  frame-alist
                                                  nil
-                                                 t)
+                                                 t
+                                                 nil
+                                                 nil
+                                                 ;; Select the other frame
+                                                 (caadr frame-alist))
                                 frame-alist))))))
 
 ;;
