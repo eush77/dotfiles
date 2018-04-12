@@ -8,7 +8,8 @@
 ;; Frame switching.
 ;;
 
-(defun my-select-frame-by-open-buffers ()
+;;;###autoload
+(defun my-select-frame ()
   "Interactively select a frame from names of buffers that are
 open in it, with frames ordered from the most recently used to
 the least recently used and the default selection pointing at the
@@ -60,6 +61,7 @@ first copy."
   (my-forward-duplicate-line)
   (forward-line -1))
 
+;;;###autoload
 (defun my-forward-duplicate-sexp-or-line ()
   "Duplicate current sexp forward, unless the point is at the
 beginning of line, in which case duplicate the line forward."
@@ -68,6 +70,7 @@ beginning of line, in which case duplicate the line forward."
       (my-forward-duplicate-line)
     (my-sp-forward-duplicate-sexp)))
 
+;;;###autoload
 (defun my-backward-duplicate-sexp-or-line ()
   "Duplicate current sexp backward, unless the point is at the
 beginning of line, in which case duplicate the line backward."
@@ -80,6 +83,7 @@ beginning of line, in which case duplicate the line backward."
   "Non-nil indicates that `my-open-next-line' and
 `my-open-previous-line' indent inserted lines.")
 
+;;;###autoload
 (defun my-open-next-line (count)
   "Insert COUNT empty lines after the line at point.
 
@@ -96,6 +100,7 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (when my-open-line-and-indent
     (indent-according-to-mode)))
 
+;;;###autoload
 (defun my-open-previous-line (count)
   "Insert COUNT empty lines before the line at point.
 
@@ -120,6 +125,7 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
 See `my-enlarge-window', `my-enlarge-window-horizontally', and
 `my-shrink-window-horizontally'.")
 
+;;;###autoload
 (defun my-enlarge-window (delta)
   "Like `enlarge-window', but defaults to `my-window-size-delta'
 instead of 1."
@@ -127,6 +133,7 @@ instead of 1."
   (setq delta (or delta my-window-size-delta))
   (enlarge-window delta))
 
+;;;###autoload
 (defun my-enlarge-window-horizontally (delta)
   "Like `enlarge-window-horizontally', but defaults to
 `my-window-size-delta' instead of 1."
@@ -134,6 +141,7 @@ instead of 1."
   (setq delta (or delta my-window-size-delta))
   (enlarge-window-horizontally delta))
 
+;;;###autoload
 (defun my-shrink-window-horizontally (delta)
   "Like `shrink-window-horizontally', but defaults to
 `my-window-size-delta' instead of 1."
@@ -145,6 +153,7 @@ instead of 1."
 ;; Window splitting.
 ;;
 
+;;;###autoload
 (defun my-balanced-split-window-vertically ()
   "Split window vertically and maintain balance."
   (interactive)
@@ -152,6 +161,7 @@ instead of 1."
     (split-window-vertically))
   (balance-windows))
 
+;;;###autoload
 (defun my-balanced-split-window-horizontally ()
   "Split window horizontally and maintain balance."
   (interactive)
@@ -159,6 +169,7 @@ instead of 1."
     (split-window-horizontally))
   (balance-windows))
 
+;;;###autoload
 (defun my-balanced-delete-window ()
   "Delete current window and maintain balance."
   (interactive)

@@ -19,7 +19,7 @@
 (global-set-key (kbd "C-x 3") #'follow-delete-other-windows-and-split)
 
 ;; Frames.
-(global-set-key (kbd "M-`") #'my-select-frame-by-open-buffers)
+(global-set-key (kbd "M-`") #'my-select-frame)
 
 ;; Git grep.
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)

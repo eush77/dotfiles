@@ -1,10 +1,8 @@
-;;; -*- lexical-binding: t -*-
 (package-initialize)
-(require 'misc)
 
-;; Load basic utilities.
+;; Setup config load path and autoloads.
 (push (expand-file-name "config" user-emacs-directory) load-path)
-(load "config-utils")
+(load "config-autoloads")
 
 ;; Custom-set macro - use instead of `setq' for customization variables.
 (defmacro custom-set (var value)
