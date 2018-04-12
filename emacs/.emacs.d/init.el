@@ -40,6 +40,7 @@ and URL
 (add-to-list 'package-selected-packages 'eshell-z)
 (add-to-list 'package-selected-packages 'expand-region)
 (add-to-list 'package-selected-packages 'flycheck)
+(add-to-list 'package-selected-packages 'gnus-select-account)
 (add-to-list 'package-selected-packages 'goto-last-change)
 (add-to-list 'package-selected-packages 'guide-key)
 (add-to-list 'package-selected-packages 'ivy)

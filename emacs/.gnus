@@ -38,6 +38,8 @@
   (define-key gnus-article-mode-map (kbd "k") #'scroll-down-line)
   (define-key gnus-article-mode-map (kbd "s") #'my-gnus-article-add-link))
 
+(gnus-select-account-enable)
+
 (gnus-demon-add-handler 'gnus-demon-scan-news 10 nil)
 (when window-system
   (gnus-desktop-notify-mode))
