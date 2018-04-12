@@ -11,6 +11,5 @@ returned by the GCC compiler."
        (keep-lines "^\s*/" (point-min) (point-max))
        (buffer-string)))))
 
-(with-eval-after-load "ffap"
-  (custom-set ffap-c-path (my-gcc-include-paths "c"))
-  (custom-set ffap-c++-path (my-gcc-include-paths "c++")))
+(custom-set ffap-c-path (my-gcc-include-paths "c"))
+(custom-set ffap-c++-path (my-gcc-include-paths "c++"))

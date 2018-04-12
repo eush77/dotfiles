@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
 (add-to-list 'package-selected-packages 'paredit)
-(package-install-selected-packages)
 
 (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
 

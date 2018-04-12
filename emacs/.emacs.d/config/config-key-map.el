@@ -1,3 +1,5 @@
+(require 'dired-x)                      ; Bind `dired-jump'
+
 ;; Case conversion.
 (global-set-key (kbd "C-x M-c") #'capitalize-region)
 (global-set-key (kbd "C-x M-l") #'downcase-region)
