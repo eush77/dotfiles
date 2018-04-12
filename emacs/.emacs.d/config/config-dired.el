@@ -1,7 +1,7 @@
 (require 'dired-x)
 
 (with-eval-after-load "dired"
-  (custom-set dired-listing-switches "-l --almost-all --group-directories-first")
+  (custom-set dired-listing-switches "-l --almost-all --group-directories-first --human-readable")
   (custom-set dired-dwim-target t)
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (add-hook 'dired-mode-hook #'dired-hide-dotfiles-mode)
