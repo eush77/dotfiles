@@ -15,6 +15,9 @@
 (global-set-key (kbd "M-=") #'er/expand-region)
 (global-set-key (kbd "M-+") #'er/mark-sentence)
 
+;; Follow-mode.
+(global-set-key (kbd "C-x 3") #'follow-delete-other-windows-and-split)
+
 ;; Frames.
 (global-set-key (kbd "M-`") #'my-select-frame-by-open-buffers)
 
