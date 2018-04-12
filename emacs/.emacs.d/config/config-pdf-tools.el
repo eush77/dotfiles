@@ -1,4 +1,4 @@
-(require 'pdf-tools)                    ; `pdf-view-mode' is not autoloaded
+(autoload 'pdf-view-mode "pdf-tools" nil t)
 (add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
 
 (with-eval-after-load "pdf-tools"

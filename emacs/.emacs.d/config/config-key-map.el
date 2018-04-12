@@ -1,4 +1,5 @@
 (require 'dired-x)                      ; Bind `dired-jump'
+(autoload 'swiper-multi "swiper" nil t)
 
 ;; Case conversion.
 (global-set-key (kbd "C-x M-c") #'capitalize-region)

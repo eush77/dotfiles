@@ -1,8 +1,8 @@
 (add-to-list 'package-selected-packages 'dash)
 (add-to-list 'package-selected-packages 'dash-functional)
 (package-install-selected-packages)
+(autoload '-compose "dash-functional")
 (require 'dash)
-(require 'dash-functional)              ; `-compose'
 
 ;;
 ;; Frame switching.

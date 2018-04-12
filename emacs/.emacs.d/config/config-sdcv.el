@@ -1,5 +1,6 @@
 (add-to-list 'package-selected-packages 'sdcv)
-(require 'sdcv)
+(autoload 'sdcv-search-pointer+ "sdcv" nil t)
+(autoload 'sdcv-search-input "sdcv" nil t)
 
 (custom-set sdcv-word-pronounce-command "true")
 
