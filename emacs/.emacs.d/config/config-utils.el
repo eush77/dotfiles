@@ -1,6 +1,8 @@
 (add-to-list 'package-selected-packages 'dash)
 (add-to-list 'package-selected-packages 'dash-functional)
 (package-install-selected-packages)
+
+(autoload 'copy-from-above-command "misc" nil t)
 (autoload '-compose "dash-functional")
 (require 'dash)
 
