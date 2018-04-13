@@ -9,6 +9,15 @@
             '(("PLAN" . "yellow")
               ("PASS" . "green")
               ("FAIL" . "red")))
+(custom-set org-agenda-custom-commands
+            `(("p" "Planned tasks"
+               ((my-org-agenda-planned-view "Weekly.org")
+                (my-org-agenda-planned-view "Monthly.org")
+                (my-org-agenda-planned-view "Quarterly.org")
+                (my-org-agenda-planned-view "Yearly.org")
+                (my-org-agenda-planned-view "5 Years.org")
+                (my-org-agenda-planned-view "Life.org"))
+               ((org-agenda-prefix-format "  ")))))
 (custom-set org-agenda-todo-list-sublevels nil)
 (custom-set org-enforce-todo-dependencies t)
 (custom-set org-enforce-todo-checkbox-dependencies t)
@@ -16,6 +25,74 @@
 (custom-set org-log-into-drawer t)
 
 (add-hook 'org-mode-hook #'auto-fill-mode)
+
+(defun my-org-agenda-planned-view (file-name)
+  "Show all PLAN, PASS, or FAIL entries that have at least one PLAN sibling,
+essentially compiling the list of currently planned items along
+with the items completed in the current time period.
+
+If FILE-NAME is not absolute, it is interpreted as relative to
+`org-directory'. "
+  (org-compile-prefix-format t)
+  (let* ((file-name (expand-file-name file-name org-directory))
+         (org-select-this-todo-keyword "PLAN|PASS|FAIL")
+         ;; Force `breadcrumbs' property to be computed.
+         (org-prefix-format-compiled
+          (cons (append (car org-prefix-format-compiled)
+                        '((org-prefix-has-breadcrumbs t)))
+                (cdr org-prefix-format-compiled)))
+         (all-entries (progn
+                        (org-check-agenda-file file-name)
+                        (org-agenda-get-day-entries
+                         file-name
+                         (calendar-gregorian-from-absolute (org-today))
+                         :todo)))
+         ;; Entries grouped by breadcrumbs.
+         (all-entry-groups (seq-group-by (lambda (entry)
+                                           (get-text-property 0
+                                                              'breadcrumbs
+                                                              entry))
+                                         all-entries))
+         ;; Groups of entries with at least one PLAN entry.
+         (entry-groups
+          (seq-filter (lambda (group)
+                        (seq-find (lambda (entry)
+                                    (string= "PLAN"
+                                             (substring entry
+                                                        (string-match
+                                                         (get-text-property
+                                                          0
+                                                          'org-todo-regexp
+                                                          entry)
+                                                         entry)
+                                                        (match-end 0))))
+                                  (cdr group)))
+                      all-entry-groups))
+         (entries (seq-mapcat #'cdr entry-groups))
+         (category (if entries
+                       (get-text-property 0 'org-category (car entries))
+                     (file-name-base file-name)))
+         ;; Collect and format all breadcrumbs.
+         (breadcrumbs
+          (mapconcat (lambda (group)
+                       (car (last (split-string (car group) "->" t))))
+                     entry-groups
+                     ", "))
+         (header (org-add-props
+                     (concat category
+                             ":"
+                             (make-string (max 1 (- (window-text-width)
+                                                    (length category)
+                                                    1 ; Colon
+                                                    (length breadcrumbs)))
+                                          ? )
+                             breadcrumbs)
+                     nil
+                   'face 'org-agenda-structure)))
+    (insert header
+            "\n"
+            (org-agenda-finalize-entries entries)
+            "\n\n")))
 
 (defun my-org-drop-headings (end)
   "Drop headings from point to END."
@@ -80,3 +157,18 @@ Otherwise hide it, and show the previous sibling subtree."
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
+
+(defun my-window-text-width--org-tty (width)
+  "Decrement text width when displaying on a terminal in Org
+Agenda mode.
+
+By default, `org-agenda-align-tags' puts last characters of
+right-aligned strings in the rightmost window column which is the
+margin column on a terminal display, and thus the strings get
+truncated."
+  (if (and (not window-system)
+           (eq major-mode 'org-agenda-mode))
+      (- width 1)
+    width))
+(advice-add 'window-text-width
+            :filter-return #'my-window-text-width--org-tty)
