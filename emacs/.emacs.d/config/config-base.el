@@ -56,10 +56,6 @@
 ;; Indentation.
 (custom-set indent-tabs-mode nil)
 
-;; Ivy.
-(custom-set ivy-use-selectable-prompt t)
-(custom-set ivy-use-virtual-buffers t)
-
 ;; Minibuffer line.
 (custom-set minibuffer-line-format
             '(:eval (let ((time-string (format-time-string "%R")))
@@ -135,7 +131,6 @@
 (custom-set view-read-only t)
 
 ;; Enable base modes.
-(ivy-mode 1)
 (minibuffer-line-mode 1)
 (pending-delete-mode 1)
 (show-paren-mode 1)

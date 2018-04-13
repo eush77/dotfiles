@@ -75,6 +75,7 @@ and URL
 (load "config-flycheck")
 (load "config-guide-key")
 (load "config-hideshow")
+(load "config-ivy")
 (load "config-key-chord")
 (load "config-key-map")
 (load "config-magit")
