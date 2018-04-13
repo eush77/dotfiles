@@ -92,6 +92,7 @@ and URL
 (with-eval-after-load "dired" (load "config-dired"))
 (with-eval-after-load "eshell" (load "config-eshell"))
 (with-eval-after-load "ffap" (load "config-ffap"))
+(with-eval-after-load "gdb-mi" (load "config-gdb-mi"))
 (with-eval-after-load "help" (load "config-help"))
 (with-eval-after-load "hippie-exp" (load "config-hippie-expand"))
 (with-eval-after-load "info" (load "config-info"))
