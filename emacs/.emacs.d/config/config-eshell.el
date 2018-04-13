@@ -22,7 +22,11 @@ until it fits and then aligned to be exactly this length.")
 
 (defun my-eshell-prompt-sigil-function ()
   "Return trailing sigil for my Eshell prompt."
-  (propertize (if (zerop (user-uid)) " # " " $ ")
+  (propertize (format " %s%s "
+                      (if (zerop (user-uid)) "#" "$")
+                      (if eshell-dirstack
+                          (number-to-string (length eshell-dirstack))
+                        ""))
               'font-lock-face
               (if (zerop eshell-last-command-status)
                   'eshell-prompt
@@ -214,6 +218,7 @@ including the sigil."
 ;; It is already propertized, so turn off built-in highlighting.
 (custom-set eshell-highlight-prompt nil)
 (custom-set eshell-prompt-function #'my-eshell-prompt-function)
+(custom-set eshell-prompt-regexp "^[^#$]* [#$][[:digit:]]* ")
 
 ;; Set up `emacs/ls'.
 (custom-set eshell-ls-initial-args '("--classify"
