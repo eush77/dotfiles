@@ -6,6 +6,9 @@
 (global-set-key (kbd "C-x M-l") #'downcase-region)
 (global-set-key (kbd "C-x M-u") #'upcase-region)
 
+;; Compilation.
+(global-set-key (kbd "<f7>") #'my-recompile)
+
 ;; Counsel overloads.
 (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
 (global-set-key [remap describe-function] #'counsel-describe-function)
