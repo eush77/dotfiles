@@ -56,54 +56,6 @@
 ;; Indentation.
 (custom-set indent-tabs-mode nil)
 
-;; Minibuffer line.
-(custom-set minibuffer-line-format
-            '(:eval (let ((time-string (format-time-string "%R")))
-                      (concat (make-string (- (frame-text-cols)
-                                              (string-width time-string)
-                                              1)
-                                           ? )
-                              time-string))))
-(defun keyboard-quit--minibuffer-line (func)
-  "Restore minibuffer line after quit."
-  (condition-case nil (funcall func) (quit (minibuffer-line--update))))
-(advice-add 'keyboard-quit :around #'keyboard-quit--minibuffer-line)
-
-;; Mode line.
-(custom-set mode-line-format '("%e"
-                               mode-line-front-space
-                               mode-line-mule-info
-                               mode-line-client
-                               mode-line-modified
-                               mode-line-remote
-                               mode-line-frame-identification
-                               mode-line-buffer-identification
-                               "   "
-                               mode-line-position
-                               (vc-mode vc-mode)
-                               "  "
-                               mode-line-modes
-                               mode-line-misc-info
-                               mode-line-end-spaces))
-(custom-set rm-blacklist '(" $"         ; rich-minority-mode
-                           " FlyC-"     ; flycheck-mode (no-checker)
-                           " Guide"     ; guide-key-mode
-                           " ivy"       ; ivy-mode
-                           "[ln]"))     ; w3m-lnum-mode
-(custom-set sml/mode-width 'right)
-(custom-set sml/name-width 20)
-(custom-set sml/position-percentage-format "")
-(custom-set sml/prefix-face-list '(("" sml/prefix)))
-(custom-set sml/replacer-regexp-list
-            '(("^~/\\.emacs\\.d/elpa/" ":elpa:")
-              ("^~/Dropbox/notes/" ":notes:")
-              ("^~/Dropbox/org/" ":org:")
-              ("^~/src/" ":src:")
-              ("^:src:\\([^/]\\)[^/]*/" ":src/\\1:")
-              ("^:src/\\(.\\):\\([^/]+\\)/" ":\\1/\\2:")))
-(custom-set sml/size-indication-format "%p of %I ")
-(custom-set sml/theme 'respectful)
-
 ;; Enable narrowing.
 (put 'narrow-to-region 'disabled nil)
 
@@ -131,7 +83,5 @@
 (custom-set view-read-only t)
 
 ;; Enable base modes.
-(minibuffer-line-mode 1)
 (pending-delete-mode 1)
 (show-paren-mode 1)
-(sml/setup)                             ; Uses `rich-minority-mode' internally.

@@ -79,6 +79,8 @@ and URL
 (load "config-key-chord")
 (load "config-key-map")
 (load "config-magit")
+(load "config-minibuffer-line")
+(load "config-mode-line")
 (load "config-smartparens")
 (load "config-smartscan")
 (load "config-vc")
