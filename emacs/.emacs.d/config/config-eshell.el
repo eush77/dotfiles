@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 (require 'eshell-z)
 
+(custom-set eshell-prefer-lisp-functions t)
+
 ;; My Eshell prompt has a fixed length.
 ;;
 ;; It is composed of "leads" - nondirectory parts of the full name of the
@@ -254,3 +256,7 @@ prompt)."
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))
 (add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
+
+(defun eshell/debug ()
+  "Debug previous command."
+  (gdb (concat "gdb -i=mi --args " (eshell-previous-input-string 1))))
