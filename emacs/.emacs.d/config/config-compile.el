@@ -14,8 +14,12 @@ from `prog-mode'."
 buffer."
   (interactive)
   (require 'compile)
-  (unless (compilation-buffer-p (current-buffer))
+  (when (my-compilation-save-buffers-predicate)
     (save-buffer))
+  (when compilation-last-buffer
+    (when-let ((compilation-window
+                (get-buffer-window compilation-last-buffer t)))
+      (select-frame-set-input-focus (window-frame compilation-window))
+      (select-window compilation-window)))
   (recompile)
-  (unless (compilation-buffer-p (current-buffer))
-    (switch-to-buffer-other-frame compilation-last-buffer)))
+  (select-window (get-buffer-window compilation-last-buffer t)))
