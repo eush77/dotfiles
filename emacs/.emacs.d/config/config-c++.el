@@ -46,4 +46,21 @@
                  :actions '(insert wrap autoskip)
                  :unless '(my-sp-c++-point-at-arrow-operator-p
                            my-sp-c++-point-at-comparison-operator-p
-                           my-sp-c++-point-at-shift-operator-p)))
+                           my-sp-c++-point-at-shift-operator-p))
+
+  (defvar my-sp-c++-restrict-to-blocks-mode-map
+    (let ((map (make-sparse-keymap)))
+      (dolist (cmd (cl-union (mapcar #'cdr sp-paredit-bindings)
+                             (mapcar #'cdr sp-smartparens-bindings)))
+        (eval `(define-key map [remap ,cmd]
+                 (sp-restrict-to-object-interactive
+                  'sp-prefix-pair-object
+                  (sp-restrict-to-pairs-interactive "{" ',cmd)))))
+      map)
+    "Keymap for `my-sp-c++-restrict-to-blocks-mode'.")
+
+  (define-minor-mode my-sp-c++-restrict-to-blocks-mode
+    "Minor mode for restricting Smartparens commands to curly
+blocks."
+    :lighter "SP/{}"
+    :keymap 'my-sp-c++-restrict-to-blocks-mode-map))
