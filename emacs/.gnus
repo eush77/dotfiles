@@ -14,7 +14,8 @@
 
 (defun my-gnus-delete-article-window ()
   "Delete Article window."
-  (when (gnus-buffer-live-p gnus-article-buffer)
+  (when (and (gnus-buffer-live-p gnus-article-buffer)
+             (not (one-window-p)))
     (when-let (article-window (get-buffer-window gnus-article-buffer))
       (delete-window article-window))))
 (add-hook 'gnus-exit-group-hook #'my-gnus-delete-article-window)
