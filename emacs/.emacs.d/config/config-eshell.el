@@ -251,7 +251,7 @@ prompt)."
 ;; `eshell-mode-map' is local to the buffer, so do it in a hook.
 (defun my-eshell-mode-hook ()
   "My hook for Eshell mode."
-  (define-key eshell-mode-map (kbd "C-c C-h") #'eshell-list-history)
+  (define-key eshell-mode-map (kbd "C-c C-h") #'counsel-esh-history)
   (define-key eshell-mode-map (kbd "C-c C-l") #'eshell/clear)
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))

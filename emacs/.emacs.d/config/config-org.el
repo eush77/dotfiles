@@ -148,8 +148,6 @@ Otherwise hide it, and show the previous sibling subtree."
     (interactive)
     (funcall show-and-move #'outline-backward-same-level)))
 
-(define-key org-mode-map (kbd "C-c C-r") #'ivy-resume)
-
 (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
@@ -157,6 +155,10 @@ Otherwise hide it, and show the previous sibling subtree."
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
+(define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
+
+(define-key org-agenda-mode-map (kbd "C-c C-j")
+  #'counsel-org-agenda-headlines)
 
 (defun my-window-text-width--org-tty (width)
   "Decrement text width when displaying on a terminal in Org

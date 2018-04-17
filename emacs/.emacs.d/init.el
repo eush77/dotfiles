@@ -74,6 +74,7 @@ and URL
 ;; and load corresponding entries in the host file.
 (load "config-base")
 (load "config-color-identifiers-mode")
+(load "config-counsel")
 (load "config-direnv")
 (load "config-emms")
 (load "config-flycheck")
@@ -92,7 +93,6 @@ and URL
 (with-eval-after-load "calendar" (load "config-calendar"))
 (with-eval-after-load "cc-mode" (load "config-c++"))
 (with-eval-after-load "compile" (load "config-compile"))
-(with-eval-after-load "counsel" (load "config-counsel"))
 (with-eval-after-load "dired" (load "config-dired"))
 (with-eval-after-load "eshell" (load "config-eshell"))
 (with-eval-after-load "ffap" (load "config-ffap"))

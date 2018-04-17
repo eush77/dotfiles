@@ -10,12 +10,10 @@
 (global-set-key (kbd "<f7>") #'my-recompile)
 
 ;; Counsel overloads.
-(define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
-(global-set-key [remap describe-function] #'counsel-describe-function)
-(global-set-key [remap describe-variable] #'counsel-describe-variable)
-(global-set-key [remap execute-extended-command] #'counsel-M-x)
-(global-set-key [remap info-lookup-symbol] #'counsel-info-lookup-symbol)
+(global-unset-key (kbd "C-x C-u"))
 (global-set-key [remap insert-char] #'counsel-unicode-char)
+(global-set-key (kbd "C-x C-f") #'counsel-file-jump)
+(global-set-key (kbd "C-x C-u C-SPC") #'counsel-mark-ring)
 
 ;; Expand-region.
 (global-set-key (kbd "M-=") #'er/expand-region)

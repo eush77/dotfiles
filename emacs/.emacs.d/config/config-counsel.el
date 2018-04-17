@@ -1,6 +1,9 @@
+(counsel-mode 1)
+
 (custom-set counsel-find-file-at-point t)
 (custom-set counsel-preselect-current-file t)
 
+;;;###autoload
 (defun my-counsel-git-grep-at-point (&optional cmd)
   "Grep for the symbol at point in the current Git repository.
 
@@ -45,3 +48,13 @@ repositories."
              (apply ivy-read-function prompt (cdr collection) args))))
     (apply func args)))
 (advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
+
+;;;###autoload
+(defun my-counsel-org-goto (arg)
+  "If called without a prefix argument, call `counsel-org-goto'.
+
+If called with a prefix argument, call `counsel-org-goto-all'."
+  (interactive "P")
+  (if arg
+      (counsel-org-goto-all)
+    (counsel-org-goto)))
