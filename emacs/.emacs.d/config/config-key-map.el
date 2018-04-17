@@ -120,6 +120,7 @@
 (global-set-key (kbd "C-M-r") #'sp-backward-down-sexp)
 (global-set-key (kbd "C-M-u") #'sp-backward-up-sexp)
 (global-set-key (kbd "C-M-y") #'sp-up-sexp)
+(global-set-key (kbd "C-x np") #'sp-narrow-to-sexp)
 (global-set-key (kbd "M-(") #'my-sp-wrap-with-pair)
 
 ;; Swap buffers.
