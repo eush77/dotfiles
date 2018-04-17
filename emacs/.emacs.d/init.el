@@ -28,6 +28,7 @@ and URL
 	    '(("gnu" . "http://elpa.gnu.org/packages/")
 	      ("melpa" . "http://melpa.org/packages/")
               ("org" . "https://orgmode.org/elpa/")))
+(package-refresh-contents)
 
 ;; Check and install missing packages.
 (add-to-list 'package-selected-packages 'clang-format)
