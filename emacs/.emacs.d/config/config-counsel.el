@@ -37,6 +37,7 @@ repositories."
 
 (defun my-counsel-ibuffer--preselect (func &rest args)
   "Remove current buffer, effectively preselecting last buffer."
+  (require 'ibuffer)
   (cl-assert (eq ibuffer-default-sorting-mode 'recency))
   (letf* ((ivy-read-function (symbol-function 'ivy-read))
           ((symbol-function 'ivy-read)
