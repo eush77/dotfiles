@@ -34,3 +34,13 @@ repositories."
     (apply func args)))
 (advice-add 'counsel--git-grep-count-func-default
             :around #'my-counsel-git-grep-count-func-default--projects)
+
+(defun my-counsel-ibuffer--preselect (func &rest args)
+  "Remove current buffer, effectively preselecting last buffer."
+  (cl-assert (eq ibuffer-default-sorting-mode 'recency))
+  (letf* ((ivy-read-function (symbol-function 'ivy-read))
+          ((symbol-function 'ivy-read)
+           (lambda (prompt collection &rest args)
+             (apply ivy-read-function prompt (cdr collection) args))))
+    (apply func args)))
+(advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
