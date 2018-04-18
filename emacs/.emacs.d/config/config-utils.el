@@ -81,9 +81,12 @@ beginning of line, in which case duplicate the line backward."
       (my-backward-duplicate-line)
     (my-sp-backward-duplicate-sexp)))
 
+;;;###autoload
 (defcustom my-open-line-and-indent t
   "Non-nil indicates that `my-open-next-line' and
-`my-open-previous-line' indent inserted lines.")
+`my-open-previous-line' indent inserted lines."
+  :type 'boolean
+  :group 'my)
 
 ;;;###autoload
 (defun my-open-next-line (count)
@@ -121,11 +124,14 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
 ;; Window sizing.
 ;;
 
+;;;###autoload
 (defcustom my-window-size-delta 1
-  "Default delta for `my-window-*' family of commands.
+  "Default delta for window sizing commands.
 
 See `my-enlarge-window', `my-enlarge-window-horizontally', and
-`my-shrink-window-horizontally'.")
+`my-shrink-window-horizontally'."
+  :type 'integer
+  :group 'my)
 
 ;;;###autoload
 (defun my-enlarge-window (delta)

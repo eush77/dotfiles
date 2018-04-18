@@ -10,17 +10,24 @@
 ;; truncated to fill all the available space, even if to the detriment of
 ;; other leads.
 
-(defvar my-eshell-prompt-length 20
-  "Length of the Eshell prompt string (as computed by
-`my-eshell-prompt-function'). The prompt string will be reduced
-until it fits and then aligned to be exactly this length.")
+;;;###autoload
+(defcustom my-eshell-prompt-length 20
+  "Length of the Eshell prompt.
 
+The prompt string computed by `my-eshell-prompt-function' will be
+reduced until it fits and then aligned to be exactly this
+length."
+  :type 'integer
+  :group 'my)
+
+;;;###autoload
 (defface my-eshell-prompt-sigil-failure
   '((default :weight bold)
     (((class color) (background light)) :foreground "Pink")
     (((class color) (background dark))  :foreground "Red"))
   "The face used to highlight sigil when
-`eshell-last-command-status' is not 0.")
+`eshell-last-command-status' is not 0."
+  :group 'my)
 
 (defun my-eshell-prompt-sigil-function ()
   "Return trailing sigil for my Eshell prompt."

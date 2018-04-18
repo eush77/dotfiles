@@ -23,6 +23,16 @@ and URL
 (custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load-file custom-file)
 
+;; My customization group.
+(defgroup my
+  '((my-eshell-prompt-length custom-variable)
+    (my-eshell-prompt-sigil-failure custom-face)
+    (my-open-line-and-indent custom-variable)
+    (my-window-size-delta custom-variable))
+  "Settings for my personal configuration."
+  :prefix "my-"
+  :link `(file-link ,(expand-file-name "init.el" user-emacs-directory)))
+
 ;; Package archives.
 (custom-set package-archives
 	    '(("gnu" . "http://elpa.gnu.org/packages/")
