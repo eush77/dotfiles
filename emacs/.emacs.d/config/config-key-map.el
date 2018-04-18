@@ -85,7 +85,7 @@
 (global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)
 (global-set-key (kbd "C-c r ev") #'rotate:even-vertical)
 (global-set-key (kbd "C-c r h") #'rotate:main-horizontal)
-(global-set-key (kbd "C-c r m") #'rotate:main-vertical)
+(global-set-key (kbd "C-c r v") #'rotate:main-vertical)
 (global-set-key (kbd "C-c r t") #'rotate:tiled)
 
 ;; Scroll lock.
