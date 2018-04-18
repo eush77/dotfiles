@@ -9,6 +9,7 @@
 (key-chord-define-global "xq" #'quit-window)
 (key-chord-define-global "xs" #'save-buffer)
 (key-chord-define-global "xf" #'find-file)
+(key-chord-define-global "xr" #'counsel-recentf)
 (key-chord-define-global "xl" #'find-library)
 (key-chord-define-global "xg" #'counsel-git)
 (key-chord-define-global "xv" #'find-alternate-file)
