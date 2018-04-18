@@ -26,15 +26,23 @@
 
 (add-hook 'org-mode-hook #'auto-fill-mode)
 
+;;;###autoload
+(defcustom my-org-plan-directory "~/org/plan"
+  "Directory with Org files for the planned agenda view.
+
+See `my-org-agenda-planned-view'."
+  :type 'directory
+  :group 'my)
+
 (defun my-org-agenda-planned-view (file-name)
   "Show all PLAN, PASS, or FAIL entries that have at least one PLAN sibling,
 essentially compiling the list of currently planned items along
 with the items completed in the current time period.
 
 If FILE-NAME is not absolute, it is interpreted as relative to
-`org-directory'. "
+`my-org-plan-directory'. "
   (org-compile-prefix-format t)
-  (let* ((file-name (expand-file-name file-name org-directory))
+  (let* ((file-name (expand-file-name file-name my-org-plan-directory))
          (org-select-this-todo-keyword "PLAN|PASS|FAIL")
          ;; Force `breadcrumbs' property to be computed.
          (org-prefix-format-compiled

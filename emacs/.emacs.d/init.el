@@ -28,6 +28,7 @@ and URL
   '((my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
     (my-open-line-and-indent custom-variable)
+    (my-org-plan-directory custom-variable)
     (my-window-size-delta custom-variable))
   "Settings for my personal configuration."
   :prefix "my-"
