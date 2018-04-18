@@ -42,10 +42,10 @@ repositories."
   "Remove current buffer, effectively preselecting last buffer."
   (require 'ibuffer)
   (cl-assert (eq ibuffer-default-sorting-mode 'recency))
-  (letf* ((ivy-read-function (symbol-function 'ivy-read))
-          ((symbol-function 'ivy-read)
-           (lambda (prompt collection &rest args)
-             (apply ivy-read-function prompt (cdr collection) args))))
+  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
+             ((symbol-function 'ivy-read)
+              (lambda (prompt collection &rest args)
+                (apply ivy-read-function prompt (cdr collection) args))))
     (apply func args)))
 (advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
 
