@@ -1,6 +1,9 @@
 (require 'dired-x)                      ; Bind `dired-jump'
 (autoload 'swiper-multi "swiper" nil t)
 
+;; Calendar.
+(global-set-key (kbd "C-c z") #'calendar)
+
 ;; Case conversion.
 (global-set-key (kbd "C-x M-c") #'capitalize-region)
 (global-set-key (kbd "C-x M-l") #'downcase-region)
