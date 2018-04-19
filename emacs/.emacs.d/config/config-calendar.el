@@ -13,3 +13,9 @@
 (custom-set calendar-week-start-day 1)
 
 (add-hook 'calendar-today-visible-hook #'calendar-mark-today)
+
+(defun my-calendar--display-at-bottom (func &rest args)
+  "Display at the bottom of the frame."
+  (let ((display-buffer-overriding-action '(display-buffer-at-bottom)))
+    (apply func args)))
+(advice-add 'calendar :around #'my-calendar--display-at-bottom)
