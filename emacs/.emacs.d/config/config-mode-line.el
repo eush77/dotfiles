@@ -17,6 +17,7 @@
                                mode-line-end-spaces))
 
 (custom-set rm-blacklist '(" $"         ; rich-minority-mode
+                           " counsel"   ; counsel-mode
                            " FlyC-"     ; flycheck-mode (no-checker)
                            " Guide"     ; guide-key-mode
                            " ivy"       ; ivy-mode
