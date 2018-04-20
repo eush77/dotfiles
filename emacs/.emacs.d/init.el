@@ -71,6 +71,7 @@ and URL
 (add-to-list 'package-selected-packages 'smartscan)
 (add-to-list 'package-selected-packages 'swap-buffers)
 (add-to-list 'package-selected-packages 'swiper)
+(add-to-list 'package-selected-packages 'switch-window)
 (add-to-list 'package-selected-packages 'w3m)
 (add-to-list 'package-selected-packages 'window-jump)
 
