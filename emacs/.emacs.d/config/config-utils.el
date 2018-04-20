@@ -183,3 +183,14 @@ instead of 1."
   (interactive)
   (delete-window)
   (balance-windows))
+
+;;
+;; Window switching
+;;
+
+;;;###autoload
+(defun my-switch-to-mru-window ()
+  "Switch to most recently used window."
+  (interactive)
+  (select-window (get-mru-window t t t))
+  (select-frame-set-input-focus (window-frame (selected-window))))

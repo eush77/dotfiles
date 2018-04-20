@@ -22,3 +22,4 @@
 
 ;; Switching windows
 (key-chord-define-global "xi" #'switch-window)
+(key-chord-define-global "xo" #'my-switch-to-mru-window)
