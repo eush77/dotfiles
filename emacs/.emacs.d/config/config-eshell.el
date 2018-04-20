@@ -264,6 +264,8 @@ prompt)."
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))
 (add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
 
-(defun eshell/debug ()
-  "Debug previous command."
-  (gdb (concat "gdb -i=mi --args " (eshell-previous-input-string 1))))
+(defun eshell/gdb ()
+  "Debug previous command in `gdb'."
+  (gdb (concat "gdb -i=mi -cd "
+               default-directory
+               " --args " (eshell-previous-input-string 1))))
