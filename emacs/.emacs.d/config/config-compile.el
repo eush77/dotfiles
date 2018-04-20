@@ -1,4 +1,3 @@
-(custom-set compilation-auto-jump-to-first-error t)
 (custom-set compilation-scroll-output t)
 
 (defun my-compilation-save-buffers-predicate ()
