@@ -18,6 +18,8 @@
                 (my-org-agenda-planned-view "5 Years.org")
                 (my-org-agenda-planned-view "Life.org"))
                ((org-agenda-prefix-format "  ")))))
+(custom-set org-default-priority ?C)
+(custom-set org-lowest-priority ?D)
 (custom-set org-agenda-todo-list-sublevels nil)
 (custom-set org-enforce-todo-dependencies t)
 (custom-set org-enforce-todo-checkbox-dependencies t)
