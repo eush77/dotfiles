@@ -20,6 +20,7 @@
                ((org-agenda-prefix-format "  ")))))
 (custom-set org-default-priority ?C)
 (custom-set org-lowest-priority ?D)
+(custom-set org-agenda-span 'fortnight)
 (custom-set org-agenda-todo-list-sublevels nil)
 (custom-set org-enforce-todo-dependencies t)
 (custom-set org-enforce-todo-checkbox-dependencies t)
