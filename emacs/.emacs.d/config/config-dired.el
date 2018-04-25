@@ -1,5 +1,5 @@
 (custom-set dired-listing-switches
-            "-l --almost-all --group-directories-first --human-readable")
+            "-lv --almost-all --group-directories-first --human-readable")
 (custom-set dired-dwim-target t)
 
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
