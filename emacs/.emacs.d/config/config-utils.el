@@ -32,15 +32,16 @@ immediately."
                  frame-list)))
     (if (<= (length frame-alist) 2)
         (other-frame 1)
-      (select-frame (cdr (assoc (completing-read "Select frame: "
-                                                 frame-alist
-                                                 nil
-                                                 t
-                                                 nil
-                                                 nil
-                                                 ;; Select the other frame
-                                                 (caadr frame-alist))
-                                frame-alist))))))
+      (select-frame-set-input-focus
+       (cdr (assoc (completing-read "Select frame: "
+                                    frame-alist
+                                    nil
+                                    t
+                                    nil
+                                    nil
+                                    ;; Select the other frame
+                                    (caadr frame-alist))
+                   frame-alist))))))
 
 ;;
 ;; Editing.
