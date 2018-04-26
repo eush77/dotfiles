@@ -13,8 +13,12 @@ to exact time.
     (file-error (format-time-string "%R"))))
 
 (custom-set minibuffer-line-format
-            '(:eval (let ((time-string (my-minibuffer-clock)))
-                      (concat (make-string (- (frame-text-cols)
+            '(:eval (let ((time-string (my-minibuffer-clock))
+                          (min-frame-text-cols
+                           (apply #'min
+                                  (mapcar #'frame-text-cols
+                                          (minibuffer-frame-list)))))
+                      (concat (make-string (- min-frame-text-cols
                                               (string-width time-string)
                                               1)
                                            ? )
