@@ -4,10 +4,11 @@
   (require 'switch-window-asciiart)
 
   (custom-set swap-buffers-qwerty-shortcuts
-              (mapcar (lambda (label)
-                        (let ((pos (1+ (string-match "(.)" label))))
-                          (substring label pos (1+ pos))))
-                      (butlast switch-window-asciiart)))
+              (progn (require 'switch-window-asciiart)
+                     (mapcar (lambda (label)
+                               (let ((pos (1+ (string-match "(.)" label))))
+                                 (substring label pos (1+ pos))))
+                             (butlast switch-window-asciiart))))
 
   (defun my-swap-buffers-label--asciiart (num)
     "My replacement for `swap-buffers-label' using

@@ -1,5 +1,5 @@
-(require 'russian-holidays)
-(custom-set holiday-local-holidays russian-holidays)
+(custom-set holiday-local-holidays (progn (require 'russian-holidays)
+                                          russian-holidays))
 
 (custom-set calendar-holidays (append holiday-local-holidays
                                       holiday-other-holidays
