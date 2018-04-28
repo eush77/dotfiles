@@ -76,3 +76,101 @@ current frame."
 (define-key gdb-frames-mode-map (kbd "u") #'my-gdb-frame-up)
 
 (define-key gud-mode-map (kbd "C-c s") #'my-gdb-switch-to-stack-buffer)
+
+;;;###autoload
+(defcustom my-rr-replay-buffer-name "*rr replay*"
+  "Replay buffer name for `my-rr-gdb'."
+  :type 'string
+  :group 'my)
+
+;;;###autoload
+(defcustom my-rr-replay-port 4040
+  "Replay port for `my-rr-gdb'."
+  :type 'integer
+  :group 'my)
+
+;;;###autoload
+(defcustom my-rr-trace-root-directory "~/.local/share/rr"
+  "Root directory with rr traces."
+  :type 'directory
+  :group 'my)
+
+(defun my-rr-select-trace ()
+  "Select rr trace with completion.
+
+Returns the absolute file name of the selected trace directory."
+  (let ((rr-trace-alist
+         (seq-map
+          (lambda (file)
+            (let ((name (car file))
+                  (atime (current-time-string (time-to-seconds
+                                               (nth 5 file)))))
+              (cons
+               (concat name
+                       (make-string (max 0 (- (frame-text-cols)
+                                              1
+                                              (length name)
+                                              (length atime)))
+                                    ? )
+                       atime)
+               name)))
+          (seq-sort
+           (lambda (left right)
+             (let ((left-atime (time-to-seconds (nth 5 left)))
+                   (right-atime (time-to-seconds (nth 5 right))))
+               (> left-atime right-atime)))
+           (seq-filter
+            (lambda (file)
+              (let ((name (car file))
+                    (directory-p (eq t (cadr file))))
+                (and directory-p
+                     (not (string= name "."))
+                     (not (string= name "..")))))
+            (directory-files-and-attributes my-rr-trace-root-directory
+                                            nil nil t))))))
+    (expand-file-name (cdr (assoc (completing-read "Select trace: "
+                                                   rr-trace-alist)
+                                  rr-trace-alist))
+                      my-rr-trace-root-directory)))
+
+(defun my-rr-get-trace-executable (trace-dir)
+  "Get the entry-point executable file from the trace directory."
+  (car (seq-filter (lambda (file)
+                     (and (not (string-match "\\.so\\(\\.\\|$\\)"
+                                             (file-name-nondirectory file)))
+                          (file-regular-p file)
+                          (file-executable-p file)))
+                   (directory-files trace-dir t))))
+
+(defun my-rr-gdb (trace-dir)
+  "Debug rr trace in `gdb'."
+  (interactive (list (my-rr-select-trace)))
+
+  ;; Start processes.
+  (gdb (concat "gdb -i=mi " (my-rr-get-trace-executable trace-dir)))
+  (when-let ((rr-replay (get-buffer-process
+                         (get-buffer-create my-rr-replay-buffer-name))))
+    (kill-process rr-replay))
+  (with-current-buffer (get-buffer-create my-rr-replay-buffer-name)
+    (erase-buffer))
+  (start-process "rr replay" (get-buffer-create my-rr-replay-buffer-name)
+                 "rr" "replay"
+                 "-s" (number-to-string my-rr-replay-port)
+                 trace-dir)
+
+  ;; Display replay buffer in place of the IO buffer.
+  (gdb-wait-for-pending
+   (gdb-set-window-buffer my-rr-replay-buffer-name
+                          t
+                          (get-buffer-window (gdb-get-buffer-create
+                                              'gdb-inferior-io))))
+
+  ;; Connect to the rr remote.
+  (gdb-input "-gdb-set sysroot /" 'ignore)
+  (gdb-wait-for-pending
+   (gdb-input (format "-target-select extended-remote localhost:%d"
+                      my-rr-replay-port)
+              'ignore)))
+
+;;;###autoload
+(defalias 'rr-gdb #'my-rr-gdb)

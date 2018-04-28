@@ -29,7 +29,10 @@ and URL
     (my-eshell-prompt-sigil-failure custom-face)
     (my-open-line-and-indent custom-variable)
     (my-org-plan-directory custom-variable)
-    (my-window-size-delta custom-variable))
+    (my-window-size-delta custom-variable)
+    (my-rr-replay-buffer-name custom-variable)
+    (my-rr-replay-port custom-variable)
+    (my-rr-trace-root-directory custom-variable))
   "Settings for my personal configuration."
   :prefix "my-"
   :link `(file-link ,(expand-file-name "init.el" user-emacs-directory)))
