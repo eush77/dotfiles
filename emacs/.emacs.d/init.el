@@ -21,6 +21,8 @@ and URL
 
 ;; Customization file.
 (custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
+(unless (file-exists-p custom-file)
+  (write-region "" nil custom-file))
 (load-file custom-file)
 
 ;; My customization group.
