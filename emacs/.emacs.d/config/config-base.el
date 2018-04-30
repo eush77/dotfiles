@@ -53,6 +53,11 @@
 (advice-add 'find-file :around #'find-file--browse-url)
 (advice-add 'find-file-noselect :around #'find-file-noselect--browse-url)
 
+;; Advice `frame-text-cols' to deduct 1 when running in a terminal, since the
+;; rightmost column is the margin column on a terminal.
+(unless window-system
+  (advice-add 'frame-text-cols :filter-return #'1-))
+
 ;; Indentation.
 (custom-set indent-tabs-mode nil)
 

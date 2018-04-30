@@ -108,7 +108,6 @@ Returns the absolute file name of the selected trace directory."
               (cons
                (concat name
                        (make-string (max 0 (- (frame-text-cols)
-                                              1
                                               (length name)
                                               (length atime)))
                                     ? )

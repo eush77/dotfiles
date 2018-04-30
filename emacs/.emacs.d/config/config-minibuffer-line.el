@@ -19,8 +19,7 @@ to exact time.
                                   (mapcar #'frame-text-cols
                                           (minibuffer-frame-list)))))
                       (concat (make-string (- min-frame-text-cols
-                                              (string-width time-string)
-                                              1)
+                                              (string-width time-string))
                                            ? )
                               time-string))))
 
