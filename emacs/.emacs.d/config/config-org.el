@@ -20,6 +20,9 @@
                ((org-agenda-prefix-format "  ")))))
 (custom-set org-default-priority ?C)
 (custom-set org-lowest-priority ?D)
+(custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
+(custom-set org-columns-default-format
+            "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
 (custom-set org-agenda-span 'fortnight)
 (custom-set org-agenda-todo-list-sublevels nil)
 (custom-set org-enforce-todo-dependencies t)
