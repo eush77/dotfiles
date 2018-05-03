@@ -44,3 +44,7 @@
 (gnus-demon-add-handler 'gnus-demon-scan-news 10 nil)
 (when window-system
   (gnus-desktop-notify-mode))
+
+(let ((host-file "~/.gnus-host"))
+  (when (file-exists-p host-file)
+    (load-file host-file)))
