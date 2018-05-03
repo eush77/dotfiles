@@ -6,10 +6,12 @@ set debug-file-directory /usr/lib/debug
 
 set listsize 30
 
+py import re
+
 alias rf = reverse-finish
 
 define list-start
-    py gdb.execute("x/{}i $pc".format(gdb.parameter("listsize")))
+    py print(re.sub(r'^(=> [^:]*:\s*)(\S+)', lambda m: m.group(1) + m.group(2).upper(), gdb.execute("x/{}i $pc".format(gdb.parameter("listsize")), to_string=True), flags=re.MULTILINE))
 end
 document list-start
 list-start
@@ -19,7 +21,7 @@ end
 alias ls = list-start
 
 define list-instructions
-    py gdb.execute("x/{}i $pc - 0x30".format(gdb.parameter("listsize")))
+    py print(re.sub(r'^(=> [^:]*:\s*)(\S+)', lambda m: m.group(1) + m.group(2).upper(), gdb.execute("x/{}i $pc - 0x30".format(gdb.parameter("listsize")), to_string=True), flags=re.MULTILINE))
 end
 document list-instructions
 list-instructions
@@ -96,5 +98,6 @@ define rsi
     list-instructions
 end
 
+#source ~/.gdb.d/glibc.gdb
 source ~/.gdb.d/llvm.gdb
 source ~/.gdb.d/postgres.gdb

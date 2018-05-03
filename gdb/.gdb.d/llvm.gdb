@@ -28,3 +28,23 @@ llvm-value-name <value>
 Print name of an LLVMValueRef instance.
 end
 alias lln = llvm-value-name
+
+define pllvmlist
+  if $arg0
+    set $cell = $arg0->head
+    while $cell
+      llv $cell->data.ptr_value
+      set $cell = $cell->next
+    end
+  end
+end
+
+define pllvmlist-blocks
+  if $arg0
+    set $cell = $arg0->head
+    while $cell
+      llv LLVMGetInstructionParent($cell->data.ptr_value)
+      set $cell = $cell->next
+    end
+  end
+end
