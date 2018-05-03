@@ -1,0 +1,48 @@
+#!/bin/bash
+# -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-
+set -euo pipefail
+IFS=$'\n'
+
+
+function help {
+	cat <<-EOF
+		Usage: $0 <input.pdf> <output-file-or-directory>
+
+		Cut file horizontally, then vertically, then crop margins.
+		Make it readable on a 6" ebook reader.
+	EOF
+}
+
+
+# decol <input.pdf> <output.pdf>
+function decol {
+	input="$1"
+	output="$2"
+
+	if [[ -e "$output" ]]; then
+		read -rp "File '$output' exists. Overwrite? (y/n) "
+		if [[ "${REPLY::1}" != "y" ]]; then
+			exit
+		fi
+	fi
+
+	tempx=$(tempfile --suffix=.pdf)
+	tempy=$(tempfile --suffix=.pdf)
+	trap "rm $tempx $tempy" EXIT
+
+	mutool poster -x2 "$input" "$tempx"
+	mutool poster -y2 "$tempx" "$tempy"
+	pdfcrop "$tempy" "$output"
+}
+
+
+if [[ "$1" = "--help" || "$#" -ne 2 ]]; then
+	help
+	exit
+fi
+
+if [[ -d "$2" ]]; then
+	decol "$1" "$2/$(basename $1)"
+else
+	decol "$1" "$2"
+fi
