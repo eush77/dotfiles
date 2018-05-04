@@ -66,6 +66,7 @@ and URL
 (add-to-list 'package-selected-packages 'magit)
 (add-to-list 'package-selected-packages 'minibuffer-line)
 (add-to-list 'package-selected-packages 'multiple-cursors)
+(add-to-list 'package-selected-packages 'multitran)
 (add-to-list 'package-selected-packages 'org-plus-contrib)
 (add-to-list 'package-selected-packages 'pass)
 (add-to-list 'package-selected-packages 'pocket-reader)

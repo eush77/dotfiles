@@ -78,6 +78,9 @@
 (global-set-key (kbd "C-M-<down>") #'mc/mark-next-like-this)
 (global-set-key (kbd "C-M-<up>") #'mc/mark-previous-like-this)
 
+;; Multitran.
+(global-set-key (kbd "C-c t") #'multitran)
+
 ;; Org.
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
