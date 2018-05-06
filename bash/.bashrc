@@ -34,8 +34,15 @@ PROMPT_COMMAND='history -a; __prompt_listing'
 PROMPT_LISTING_LIMIT=20
 PS1='\[$((PS1_STATUS=$?))\r\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[31m\]$(__ps1_failure)\[\e[0m\]$(__ps1_success) '
 
-if [[ "$SHLVL" -gt 1 ]]; then
-	PS1_SHLVL="(+$((SHLVL - 1))) "
+# Calculate SHLVL nesting level indicator for PS1.
+if [[ -n "$DISPLAY" ]]; then
+	# Terminal emulators in desktop sessions start at SHLVL=2.
+	SHLVL_BASE=2
+else
+	SHLVL_BASE=1
+fi
+if [[ "$SHLVL" -gt "$SHLVL_BASE" ]]; then
+	PS1_SHLVL="(+$((SHLVL - SHLVL_BASE))) "
 else
 	PS1_SHLVL=
 fi
