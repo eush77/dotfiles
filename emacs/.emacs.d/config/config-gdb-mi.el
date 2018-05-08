@@ -1,3 +1,5 @@
+(require 'gdb-mi)
+
 (custom-set gdb-many-windows t)
 
 (defun my-gdb-setup-windows--dedicate-comint-window ()
@@ -141,6 +143,7 @@ Returns the absolute file name of the selected trace directory."
                           (file-executable-p file)))
                    (directory-files trace-dir t))))
 
+;;;###autoload
 (defun my-rr-gdb (trace-dir)
   "Debug rr trace in `gdb'."
   (interactive (list (my-rr-select-trace)))
