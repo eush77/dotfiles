@@ -1,7 +1,8 @@
 (when (executable-find "direnv")
   (direnv-mode 1))
 
-(custom-set direnv-non-file-modes '(eshell-mode
+(custom-set direnv-non-file-modes '(dired-mode
+                                    eshell-mode
                                     magit-status-mode))
 
 (with-eval-after-load "eshell"
