@@ -136,12 +136,38 @@ Returns the absolute file name of the selected trace directory."
 
 (defun my-rr-get-trace-executable (trace-dir)
   "Get the entry-point executable file from the trace directory."
-  (car (seq-filter (lambda (file)
-                     (and (not (string-match "\\.so\\(\\.\\|$\\)"
-                                             (file-name-nondirectory file)))
-                          (file-regular-p file)
-                          (file-executable-p file)))
-                   (directory-files trace-dir t))))
+  (if-let ((executable
+            (car (seq-filter
+                  (lambda (file)
+                    (and (not (string-match "\\.so\\(\\.\\|$\\)"
+                                            (file-name-nondirectory file)))
+                         (file-regular-p file)
+                         (file-executable-p file)))
+                  (directory-files trace-dir t)))))
+      executable
+
+    ;; Older versions of `rr' do not copy executables to trace directories.
+    ;; Read executable file name with completion.
+    (let* ((executable-name
+            (mapconcat #'identity
+                       (butlast (split-string
+                                 (file-name-nondirectory trace-dir)
+                                 "-")
+                                1)
+                       "-"))
+           (path-executable (executable-find executable-name))
+           (directory (if path-executable
+                          (file-name-directory path-executable)
+                        nil))
+           (executable (read-file-name "Select executable: "
+                                       directory
+                                       nil
+                                       t
+                                       executable-name
+                                       #'file-executable-p)))
+      (if (file-executable-p executable)
+          executable
+        (user-error "File is not executable")))))
 
 ;;;###autoload
 (defun my-rr-gdb (trace-dir)
