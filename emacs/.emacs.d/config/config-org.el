@@ -29,6 +29,7 @@
 (custom-set org-enforce-todo-checkbox-dependencies t)
 (custom-set org-log-done 'time)
 (custom-set org-log-into-drawer t)
+(custom-set org-startup-indented t)
 
 (add-hook 'org-mode-hook #'auto-fill-mode)
 
