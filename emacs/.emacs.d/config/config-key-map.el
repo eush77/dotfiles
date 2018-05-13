@@ -1,5 +1,6 @@
 (require 'dired-x)                      ; Bind `dired-jump'
 (autoload 'swiper-multi "swiper" nil t)
+(autoload 'zap-up-to-char "misc" nil t)
 
 ;; Calendar.
 (global-set-key (kbd "C-c z") #'calendar)
