@@ -63,7 +63,7 @@
 
 ;; Magit.
 (global-set-key (kbd "C-x g") #'magit-status)
-(global-set-key (kbd "C-x M-g") #'magit-list-repositories)
+(global-set-key (kbd "C-x G") #'magit-list-repositories)
 
 ;; Man.
 (global-set-key (kbd "C-h M") #'man)
