@@ -143,6 +143,8 @@ and URL
   (when (file-exists-p host-file)
     (load-file host-file)))
 
-(server-start)
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 (pinentry-start)
 (setenv "EDITOR" "emacsclient")
