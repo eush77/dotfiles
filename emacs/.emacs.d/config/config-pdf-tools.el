@@ -1,5 +1,4 @@
-(autoload 'pdf-view-mode "pdf-tools" nil t)
-(add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
+(pdf-tools-install)
 
 (with-eval-after-load "pdf-tools"
   (add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
