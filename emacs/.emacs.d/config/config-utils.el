@@ -193,5 +193,5 @@ instead of 1."
 (defun my-switch-to-mru-window ()
   "Switch to most recently used window."
   (interactive)
-  (select-window (get-mru-window t t t))
+  (select-window (or (get-mru-window t t t) (minibuffer-window)))
   (select-frame-set-input-focus (window-frame (selected-window))))
