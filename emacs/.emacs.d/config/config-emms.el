@@ -92,6 +92,8 @@ EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
   ("p" emms-previous "previous")
   ("0" emms-volume-raise "++" :column "Volume")
   ("9" emms-volume-lower "--")
+  ("C-b" emms-seek-backward "<<" :column "Seek")
+  ("C-f" emms-seek-forward ">>")
   ("a" my-hydra-emms-add "add" :column "Playlist")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel" :column ""))
