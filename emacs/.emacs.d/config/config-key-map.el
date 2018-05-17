@@ -19,6 +19,9 @@
 (global-set-key (kbd "C-x C-f") #'counsel-file-jump)
 (global-set-key (kbd "C-x C-u C-SPC") #'counsel-mark-ring)
 
+;; EMMS
+(global-set-key (kbd "C-c e") #'my-hydra-emms/body)
+
 ;; Expand-region
 (global-set-key (kbd "M-=") #'er/expand-region)
 (global-set-key (kbd "M-+") #'er/mark-sentence)

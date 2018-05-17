@@ -60,6 +60,7 @@ and URL
 (add-to-list 'package-selected-packages 'goto-last-change)
 (add-to-list 'package-selected-packages 'guide-key)
 (add-to-list 'package-selected-packages 'highlight)
+(add-to-list 'package-selected-packages 'hydra)
 (add-to-list 'package-selected-packages 'ivy)
 (add-to-list 'package-selected-packages 'ivy-xref)
 (add-to-list 'package-selected-packages 'key-chord)

@@ -24,3 +24,55 @@ Active sink is defined as the last one in the list printed by
     (setq emms-volume-pulse-sink (my-emms-pulse-get-sink)))
   (advice-add 'emms-volume--pulse-get-volume
               :before #'my-emms-volume-pulse-get-volume--select-sink))
+
+;;
+;; EMMS Hydra
+;;
+
+(defvar my-hydra-emms/hint-title ""
+  "Track title for use in `my-hydra-emms/body' hint.")
+
+(defvar my-hydra-emms/hint-time ""
+  "Track playing time for use in `my-hydra-emms/body' hint.")
+
+(defun my-hydra-emms-update-hint ()
+  "Set up hint variables for `my-hydra-emms/body'."
+  (interactive)
+  (let ((description (emms-track-description
+                      (emms-playlist-current-selected-track))))
+    (setq my-hydra-emms/hint-title
+          (if (and (file-name-absolute-p description)
+                   emms-source-file-default-directory)
+              (file-relative-name description
+                                  emms-source-file-default-directory)
+            description)))
+  (let ((emms-playing-time-display-p t)
+        (emms-playing-time-style 'time))
+    (emms-playing-time-display)
+    (setq my-hydra-emms/hint-time emms-playing-time-string)))
+
+(defun my-hydra-emms-next ()
+  "Next command for `my-hydra-emms/body'."
+  (interactive)
+  (emms-next)
+  (my-hydra-emms-update-hint))
+
+(defun my-hydra-emms-previous ()
+  "Previous command for `my-hydra-emms/body'."
+  (interactive)
+  (emms-previous)
+  (my-hydra-emms-update-hint))
+
+;;;###autoload (autoload 'my-hydra-emms/body "config-emms")
+(defhydra my-hydra-emms (:body-pre (my-hydra-emms-update-hint))
+  "
+EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
+"
+  ("9" emms-volume-lower "volume <")
+  ("0" emms-volume-raise "volume >")
+  ("SPC" emms-pause "pause")
+  ("n" my-hydra-emms-next "next")
+  ("p" my-hydra-emms-previous "previous")
+  ("r" my-hydra-emms-update-hint "refresh")
+  ("e" emms "playlist" :exit t)
+  ("q" nil "cancel"))
