@@ -1,5 +1,7 @@
 (emms-all)
 (emms-default-players)
+(emms-mode-line-disable)
+(emms-playing-time-disable-display)
 
 (with-eval-after-load "emms-playlist-mode"
   (define-key emms-playlist-mode-map (kbd "0") #'emms-volume-raise)
