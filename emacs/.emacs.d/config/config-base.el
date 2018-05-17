@@ -1,4 +1,4 @@
-;; Interface & startup.
+;; Interface & startup
 (custom-set frame-title-format "%b @ emacs")
 (custom-set initial-scratch-message nil)
 (blink-cursor-mode 0)
@@ -8,7 +8,7 @@
 (size-indication-mode 1)
 (tool-bar-mode 0)
 
-;; Backups.
+;; Backups
 (custom-set backup-directory-alist '(("." . "~/.emacs.d/backups/")))
 
 ;; Delete trailing space on save.
@@ -17,11 +17,11 @@
             (unless (eq major-mode 'diff-mode)
               (delete-trailing-whitespace))))
 
-;; Commenting style.
+;; Commenting style
 (custom-set comment-multi-line t)
 (custom-set comment-style 'extra-line)
 
-;; Input method.
+;; Input method
 (custom-set default-input-method "russian-computer")
 
 ;; Recursive minibuffer - use minibuffer while in minibuffer.
@@ -36,7 +36,7 @@
     (apply func name rest)))
 (advice-add 'expand-file-name :around #'expand-file-name--http-url)
 
-;; Paragraph filling.
+;; Paragraph filling
 (custom-set fill-column 78)
 
 ;; Advice `find-file' to use `browse-url' to open HTTP URLs.
@@ -58,13 +58,13 @@
 (unless window-system
   (advice-add 'frame-text-cols :filter-return #'1-))
 
-;; Indentation.
+;; Indentation
 (custom-set indent-tabs-mode nil)
 
 ;; Enable narrowing.
 (put 'narrow-to-region 'disabled nil)
 
-;; `quoted-insert' radix.
+;; `quoted-insert' radix
 (custom-set read-quoted-char-radix 16)
 
 ;; Enable region case conversion commands.
@@ -84,7 +84,7 @@
 ;; Ignore case when sorting lines.
 (custom-set sort-fold-case t)
 
-;; View mode.
+;; View mode
 (custom-set view-read-only t)
 
 ;; Enable base modes.

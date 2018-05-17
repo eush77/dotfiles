@@ -7,7 +7,7 @@
 (require 'dash)
 
 ;;
-;; Frame switching.
+;; Frame switching
 ;;
 
 ;;;###autoload
@@ -44,7 +44,7 @@ immediately."
                    frame-alist))))))
 
 ;;
-;; Editing.
+;; Editing
 ;;
 
 (defun my-forward-duplicate-line ()
@@ -122,7 +122,7 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
     (indent-according-to-mode)))
 
 ;;
-;; Window sizing.
+;; Window sizing
 ;;
 
 ;;;###autoload
@@ -159,7 +159,7 @@ instead of 1."
   (shrink-window-horizontally delta))
 
 ;;
-;; Window splitting.
+;; Window splitting
 ;;
 
 ;;;###autoload

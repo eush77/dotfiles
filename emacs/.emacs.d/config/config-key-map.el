@@ -2,92 +2,92 @@
 (autoload 'swiper-multi "swiper" nil t)
 (autoload 'zap-up-to-char "misc" nil t)
 
-;; Calendar.
+;; Calendar
 (global-set-key (kbd "C-c z") #'calendar)
 
-;; Case conversion.
+;; Case conversion
 (global-set-key (kbd "C-x M-c") #'capitalize-region)
 (global-set-key (kbd "C-x M-l") #'downcase-region)
 (global-set-key (kbd "C-x M-u") #'upcase-region)
 
-;; Compilation.
+;; Compilation
 (global-set-key (kbd "<f7>") #'my-recompile)
 
-;; Counsel overloads.
+;; Counsel overloads
 (global-unset-key (kbd "C-x C-u"))
 (global-set-key [remap insert-char] #'counsel-unicode-char)
 (global-set-key (kbd "C-x C-f") #'counsel-file-jump)
 (global-set-key (kbd "C-x C-u C-SPC") #'counsel-mark-ring)
 
-;; Expand-region.
+;; Expand-region
 (global-set-key (kbd "M-=") #'er/expand-region)
 (global-set-key (kbd "M-+") #'er/mark-sentence)
 
-;; Follow-mode.
+;; Follow-mode
 (global-set-key (kbd "C-x 3") #'follow-delete-other-windows-and-split)
 
-;; Frames.
+;; Frames
 (global-set-key (kbd "M-`") #'my-select-frame)
 
-;; Git grep.
+;; Git grep
 (global-set-key (kbd "C-x v /") #'counsel-git-grep)
 (global-set-key (kbd "C-x v ?") #'my-counsel-git-grep-at-point)
 
-;; Global shortcuts.
+;; Global shortcuts
 (global-set-key (kbd "C-x M-1") #'eshell)
 (global-set-key (kbd "C-x M-2") #'gnus)
 (global-set-key (kbd "C-x M-3") #'browse-web)
 (global-set-key (kbd "C-x M-4") #'pocket-reader)
 
-;; Goto-last-change.
+;; Goto-last-change
 (global-set-key (kbd "M-_") #'goto-last-change)
 
-;; Hippie-expand.
+;; Hippie-expand
 (global-set-key [remap dabbrev-expand] #'hippie-expand)
 
-;; IBuffer.
+;; IBuffer
 (global-set-key [remap list-buffers] #'ibuffer)
 
-;; Ivy.
+;; Ivy
 (global-set-key (kbd "C-x C-r") #'ivy-resume)
 (define-key ivy-minibuffer-map (kbd "C-w") #'ivy-yank-word)
 
-;; Keyboard-escape-quit.
+;; Keyboard-escape-quit
 ;; `C-[ C-[ C-[' is too easy to hit by an accident.
 (global-unset-key (kbd "C-[ C-[ C-["))
 (global-set-key (kbd "M-C-]") #'keyboard-escape-quit)
 
-;; Line editing.
+;; Line editing
 (global-set-key (kbd "M-o") #'my-open-next-line)
 (global-set-key (kbd "C-o") #'my-open-previous-line)
 
-;; Magit.
+;; Magit
 (global-set-key (kbd "C-x g") #'magit-status)
 (global-set-key (kbd "C-x G") #'magit-list-repositories)
 
-;; Man.
+;; Man
 (global-set-key (kbd "C-h M") #'man)
 
-;; Movement.
+;; Movement
 ;; Unbinding `C-m' from `RET' does not work in a terminal.
 (when window-system
   (define-key prog-mode-map (kbd "C-;") #'backward-paragraph)
   (define-key prog-mode-map (kbd "C-m") #'forward-paragraph)
   (define-key prog-mode-map (kbd "<return>") #'newline))
 
-;; Multiple cursors.
+;; Multiple cursors
 (global-set-key (kbd "C-M-<down>") #'mc/mark-next-like-this)
 (global-set-key (kbd "C-M-<up>") #'mc/mark-previous-like-this)
 
-;; Multitran.
+;; Multitran
 (global-set-key (kbd "C-c t") #'multitran)
 
-;; Org.
+;; Org
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c l") #'org-store-link)
 
-;; Rotate.
+;; Rotate
 (global-set-key (kbd "C-c r r") #'rotate-window)
 (global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)
 (global-set-key (kbd "C-c r ev") #'rotate:even-vertical)
@@ -95,14 +95,14 @@
 (global-set-key (kbd "C-c r v") #'rotate:main-vertical)
 (global-set-key (kbd "C-c r t") #'rotate:tiled)
 
-;; Scroll lock.
+;; Scroll lock
 (global-set-key (kbd "<Scroll_Lock>") #'scroll-lock-mode)
 
-;; Scrolling.
+;; Scrolling
 (global-set-key (kbd "M-p") #'scroll-down)
 (global-set-key (kbd "M-n") #'scroll-up)
 
-;; Smartparens.
+;; Smartparens
 (global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
 (global-set-key (kbd "C-c C-b") #'sp-backward-sexp)
 (global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
@@ -129,35 +129,35 @@
 (global-set-key (kbd "C-x np") #'sp-narrow-to-sexp)
 (global-set-key (kbd "M-(") #'my-sp-wrap-with-pair)
 
-;; Swap buffers.
+;; Swap buffers
 (global-set-key (kbd "C-c b") #'swap-buffers)
 
-;; Swiper.
+;; Swiper
 ;; Complementary to `isearch-backward' on C-r.
 (global-set-key (kbd "C-s") #'swiper)
 (global-set-key (kbd "C-S-s") #'swiper-all)
 (global-set-key (kbd "C-M-s") #'swiper-multi)
 
-;; View mode.
+;; View mode
 (global-set-key (kbd "<pause>") #'view-mode)
 (when (not window-system)
   (define-key key-translation-map (kbd "M-[ P") (kbd "<pause>")))
 
-;; Window jump.
+;; Window jump
 (global-set-key (kbd "C-M-j") #'window-jump-left)
 (global-set-key (kbd "C-M-k") #'window-jump-right)
 (global-set-key (kbd "C-M-p") #'window-jump-up)
 (global-set-key (kbd "C-M-n") #'window-jump-down)
 
-;; Window sizing.
+;; Window sizing
 (global-set-key [remap enlarge-window] #'my-enlarge-window)
 (global-set-key [remap enlarge-window-horizontally]
                 #'my-enlarge-window-horizontally)
 (global-set-key [remap shrink-window-horizontally]
                 #'my-shrink-window-horizontally)
 
-;; Whitespace.
+;; Whitespace
 (global-set-key [remap just-one-space] #'cycle-spacing)
 
-;; Zap-to-char behavior.
+;; Zap-to-char behavior
 (global-set-key [remap zap-to-char] #'zap-up-to-char)

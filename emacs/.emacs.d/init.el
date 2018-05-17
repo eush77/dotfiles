@@ -19,13 +19,13 @@ and URL
    `(,var ,value nil nil
           ,(format "!!! CAREFUL: CUSTOM-SET IN %s !!!" load-file-name))))
 
-;; Customization file.
+;; Customization file
 (custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
 (unless (file-exists-p custom-file)
   (write-region "" nil custom-file))
 (load-file custom-file)
 
-;; My customization group.
+;; My customization group
 (defgroup my
   '((my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
@@ -39,7 +39,7 @@ and URL
   :prefix "my-"
   :link `(file-link ,(expand-file-name "init.el" user-emacs-directory)))
 
-;; Package archives.
+;; Package archives
 (custom-set package-archives
 	    '(("gnu" . "http://elpa.gnu.org/packages/")
 	      ("melpa" . "http://melpa.org/packages/")
