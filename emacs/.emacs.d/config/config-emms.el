@@ -67,18 +67,6 @@ Active sink is defined as the last one in the list printed by
   (cancel-timer my-hydra-emms/hint-update-timer)
   (setq my-hydra-emms/hint-update-timer nil))
 
-(defun my-hydra-emms-next ()
-  "Wrapper around `emms-next' for `my-hydra-emms/body'."
-  (interactive)
-  (emms-next)
-  (my-hydra-emms-update-hint))
-
-(defun my-hydra-emms-previous ()
-  "Wrapper around `emms-previous' for `my-hydra-emms/body'."
-  (interactive)
-  (emms-previous)
-  (my-hydra-emms-update-hint))
-
 (defun my-hydra-emms-add ()
   "Add files using `emms-add-dired' or `emms-add-directory-tree'
 (with completion), depending on the mode of the buffer."
@@ -97,8 +85,8 @@ EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
   ("9" emms-volume-lower "volume <")
   ("0" emms-volume-raise "volume >")
   ("SPC" emms-pause "pause")
-  ("n" my-hydra-emms-next "next")
-  ("p" my-hydra-emms-previous "previous")
+  ("n" emms-next "next")
+  ("p" emms-previous "previous")
   ("a" my-hydra-emms-add "add")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel"))
