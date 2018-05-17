@@ -63,6 +63,15 @@ Active sink is defined as the last one in the list printed by
   (emms-previous)
   (my-hydra-emms-update-hint))
 
+(defun my-hydra-emms-add ()
+  "Add files using `emms-add-dired' or `emms-add-directory-tree'
+(with completion), depending on the mode of the buffer."
+  (interactive)
+  (message "%s" major-mode)
+  (if (eq major-mode 'dired-mode)
+      (emms-add-dired)
+    (call-interactively #'emms-add-directory-tree)))
+
 ;;;###autoload (autoload 'my-hydra-emms/body "config-emms")
 (defhydra my-hydra-emms (:body-pre (my-hydra-emms-update-hint))
   "
@@ -74,5 +83,6 @@ EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
   ("n" my-hydra-emms-next "next")
   ("p" my-hydra-emms-previous "previous")
   ("r" my-hydra-emms-update-hint "refresh")
+  ("a" my-hydra-emms-add "add")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel"))
