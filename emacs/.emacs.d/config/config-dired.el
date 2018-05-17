@@ -29,5 +29,6 @@ the same window."
 (define-key dired-mode-map (kbd "C-S-n") #'dired-next-subdir)
 (define-key dired-mode-map (kbd "b") #'my-dired-browse-file)
 (define-key dired-mode-map (kbd "c") #'dired-kill-subdir)
+(define-key dired-mode-map (kbd "r") #'dired-do-query-replace-regexp)
 (define-key dired-mode-map (kbd "z") #'dired-hide-subdir)
 (define-key dired-mode-map [mouse-2] #'my-dired-mouse-find-file)
