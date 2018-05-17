@@ -46,8 +46,13 @@ Active sink is defined as the last one in the list printed by
               (file-relative-name description
                                   emms-source-file-default-directory)
             description)))
-  (setq my-hydra-emms/hint-time
-        (format-seconds "%m:%02s" emms-playing-time))
+  (let ((total-time (emms-track-get
+                     (emms-playlist-current-selected-track)
+                     'info-playing-time)))
+    (setq my-hydra-emms/hint-time
+          (concat (format-seconds "%m:%02s" emms-playing-time)
+                  (and total-time
+                       (format-seconds "/%m:%02s" total-time)))))
   (hydra-show-hint my-hydra-emms/hint 'my-hydra-emms))
 
 (defvar my-hydra-emms/hint-update-timer nil
