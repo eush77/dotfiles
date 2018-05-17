@@ -87,11 +87,11 @@ Active sink is defined as the last one in the list printed by
   "
 EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
 "
-  ("9" emms-volume-lower "volume <")
-  ("0" emms-volume-raise "volume >")
-  ("SPC" emms-pause "pause")
+  ("SPC" emms-pause "pause" :column "Playback")
   ("n" emms-next "next")
   ("p" emms-previous "previous")
-  ("a" my-hydra-emms-add "add")
+  ("0" emms-volume-raise "++" :column "Volume")
+  ("9" emms-volume-lower "--")
+  ("a" my-hydra-emms-add "add" :column "Playlist")
   ("e" emms "playlist" :exit t)
-  ("q" nil "cancel"))
+  ("q" nil "cancel" :column ""))
