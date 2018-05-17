@@ -52,13 +52,13 @@ Active sink is defined as the last one in the list printed by
     (setq my-hydra-emms/hint-time emms-playing-time-string)))
 
 (defun my-hydra-emms-next ()
-  "Next command for `my-hydra-emms/body'."
+  "Wrapper around `emms-next' for `my-hydra-emms/body'."
   (interactive)
   (emms-next)
   (my-hydra-emms-update-hint))
 
 (defun my-hydra-emms-previous ()
-  "Previous command for `my-hydra-emms/body'."
+  "Wrapper around `emms-previous' for `my-hydra-emms/body'."
   (interactive)
   (emms-previous)
   (my-hydra-emms-update-hint))
