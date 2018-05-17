@@ -49,7 +49,25 @@ Active sink is defined as the last one in the list printed by
   (let ((emms-playing-time-display-p t)
         (emms-playing-time-style 'time))
     (emms-playing-time-display)
-    (setq my-hydra-emms/hint-time emms-playing-time-string)))
+    (setq my-hydra-emms/hint-time emms-playing-time-string))
+  (hydra-show-hint my-hydra-emms/hint 'my-hydra-emms))
+
+(defvar my-hydra-emms/hint-update-timer nil
+  "Timer for `my-hydra-emms-update-hint'.")
+
+(defun my-hydra-emms-start-hint-update-timer ()
+  "Set up `my-hydra-emms/hint-update-timer' to call
+`my-hydra-emms-update-hint' every second."
+  (cl-assert (null my-hydra-emms/hint-update-timer))
+  (setq my-hydra-emms/hint-update-timer
+        (run-at-time 0 1 #'my-hydra-emms-update-hint)))
+
+(defun my-hydra-emms-stop-hint-update-timer ()
+  "Stop `my-hydra-emms/hint-update-timer' previously started by
+`my-hydra-emms-start-hint-update-timer'."
+  (cl-assert my-hydra-emms/hint-update-timer)
+  (cancel-timer my-hydra-emms/hint-update-timer)
+  (setq my-hydra-emms/hint-update-timer nil))
 
 (defun my-hydra-emms-next ()
   "Wrapper around `emms-next' for `my-hydra-emms/body'."
@@ -73,7 +91,8 @@ Active sink is defined as the last one in the list printed by
     (call-interactively #'emms-add-directory-tree)))
 
 ;;;###autoload (autoload 'my-hydra-emms/body "config-emms")
-(defhydra my-hydra-emms (:body-pre (my-hydra-emms-update-hint))
+(defhydra my-hydra-emms (:body-pre (my-hydra-emms-start-hint-update-timer)
+                         :before-exit (my-hydra-emms-stop-hint-update-timer))
   "
 EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
 "
@@ -82,7 +101,6 @@ EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
   ("SPC" emms-pause "pause")
   ("n" my-hydra-emms-next "next")
   ("p" my-hydra-emms-previous "previous")
-  ("r" my-hydra-emms-update-hint "refresh")
   ("a" my-hydra-emms-add "add")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel"))
