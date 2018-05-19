@@ -29,6 +29,10 @@ and URL
 (defgroup my
   '((my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
+    (my-hydra-emms-hint-line-album custom-face)
+    (my-hydra-emms-hint-line-artist custom-face)
+    (my-hydra-emms-hint-line-time custom-face)
+    (my-hydra-emms-hint-line-title custom-face)
     (my-open-line-and-indent custom-variable)
     (my-org-plan-directory custom-variable)
     (my-window-size-delta custom-variable)

@@ -29,30 +29,89 @@ Active sink is defined as the last one in the list printed by
 ;; EMMS Hydra
 ;;
 
-(defvar my-hydra-emms/hint-title ""
-  "Track title for use in `my-hydra-emms/body' hint.")
+(defvar my-hydra-emms/hint-line ""
+  "First line of `my-hydra-emms/hint' showing track info.")
 
-(defvar my-hydra-emms/hint-time ""
-  "Track playing time for use in `my-hydra-emms/body' hint.")
+;;;###autoload
+(defface my-hydra-emms-hint-line-artist
+  '((t :bold t))
+  "The face used to highlight artist in the
+`my-hydra-emms/hint-line'."
+  :group 'my)
+
+;;;###autoload
+(defface my-hydra-emms-hint-line-time
+  '((t :foreground "Black" :bold t))
+  "The face used to highlight playing time in the
+`my-hydra-emms/hint-line'."
+  :group 'my)
+
+;;;###autoload
+(defface my-hydra-emms-hint-line-title
+  '((t :foreground "Green"))
+  "The face used to highlight title in the
+`my-hydra-emms/hint-line'."
+  :group 'my)
+
+;;;###autoload
+(defface my-hydra-emms-hint-line-album
+  '((t :foreground "Yellow"))
+  "The face used to highlight album in the
+`my-hydra-emms/hint-line'."
+  :group 'my)
+
+(defun my-hydra-emms-format-hint-line (track)
+  "Format hint line for `my-hydra-emms/hint-line'."
+  (let ((playing-time (format-seconds "%m:%02s" emms-playing-time))
+        (total-time (when-let ((total-time
+                                (emms-track-get track 'info-playing-time)))
+                      (format-seconds "/%m:%02s" total-time)))
+        (artist (when-let ((artist (emms-track-get track 'info-artist)))
+                  (concat artist " ")))
+        (title (emms-track-get track 'info-title))
+        (tracknumber (when-let ((tracknumber
+                                 (emms-track-get track 'info-tracknumber)))
+                       (format "#%d of " (string-to-number tracknumber))))
+        (album (emms-track-get track 'info-album))
+        (year (when-let ((year (emms-track-get track 'info-year)))
+                (format " (%s)" year))))
+    (if title
+        (let* ((left (concat
+                      (propertize artist
+                                  'face 'my-hydra-emms-hint-line-artist)
+                      (propertize (concat "[" playing-time total-time "]")
+                                  'face 'my-hydra-emms-hint-line-time)))
+               (middle (propertize title
+                                   'face 'my-hydra-emms-hint-line-title))
+               (right (concat
+                       tracknumber
+                       (propertize album 'face 'my-hydra-emms-hint-line-album)
+                       year))
+               (space (- (frame-text-cols)
+                         (length left)
+                         (length middle)
+                         (length right)))
+               (left-space (/ space 2))
+               (right-space (- space left-space)))
+          (concat left
+                  (make-string left-space ? )
+                  middle
+                  (make-string right-space ? )
+                  right))
+      ;; Fall back to simple description or file name.
+      (concat (propertize (concat "[" playing-time total-time "] ")
+                          'face 'my-hydra-emms-hint-line-time)
+              (if (and (eq (emms-track-type track) 'file)
+                       emms-source-file-default-directory)
+                  (file-relative-name (emms-track-name track)
+                                      emms-source-file-default-directory)
+                (emms-track-simple-description track))))))
 
 (defun my-hydra-emms-update-hint ()
-  "Set up hint variables for `my-hydra-emms/body'."
-  (interactive)
-  (let ((description (emms-track-description
-                      (emms-playlist-current-selected-track))))
-    (setq my-hydra-emms/hint-title
-          (if (and (file-name-absolute-p description)
-                   emms-source-file-default-directory)
-              (file-relative-name description
-                                  emms-source-file-default-directory)
-            description)))
-  (let ((total-time (emms-track-get
-                     (emms-playlist-current-selected-track)
-                     'info-playing-time)))
-    (setq my-hydra-emms/hint-time
-          (concat (format-seconds "%m:%02s" emms-playing-time)
-                  (and total-time
-                       (format-seconds "/%m:%02s" total-time)))))
+  "Recompute `my-hydra-emms/hint-line' and update
+`my-hydra-emms/hint'."
+  (setq my-hydra-emms/hint-line (my-hydra-emms-format-hint-line
+                                 (emms-playlist-current-selected-track)))
   (hydra-show-hint my-hydra-emms/hint 'my-hydra-emms))
 
 (defvar my-hydra-emms/hint-update-timer nil
@@ -85,7 +144,7 @@ Active sink is defined as the last one in the list printed by
 (defhydra my-hydra-emms (:body-pre (my-hydra-emms-start-hint-update-timer)
                          :before-exit (my-hydra-emms-stop-hint-update-timer))
   "
-EMMS [%s`my-hydra-emms/hint-time] %s`my-hydra-emms/hint-title
+%s`my-hydra-emms/hint-line
 "
   ("SPC" emms-pause "pause" :column "Playback")
   ("n" emms-next "next")
