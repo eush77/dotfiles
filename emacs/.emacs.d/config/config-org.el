@@ -2,7 +2,7 @@
 (require 'org-depend)
 
 (custom-set org-todo-keywords
-            '((sequence "TODO(!)" "NEXT(!)" "|" "DONE" "DROP(@)")
+            '((sequence "TODO(!)" "WAIT(!)" "NEXT(!)" "|" "DONE" "DROP(@)")
               (sequence "PLAN" "|" "PASS" "FAIL")
               (sequence "|" "GONE")))
 (custom-set org-todo-keyword-faces
