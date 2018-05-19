@@ -95,6 +95,9 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c l") #'org-store-link)
 
+;; Query-replace
+(global-set-key (kbd "C-r") #'query-replace)
+
 ;; Rotate
 (global-set-key (kbd "C-c r r") #'rotate-window)
 (global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)
@@ -141,7 +144,6 @@
 (global-set-key (kbd "C-c b") #'swap-buffers)
 
 ;; Swiper
-;; Complementary to `isearch-backward' on C-r.
 (global-set-key (kbd "C-s") #'swiper)
 (global-set-key (kbd "C-S-s") #'swiper-all)
 (global-set-key (kbd "C-M-s") #'swiper-multi)
