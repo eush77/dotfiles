@@ -167,6 +167,7 @@ Otherwise hide it, and show the previous sibling subtree."
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
 (define-key org-mode-map (kbd "C-c p") #'org-metaup)
+(define-key org-mode-map (kbd "C-c u") #'org-remove-occur-highlights)
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
