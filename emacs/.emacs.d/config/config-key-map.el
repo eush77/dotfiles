@@ -88,7 +88,7 @@
 (global-set-key (kbd "C-M-<up>") #'mc/mark-previous-like-this)
 
 ;; Multitran
-(global-set-key (kbd "C-c t") #'multitran)
+(global-set-key (kbd "C-c t") #'my-multitran-region)
 
 ;; Org
 (global-set-key (kbd "C-c a") #'org-agenda)
