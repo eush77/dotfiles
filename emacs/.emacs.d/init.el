@@ -47,6 +47,7 @@ and URL
 (package-refresh-contents)
 
 ;; Check and install missing packages.
+(add-to-list 'package-selected-packages 'avy)
 (add-to-list 'package-selected-packages 'clang-format)
 (add-to-list 'package-selected-packages 'color-identifiers-mode)
 (add-to-list 'package-selected-packages 'counsel)

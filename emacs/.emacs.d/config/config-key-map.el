@@ -2,6 +2,11 @@
 (autoload 'swiper-multi "swiper" nil t)
 (autoload 'zap-up-to-char "misc" nil t)
 
+;; Avy
+(global-set-key (kbd "M-g M-j") #'avy-goto-char-timer)
+(global-set-key (kbd "M-g M-w") #'avy-goto-word-1)
+(global-set-key [remap goto-line] #'avy-goto-line)
+
 ;; Calendar
 (global-set-key (kbd "C-c z") #'calendar)
 
