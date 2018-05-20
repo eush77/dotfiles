@@ -8,24 +8,26 @@ to exact time.
 
 \[1]: URL `https://sourceforge.net/projects/bashfuzzyclock'
 \[2]: URL `https://aur.archlinux.org/packages/bash-fuzzy-clock'"
-  (condition-case nil
-      (string-trim-right (car (process-lines "bash-fuzzy-clock")))
-    (file-error (format-time-string "%R"))))
+  (let ((help-echo (format-time-string "%c")))
+    (propertize (condition-case nil
+                    (string-trim-right
+                     (car (process-lines "bash-fuzzy-clock")))
+                  (file-error (format-time-string "%R")))
+                'help-echo help-echo
+                'mouse-face 'highlight)))
 
 (custom-set minibuffer-line-format
-            '(:eval (let ((fuzzy-time-string (my-minibuffer-clock))
-                          (exact-time-string (format-time-string "%c"))
-                          (min-frame-text-cols
-                           (apply #'min
-                                  (mapcar #'frame-text-cols
-                                          (minibuffer-frame-list)))))
-                      (propertize (concat (make-string
-                                           (- min-frame-text-cols
-                                              (string-width fuzzy-time-string))
-                                           ? )
-                                          fuzzy-time-string)
-                                  'help-echo exact-time-string
-                                  'mouse-face 'highlight))))
+            '(:eval (let* ((globals (format-mode-line global-mode-string))
+                           (clock (my-minibuffer-clock))
+                           (space
+                            (make-string
+                             (- (apply #'min
+                                       (mapcar #'frame-text-cols
+                                               (minibuffer-frame-list)))
+                                (string-width globals)
+                                (string-width clock))
+                             ? )))
+                      (concat globals space clock))))
 
 (defun keyboard-quit--minibuffer-line (func)
   "Restore minibuffer line after quit."

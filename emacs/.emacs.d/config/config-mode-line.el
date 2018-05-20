@@ -13,7 +13,6 @@
                                (vc-mode vc-mode)
                                "  "
                                mode-line-modes
-                               mode-line-misc-info
                                mode-line-end-spaces))
 
 (custom-set rm-blacklist '(" $"         ; rich-minority-mode
