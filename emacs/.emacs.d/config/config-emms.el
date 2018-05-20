@@ -66,6 +66,10 @@ Active sink is defined as the last one in the list printed by
         (total-time (when-let ((total-time
                                 (emms-track-get track 'info-playing-time)))
                       (format-seconds "/%m:%02s" total-time)))
+        (state (cond ((eq emms-player-next-function 'emms-stop) "Stop After")
+                     (emms-random-playlist "Random")
+                     (emms-repeat-track "Loop One")
+                     (emms-repeat-playlist "Loop")))
         (artist (when-let ((artist (emms-track-get track 'info-artist)))
                   (concat artist " ")))
         (title (emms-track-get track 'info-title))
@@ -79,7 +83,8 @@ Active sink is defined as the last one in the list printed by
         (let* ((left (concat
                       (propertize artist
                                   'face 'my-hydra-emms-hint-line-artist)
-                      (propertize (concat "[" playing-time total-time "]")
+                      (propertize (concat "[" playing-time total-time "]"
+                                          (and state (concat " " state)))
                                   'face 'my-hydra-emms-hint-line-time)))
                (middle (propertize title
                                    'face 'my-hydra-emms-hint-line-title))
@@ -99,7 +104,8 @@ Active sink is defined as the last one in the list printed by
                   (make-string right-space ? )
                   right))
       ;; Fall back to simple description or file name.
-      (concat (propertize (concat "[" playing-time total-time "] ")
+      (concat (propertize (concat (and state (concat state " "))
+                                  "[" playing-time total-time "] ")
                           'face 'my-hydra-emms-hint-line-time)
               (if (and (eq (emms-track-type track) 'file)
                        emms-source-file-default-directory)
@@ -131,6 +137,61 @@ Active sink is defined as the last one in the list printed by
   (cancel-timer my-hydra-emms/hint-update-timer)
   (setq my-hydra-emms/hint-update-timer nil))
 
+(defun my-hydra-emms-previous ()
+  "Like `emms-previous', but signal an error if
+`emms-random-playlist' is on."
+  (interactive)
+  (when emms-random-playlist
+    (user-error "Can't go back in a random playback"))
+  (emms-previous))
+
+(defun my-hydra-emms-next ()
+  "Call `emms-next' or `emms-random', depending on the value of
+`emms-random-playlist'."
+  (interactive)
+  (if emms-random-playlist
+      (emms-random)
+    (emms-next)))
+
+(defun my-hydra-emms-toggle-looping ()
+  "Toggle between looping a single track, a playlist, or stopping
+at the end of the playlist.
+
+Resets `emms-random-playlist', modifies `emms-repeat-track'
+and/or `emms-repeat-playlist', and finally updates
+`my-hydra-emms/hint'."
+  (interactive)
+  (setq emms-random-playlist nil)
+  (setq emms-player-next-function #'emms-next-noerror)
+  (cond (emms-repeat-track (setq emms-repeat-track nil)
+                           (setq emms-repeat-playlist t))
+        (emms-repeat-playlist (setq emms-repeat-playlist nil))
+        (t (setq emms-repeat-track t)))
+  (my-hydra-emms-update-hint))
+
+(defun my-hydra-emms-toggle-random ()
+  "Toggle between sequential or random order of playback.
+
+Equivalent to `emms-toggle-random-playlist', except that it also
+updates `my-hydra-emms/hint'."
+  (interactive)
+  (setq emms-player-next-function
+        (if (setq emms-random-playlist (not emms-random-playlist))
+            #'emms-random
+          #'emms-next-noerror))
+  (my-hydra-emms-update-hint))
+
+(defun my-hydra-emms-toggle-stop-after ()
+  "Toggle between stopping after this track or continuing playing
+the playlist."
+  (interactive)
+  (cond ((not (eq emms-player-next-function 'emms-stop))
+         (setq emms-player-next-function #'emms-stop))
+        (emms-random-playlist
+         (setq emms-player-next-function #'emms-random))
+        (t (setq emms-player-next-function #'emms-next-noerror)))
+  (my-hydra-emms-update-hint))
+
 (defun my-hydra-emms-add ()
   "Add files using `emms-add-dired' or `emms-add-directory-tree'
 (with completion), depending on the mode of the buffer."
@@ -147,12 +208,15 @@ Active sink is defined as the last one in the list printed by
 %s`my-hydra-emms/hint-line
 "
   ("SPC" emms-pause "pause" :column "Playback")
-  ("n" emms-next "next")
-  ("p" emms-previous "previous")
+  ("p" my-hydra-emms-previous "previous")
+  ("n" my-hydra-emms-next "next")
   ("0" emms-volume-raise "++" :column "Volume")
   ("9" emms-volume-lower "--")
   ("<" emms-seek-backward "backward" :column "Seek")
   (">" emms-seek-forward "forward")
+  ("l" my-hydra-emms-toggle-looping "looping" :column "Order")
+  ("r" my-hydra-emms-toggle-random "random")
+  ("s" my-hydra-emms-toggle-stop-after "stop after")
   ("a" my-hydra-emms-add "add" :column "Playlist")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel" :column ""))
