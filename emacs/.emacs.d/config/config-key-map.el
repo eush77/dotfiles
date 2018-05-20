@@ -96,7 +96,7 @@
 (global-set-key (kbd "C-c l") #'org-store-link)
 
 ;; Query-replace
-(global-set-key (kbd "C-r") #'query-replace)
+(global-set-key (kbd "C-r") #'query-replace-regexp)
 
 ;; Rotate
 (global-set-key (kbd "C-c r r") #'rotate-window)
