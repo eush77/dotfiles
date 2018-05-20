@@ -1,3 +1,5 @@
+(set-keymap-parent c-mode-base-map prog-mode-map)
+
 ;;
 ;; C
 ;;
