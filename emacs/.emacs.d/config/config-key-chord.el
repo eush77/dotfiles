@@ -20,6 +20,13 @@
 (key-chord-define-global "xr" #'counsel-recentf)
 (key-chord-define-global "xv" #'find-alternate-file)
 
+;; Movement
+(key-chord-define-global "gb" #'iy-go-to-char-backward)
+(key-chord-define-global "gf" #'iy-go-to-char)
+(key-chord-define-global "gg" #'avy-goto-line)
+(key-chord-define-global "gj" #'avy-goto-char-timer)
+(key-chord-define-global "gw" #'avy-goto-word-1)
+
 ;; Switching windows
 (key-chord-define-global "xi" #'switch-window)
 (key-chord-define-global "xo" #'my-switch-to-mru-window)

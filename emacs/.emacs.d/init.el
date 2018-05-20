@@ -68,6 +68,7 @@ and URL
 (add-to-list 'package-selected-packages 'hydra)
 (add-to-list 'package-selected-packages 'ivy)
 (add-to-list 'package-selected-packages 'ivy-xref)
+(add-to-list 'package-selected-packages 'iy-go-to-char)
 (add-to-list 'package-selected-packages 'key-chord)
 (add-to-list 'package-selected-packages 'magit)
 (add-to-list 'package-selected-packages 'minibuffer-line)
