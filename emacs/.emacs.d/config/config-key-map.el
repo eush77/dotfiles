@@ -74,6 +74,9 @@
 (global-set-key (kbd "M-o") #'my-open-next-line)
 (global-set-key (kbd "C-o") #'my-open-previous-line)
 
+;; Lisp evaluation
+(global-set-key [remap eval-last-sexp] #'my-eval-sexp)
+
 ;; Magit
 (global-set-key (kbd "C-x g") #'magit-status)
 (global-set-key (kbd "C-x G") #'magit-list-repositories)

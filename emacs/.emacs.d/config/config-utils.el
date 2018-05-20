@@ -1,14 +1,8 @@
-(add-to-list 'package-selected-packages 'dash)
-(add-to-list 'package-selected-packages 'dash-functional)
-(package-install-selected-packages)
-
-(autoload 'copy-from-above-command "misc" nil t)
-(autoload '-compose "dash-functional")
-(require 'dash)
-
 ;;
 ;; Editing
 ;;
+
+(autoload 'copy-from-above-command "misc" nil t)
 
 (defun my-forward-duplicate-line ()
   "Duplicate current line forward, moving the cursor to the
@@ -88,6 +82,13 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
 ;; Frame switching
 ;;
 
+(add-to-list 'package-selected-packages 'dash)
+(add-to-list 'package-selected-packages 'dash-functional)
+(package-install-selected-packages)
+
+(autoload '-compose "dash-functional")
+(require 'dash)
+
 ;;;###autoload
 (defun my-select-frame ()
   "Interactively select a frame from names of buffers that are
@@ -120,6 +121,37 @@ immediately."
                                     ;; Select the other frame
                                     (caadr frame-alist))
                    frame-alist))))))
+
+;;
+;; Lisp evaluation
+;;
+
+(autoload 'sp-get "smartparens")
+(autoload 'sp-get-sexp "smartparens")
+
+;;;###autoload
+(defun my-eval-sexp (replace-sexp)
+  "Evaluate region if the region is active, otherwise evaluate last sexp.
+
+If REPLACE-SEXP is not nil, replace the sexp with its value.
+Otherwise print the value in the echo area."
+  (interactive "P")
+  (let ((region (if (use-region-p)
+                    (sort (list (mark) (point)) #'<)
+                  (sp-get (sp-get-sexp t) (list :beg :end))))
+        (output (if replace-sexp (current-buffer) t)))
+    (when replace-sexp
+      (goto-char (cadr region)))
+    (apply #'eval-region (append region (list output)))
+    (when replace-sexp
+      (when (looking-back "\n")
+        (delete-char -1))
+      (let ((marker (point-marker)))
+        (goto-char (car region))
+        (apply #'delete-region region)
+        (when (looking-at "\n")
+          (delete-char 1))
+        (goto-char marker)))))
 
 ;;
 ;; Window sizing
