@@ -117,7 +117,7 @@ and URL
 (load "config-vc")
 (load "config-w3m")
 (with-eval-after-load "calendar" (load "config-calendar"))
-(with-eval-after-load "cc-mode" (load "config-c++"))
+(with-eval-after-load "cc-mode" (load "config-cc"))
 (with-eval-after-load "compile" (load "config-compile"))
 (with-eval-after-load "custom" (load "config-custom"))
 (with-eval-after-load "dired" (load "config-dired"))
