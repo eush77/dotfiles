@@ -7,43 +7,6 @@
 (require 'dash)
 
 ;;
-;; Frame switching
-;;
-
-;;;###autoload
-(defun my-select-frame ()
-  "Interactively select a frame from names of buffers that are
-open in it, with frames ordered from the most recently used to
-the least recently used and the default selection pointing at the
-most recently used other frame.
-
-If there are only 2 frames open, switch to the other frame
-immediately."
-  (interactive)
-  (let* ((frame-list                     ; List of frames in MRU order
-          (-distinct (--map (window-frame it)
-                            (--mapcat (get-buffer-window-list it nil 'visible)
-                                      (buffer-list)))))
-         (frame-alist                    ; List of frames with labels
-          (--map (cons (mapconcat (-compose #'buffer-name #'window-buffer)
-                                  (window-list it)
-                                  ", ")
-                       it)
-                 frame-list)))
-    (if (<= (length frame-alist) 2)
-        (other-frame 1)
-      (select-frame-set-input-focus
-       (cdr (assoc (completing-read "Select frame: "
-                                    frame-alist
-                                    nil
-                                    t
-                                    nil
-                                    nil
-                                    ;; Select the other frame
-                                    (caadr frame-alist))
-                   frame-alist))))))
-
-;;
 ;; Editing
 ;;
 
@@ -120,6 +83,43 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (open-line count)
   (when my-open-line-and-indent
     (indent-according-to-mode)))
+
+;;
+;; Frame switching
+;;
+
+;;;###autoload
+(defun my-select-frame ()
+  "Interactively select a frame from names of buffers that are
+open in it, with frames ordered from the most recently used to
+the least recently used and the default selection pointing at the
+most recently used other frame.
+
+If there are only 2 frames open, switch to the other frame
+immediately."
+  (interactive)
+  (let* ((frame-list                     ; List of frames in MRU order
+          (-distinct (--map (window-frame it)
+                            (--mapcat (get-buffer-window-list it nil 'visible)
+                                      (buffer-list)))))
+         (frame-alist                    ; List of frames with labels
+          (--map (cons (mapconcat (-compose #'buffer-name #'window-buffer)
+                                  (window-list it)
+                                  ", ")
+                       it)
+                 frame-list)))
+    (if (<= (length frame-alist) 2)
+        (other-frame 1)
+      (select-frame-set-input-focus
+       (cdr (assoc (completing-read "Select frame: "
+                                    frame-alist
+                                    nil
+                                    t
+                                    nil
+                                    nil
+                                    ;; Select the other frame
+                                    (caadr frame-alist))
+                   frame-alist))))))
 
 ;;
 ;; Window sizing
