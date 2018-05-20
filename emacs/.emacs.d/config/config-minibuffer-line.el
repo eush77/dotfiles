@@ -33,3 +33,14 @@ to exact time.
   "Restore minibuffer line after quit."
   (condition-case nil (funcall func) (quit (minibuffer-line--update))))
 (advice-add 'keyboard-quit :around #'keyboard-quit--minibuffer-line)
+
+(defun my-minibuffer-line-update--original-faces (func &rest args)
+  "Don't replace any faces when formatting the mode line."
+  (cl-letf* ((format-mode-line-function (symbol-function 'format-mode-line))
+             ((symbol-function 'format-mode-line)
+              (lambda (format &optional face)
+                ;; Ignore FACE.
+                (funcall format-mode-line-function format))))
+    (apply func args)))
+(advice-add 'minibuffer-line--update
+            :around #'my-minibuffer-line-update--original-faces)
