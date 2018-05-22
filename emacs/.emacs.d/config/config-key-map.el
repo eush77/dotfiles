@@ -148,6 +148,9 @@
 (global-set-key (kbd "C-x np") #'sp-narrow-to-sexp)
 (global-set-key (kbd "M-(") #'my-sp-wrap-with-pair)
 
+;; Sorting
+(global-set-key (kbd "M-s M-s") #'sort-lines)
+
 ;; Swap buffers
 (global-set-key (kbd "C-c b") #'swap-buffers)
 
