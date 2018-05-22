@@ -25,6 +25,7 @@
             "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
 (custom-set org-agenda-span 'fortnight)
 (custom-set org-agenda-todo-list-sublevels nil)
+(custom-set org-archive-location "archive/%s::")
 (custom-set org-enforce-todo-dependencies t)
 (custom-set org-enforce-todo-checkbox-dependencies t)
 (custom-set org-log-done 'time)
