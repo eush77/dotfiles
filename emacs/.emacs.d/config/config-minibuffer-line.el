@@ -16,18 +16,41 @@ to exact time.
                 'help-echo help-echo
                 'mouse-face 'highlight)))
 
+(defun my-format-minibuffer-clock (clock width)
+  "Format minibuffer clock to the given width."
+  (when (stringp clock)
+    (setq clock (split-string clock)))
+  (let ((str (mapconcat #'identity clock " ")))
+    (if (<= (length str) width)
+        str
+      (my-format-minibuffer-clock (cdr clock) width))))
+
 (custom-set minibuffer-line-format
             '(:eval (let* ((globals (format-mode-line global-mode-string))
                            (clock (my-minibuffer-clock))
-                           (space
-                            (make-string
-                             (- (apply #'min
-                                       (mapcar #'frame-text-cols
-                                               (minibuffer-frame-list)))
-                                (string-width globals)
-                                (string-width clock))
-                             ? )))
-                      (concat globals space clock))))
+                           (frame-width
+                            (apply #'min
+                                   (mapcar #'frame-text-cols
+                                           (minibuffer-frame-list))))
+                           (space-width
+                            (max 2 (- frame-width
+                                      (string-width globals)
+                                      (string-width clock))))
+                           (clock-width (max 0 (- frame-width
+                                                  (string-width globals)
+                                                  space-width)))
+                           (clock (my-format-minibuffer-clock clock
+                                                              clock-width))
+                           (space-width
+                            (max 2 (- frame-width
+                                      (string-width globals)
+                                      (string-width clock))))
+                           (globals-width (- frame-width
+                                             space-width
+                                             (string-width clock))))
+                      (concat (substring globals 0 globals-width)
+                              (make-string space-width ? )
+                              clock))))
 
 (defun keyboard-quit--minibuffer-line (func)
   "Restore minibuffer line after quit."
