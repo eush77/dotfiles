@@ -123,7 +123,7 @@
 
 ;; Smartparens
 (global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
-(global-set-key (kbd "C-c C-b") #'sp-backward-sexp)
+(global-set-key (kbd "C-c C-b") #'sp-previous-sexp)
 (global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
 (global-set-key (kbd "C-c C-e") #'sp-end-of-sexp)
 (global-set-key (kbd "C-c C-f") #'sp-forward-sexp)
@@ -139,7 +139,7 @@
 (global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
 (global-set-key (kbd "C-c M-n") #'my-forward-duplicate-sexp-or-line)
 (global-set-key (kbd "C-c M-p") #'my-backward-duplicate-sexp-or-line)
-(global-set-key (kbd "C-M-b") #'sp-previous-sexp)
+(global-set-key (kbd "C-M-b") #'sp-backward-sexp)
 (global-set-key (kbd "C-M-d") #'sp-down-sexp)
 (global-set-key (kbd "C-M-f") #'sp-next-sexp)
 (global-set-key (kbd "C-M-r") #'sp-backward-down-sexp)
