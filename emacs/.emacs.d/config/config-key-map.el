@@ -59,7 +59,7 @@
 (global-set-key [remap list-buffers] #'ibuffer)
 
 ;; IMenu
-(define-key prog-mode-map (kbd "M-i") #'counsel-imenu)
+(global-set-key (kbd "M-i") #'counsel-imenu)
 
 ;; Ivy
 (global-set-key (kbd "C-x C-r") #'ivy-resume)

@@ -1,3 +1,5 @@
+(require 'dired-imenu)
+
 (custom-set dired-dwim-target t)
 (custom-set dired-listing-switches
             (concat "-lv --group-directories-first --human-readable"
