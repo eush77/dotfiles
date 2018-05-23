@@ -34,6 +34,7 @@ and URL
     (my-hydra-emms-hint-line-time custom-face)
     (my-hydra-emms-hint-line-title custom-face)
     (my-open-line-and-indent custom-variable)
+    (my-org-agenda-context-filter custom-variable)
     (my-org-plan-directory custom-variable)
     (my-window-size-delta custom-variable)
     (my-rr-replay-buffer-name custom-variable)

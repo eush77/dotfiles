@@ -176,7 +176,31 @@ Otherwise hide it, and show the previous sibling subtree."
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 
+(defun my-org-agenda-context-filter--set (symbol value)
+  "Set VALUE as a context filter."
+  (unless (cl-every (lambda (str) (string-match "^[+-]@" str)) value)
+    (user-error "Invalid value for a context filter"))
+  (set-default symbol value))
+
+;;;###autoload
+(defcustom my-org-agenda-context-filter nil
+  "Context filter to apply in the `org-todo-list' agenda view.
+
+See `org-agenda-tag-filter-preset'."
+  :type '(repeat string)
+  :set #'my-org-agenda-context-filter--set
+  :group 'my)
+
 (with-eval-after-load "org-agenda"
+  (defun my-org-todo-list--context-filter (func &rest args)
+    "Filter contexts according to `my-org-agenda-context-filter'
+in the `org-todo-list' agenda view."
+    (let ((org-agenda-tag-filter-preset
+           (append my-org-agenda-context-filter
+                   org-agenda-tag-filter-preset)))
+      (apply func args)))
+  (advice-add 'org-todo-list :around #'my-org-todo-list--context-filter)
+
   (define-key org-agenda-mode-map (kbd "C-c C-j")
     #'counsel-org-agenda-headlines))
 
