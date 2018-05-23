@@ -126,9 +126,6 @@ immediately."
 ;; Lisp evaluation
 ;;
 
-(autoload 'sp-get "smartparens")
-(autoload 'sp-get-sexp "smartparens")
-
 ;;;###autoload
 (defun my-eval-sexp (replace-sexp)
   "Evaluate region if the region is active, otherwise evaluate last sexp.
@@ -138,7 +135,10 @@ Otherwise print the value in the echo area."
   (interactive "P")
   (let ((region (if (use-region-p)
                     (sort (list (mark) (point)) #'<)
-                  (sp-get (sp-get-sexp t) (list :beg :end))))
+                  (let ((bounds (save-excursion
+                                  (thing-at-point--beginning-of-sexp)
+                                  (bounds-of-thing-at-point 'sexp))))
+                    (list (car bounds) (cdr bounds)))))
         (output (if replace-sexp (current-buffer) t)))
     (when replace-sexp
       (goto-char (cadr region)))
