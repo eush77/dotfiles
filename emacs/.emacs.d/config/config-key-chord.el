@@ -28,5 +28,5 @@
 (key-chord-define-global "gw" #'avy-goto-word-1)
 
 ;; Switching windows
-(key-chord-define-global "xi" #'switch-window)
+(key-chord-define-global "xj" #'switch-window)
 (key-chord-define-global "xo" #'my-switch-to-mru-window)
