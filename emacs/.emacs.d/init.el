@@ -134,6 +134,7 @@ and URL
 (with-eval-after-load "highlight" (load "config-highlight"))
 (with-eval-after-load "hippie-exp" (load "config-hippie-expand"))
 (with-eval-after-load "info" (load "config-info"))
+(with-eval-after-load "litable" (load "config-litable"))
 (with-eval-after-load "man" (load "config-man"))
 (with-eval-after-load "markdown-mode" (load "config-markdown"))
 (with-eval-after-load "multitran" (load "config-multitran"))
