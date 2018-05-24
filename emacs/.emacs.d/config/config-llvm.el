@@ -39,10 +39,7 @@
   ;; Create TableGen mode keymap.
   ;; Based on the code in LLVM trunk - seems like a bug fix.
   (when (not tablegen-mode-map)
-    (setq tablegen-mode-map (make-sparse-keymap))
-    (define-key tablegen-mode-map "\t"  'tab-to-tab-stop)
-    (define-key tablegen-mode-map "\es" 'center-line)
-    (define-key tablegen-mode-map "\eS" 'center-paragraph))
+    (setq tablegen-mode-map (make-sparse-keymap)))
 
   (define-key tablegen-mode-map [remap indent-region] #'clang-format-region)
 
