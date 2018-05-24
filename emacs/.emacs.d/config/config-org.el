@@ -20,6 +20,23 @@
 (custom-set org-default-priority ?C)
 (custom-set org-lowest-priority ?D)
 (custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
+(custom-set org-capture-templates
+            `(("n" "New item in the backlog" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %?\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"))
+              ("r" "New item in the backlog (quote region)" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %?\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"
+                        "Captured from %f%:from:\n"
+                        "#+BEGIN_QUOTE\n"
+                        "%i\n"
+                        "#+END_QUOTE\n"))))
 (custom-set org-columns-default-format
             "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
 (custom-set org-agenda-span 'fortnight)
