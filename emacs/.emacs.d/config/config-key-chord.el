@@ -22,7 +22,7 @@
 
 ;; Movement
 (key-chord-define-global "gb" #'iy-go-to-char-backward)
-(key-chord-define-global "gf" #'iy-go-to-char)
+(key-chord-define-global "gf" #'iy-go-up-to-char)
 (key-chord-define-global "gj" #'avy-goto-char-timer)
 (key-chord-define-global "gm" #'avy-goto-line)
 (key-chord-define-global "gw" #'avy-goto-word-1)
