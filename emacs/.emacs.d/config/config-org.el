@@ -33,7 +33,12 @@
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"
-                        "Captured from %f%:from:\n"
+                        "Captured from %(pcase
+                            (with-current-buffer
+                                (org-capture-get :original-buffer) major-mode)
+                          ('w3m-mode \"%:link\")
+                          ('gnus-article-mode \"%:from\")
+                          (_ \"%f\")):\n"
                         "#+BEGIN_QUOTE\n"
                         "%i\n"
                         "#+END_QUOTE\n"))))
