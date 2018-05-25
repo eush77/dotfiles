@@ -1,3 +1,9 @@
+(add-to-list 'package-selected-packages 'dash)
+(add-to-list 'package-selected-packages 'dash-functional)
+(package-install-selected-packages)
+(require 'dash)
+(autoload '-compose "dash-functional")
+
 (minibuffer-line-mode 1)
 
 (defun my-minibuffer-clock ()
@@ -25,8 +31,16 @@ to exact time.
         str
       (my-format-minibuffer-clock (cdr clock) width))))
 
+(defun my-format-minibuffer-global-mode-string ()
+  "Format `global-mode-string' for display in the minibuffer."
+  (mapconcat #'identity
+             (-remove #'string-empty-p
+                      (-map (-compose #'string-trim #'format-mode-line)
+                            global-mode-string))
+             " "))
+
 (custom-set minibuffer-line-format
-            '(:eval (let* ((globals (format-mode-line global-mode-string))
+            '(:eval (let* ((globals (my-format-minibuffer-global-mode-string))
                            (clock (my-minibuffer-clock))
                            (frame-width
                             (apply #'min
