@@ -66,10 +66,17 @@ to exact time.
                               (make-string space-width ? )
                               clock))))
 
-(defun keyboard-quit--minibuffer-line (func)
-  "Restore minibuffer line after quit."
+(defun my-keyboard-quit--minibuffer-line (func)
+  "Update minibuffer line after quit."
   (condition-case nil (funcall func) (quit (minibuffer-line--update))))
-(advice-add 'keyboard-quit :around #'keyboard-quit--minibuffer-line)
+(advice-add 'keyboard-quit :around #'my-keyboard-quit--minibuffer-line)
+
+(defun my-minibuffer-line--auto-save-hook ()
+  "Update minibuffer line after auto-saving."
+  (run-at-time 0 nil (lambda ()
+                       (message nil)
+                       (minibuffer-line--update))))
+(add-to-list 'auto-save-hook #'my-minibuffer-line--auto-save-hook)
 
 (defun my-minibuffer-line-update--original-faces (func &rest args)
   "Don't replace any faces when formatting the mode line."
