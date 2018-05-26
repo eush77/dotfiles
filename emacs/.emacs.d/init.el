@@ -121,6 +121,7 @@ and URL
 (load "config-smartscan")
 (load "config-vc")
 (load "config-w3m")
+(with-eval-after-load "bookmark" (load "config-bookmark"))
 (with-eval-after-load "calendar" (load "config-calendar"))
 (with-eval-after-load "cc-mode" (load "config-cc"))
 (with-eval-after-load "compile" (load "config-compile"))
