@@ -23,3 +23,25 @@ is running."
     (push 'org-mode-line-string global-mode-string)))
 (advice-add 'org-pomodoro-start
             :after #'my-org-pomodoro-start--adjust-mode-line)
+
+(defun my-format-ordinal (num)
+  "Format NUMBER as an ordinal by appending one of \"st\",
+\"nd\", \"rd\", or \"th\"."
+  (concat (number-to-string num)
+          (if (= (/ (mod num 100) 10) 1)
+              "th"
+            (case (mod num 10)
+              ((1) "st")
+              ((2) "nd")
+              ((3) "rd")
+              (t "th")))))
+
+(defun my-org-pomodoro-update-mode-line--pomodoro-count (func &rest args)
+  "Include `org-pomodoro-count' in `org-pomodoro-format'."
+  (let ((org-pomodoro-format
+         (concat (my-format-ordinal (+ org-pomodoro-count 1))
+                 " "
+                 org-pomodoro-format)))
+    (apply func args)))
+(advice-add 'org-pomodoro-update-mode-line
+            :around #'my-org-pomodoro-update-mode-line--pomodoro-count)
