@@ -14,15 +14,16 @@ unless `org-pomodoro-clock-break' is t."
 (advice-add 'org-pomodoro
             :around #'my-org-pomodoro--clock-in-last)
 
-(defun my-org-pomodoro-start--adjust-mode-line (func &rest args)
-  "My adjustments to the `global-mode-string' when `org-pomodoro'
-is running."
-  ;; Put `org-mode-line-string' before `org-pomodoro-mode-line'.
-  (when (memq 'org-mode-line-string global-mode-string)
-    (delq 'org-mode-line-string global-mode-string)
+(defun my-org-pomodoro-adjust-mode-line ()
+  "Adjust `global-mode-string' regarding the position of
+`org-mode-line-string' and `org-pomodoro-mode-line'."
+  (when (and (memq 'org-mode-line-string global-mode-string)
+             (memq 'org-pomodoro-mode-line global-mode-string)
+             (not (eq (car global-mode-string) 'org-mode-line-string)))
+    (setq global-mode-string (delq 'org-mode-line-string global-mode-string))
+    (setq global-mode-string (delq 'org-pomodoro-mode-line global-mode-string))
+    (push 'org-pomodoro-mode-line global-mode-string)
     (push 'org-mode-line-string global-mode-string)))
-(advice-add 'org-pomodoro-start
-            :after #'my-org-pomodoro-start--adjust-mode-line)
 
 (defun my-format-ordinal (num)
   "Format NUMBER as an ordinal by appending one of \"st\",
@@ -38,6 +39,7 @@ is running."
 
 (defun my-org-pomodoro-update-mode-line--pomodoro-count (func &rest args)
   "Include `org-pomodoro-count' in `org-pomodoro-format'."
+  (my-org-pomodoro-adjust-mode-line)
   (let ((org-pomodoro-format
          (concat (my-format-ordinal (+ org-pomodoro-count 1))
                  " "
