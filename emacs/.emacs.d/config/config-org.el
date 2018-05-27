@@ -241,3 +241,18 @@ truncated."
     width))
 (advice-add 'window-text-width
             :filter-return #'my-window-text-width--org-tty)
+
+;;
+;; Org Clock Hydra
+;;
+
+;;;###autoload (autoload 'my-hydra-org-clock/body "config-org")
+(defhydra my-hydra-org-clock ()
+  "Org Clock"
+  ("i" org-clock-in "clock-in" :exit t)
+  ("x" org-clock-in-last "clock-in last" :exit t)
+  ("p" org-pomodoro "pomodoro" :exit t)
+  ("o" org-clock-out "clock-out" :exit t)
+  ("c" org-clock-cancel "cancel clock" :exit t)
+  ("j" org-clock-goto "goto clock" :exit t)
+  ("q" nil "quit"))
