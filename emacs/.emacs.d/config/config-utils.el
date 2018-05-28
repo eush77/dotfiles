@@ -218,6 +218,24 @@ instead of 1."
   (balance-windows))
 
 ;;
+;; Virtual desktops
+;;
+
+;;;###autoload
+(defun my-frame-wm-desktop (frame)
+  "Get virtual desktop number of a frame running in a window
+system, or nil."
+  (when window-system
+    (string-to-number
+     (cadr
+      (split-string
+       (shell-command-to-string
+        (format "xprop -id %s _NET_WM_DESKTOP"
+                (alist-get 'outer-window-id
+                           (frame-parameters frame))))
+       "=")))))
+
+;;
 ;; Window switching
 ;;
 
