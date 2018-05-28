@@ -1,9 +1,8 @@
-(custom-autoload 'org-bookmark-names-plist "org")
-
 (defun my-bookmark-all-names--hide-org-bookmarks (names)
   "Remove Org bookmarks from the list.
 
 See `org-bookmark-names-plist'."
+  (require 'org)
   (let ((org-bookmark-names
          (mapcar #'cadr
                  (seq-partition (symbol-value 'org-bookmark-names-plist)
