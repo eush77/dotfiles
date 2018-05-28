@@ -128,7 +128,8 @@ Returns the absolute file name of the selected trace directory."
                      (not (string= name "."))
                      (not (string= name "..")))))
             (directory-files-and-attributes my-rr-trace-root-directory
-                                            nil nil t))))))
+                                            nil nil t)))))
+        (ivy-sort-functions-alist nil))
     (expand-file-name (cdr (assoc (completing-read "Select trace: "
                                                    rr-trace-alist)
                                   rr-trace-alist))
