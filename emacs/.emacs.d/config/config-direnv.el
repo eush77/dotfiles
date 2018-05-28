@@ -6,6 +6,13 @@
                                     magit-status-mode))
 
 (with-eval-after-load "eshell"
+  (defun my-eshell--direnv-path-env (&rest args)
+    "Update `eshell-path-env'."
+    (unless (file-remote-p default-directory)
+      (setq eshell-path-env (getenv "PATH"))))
+  (advice-add 'eshell
+              :after #'my-eshell--direnv-path-env)
+
   (defun my-direnv-update-directory-environment--eshell (&rest args)
     "Update `eshell-path-env'."
     (setq eshell-path-env (getenv "PATH")))
