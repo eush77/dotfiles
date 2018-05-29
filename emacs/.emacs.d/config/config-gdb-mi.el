@@ -8,7 +8,7 @@
   :type 'integer
   :group 'my)
 
-(defun my-gdb-locals-handler-custom--shorten-rows (func &rest args)
+(defun my-gdb-locals-handler-custom--add-row (func &rest args)
   "Clip variable types and values to make the table more
 readable."
   (cl-letf*
@@ -23,17 +23,18 @@ readable."
                                         0
                                         (- my-gdb-locals-max-type-length 1))
                              (substring type -1))))
-                  (display-value        ; Omit referenced values.
-                   (if (string-match "^@0x" value)
-                       (car (split-string value ":"))
-                     value)))
-              (funcall add-row-function
-                       table
-                       (list display-type name display-value)
-                       properties))))))
+                  (display-value
+                   (unless (or (string= value "<complex data type>")
+                               (string= value "<optimized out>"))
+                     (car (split-string (car (split-string value " =")) ": {")))))
+              (when display-value
+                (funcall add-row-function
+                         table
+                         (list display-type name display-value)
+                         properties)))))))
     (apply func args)))
 (advice-add 'gdb-locals-handler-custom
-            :around #'my-gdb-locals-handler-custom--shorten-rows)
+            :around #'my-gdb-locals-handler-custom--add-row)
 
 (defun my-gdb-setup-windows--dedicate-comint-window ()
   "Make GUD Comint window dedicated so that `display-buffer'
