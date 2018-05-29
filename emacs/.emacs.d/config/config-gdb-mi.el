@@ -2,6 +2,39 @@
 
 (custom-set gdb-many-windows t)
 
+;;;###autoload
+(defcustom my-gdb-locals-max-type-length 30
+  "Maximum type length to display in Gdb Locals window."
+  :type 'integer
+  :group 'my)
+
+(defun my-gdb-locals-handler-custom--shorten-rows (func &rest args)
+  "Clip variable types and values to make the table more
+readable."
+  (cl-letf*
+      ((add-row-function (symbol-function 'gdb-table-add-row))
+       ((symbol-function 'gdb-table-add-row)
+        (lambda (table row &optional properties)
+          (seq-let (type name value) row
+            (let ((display-type
+                   (if (< (length type) my-gdb-locals-max-type-length)
+                       type
+                     (concat (substring type
+                                        0
+                                        (- my-gdb-locals-max-type-length 1))
+                             (substring type -1))))
+                  (display-value        ; Omit referenced values.
+                   (if (string-match "^@0x" value)
+                       (car (split-string value ":"))
+                     value)))
+              (funcall add-row-function
+                       table
+                       (list display-type name display-value)
+                       properties))))))
+    (apply func args)))
+(advice-add 'gdb-locals-handler-custom
+            :around #'my-gdb-locals-handler-custom--shorten-rows)
+
 (defun my-gdb-setup-windows--dedicate-comint-window ()
   "Make GUD Comint window dedicated so that `display-buffer'
 won't use it for source buffers."

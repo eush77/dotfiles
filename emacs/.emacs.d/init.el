@@ -33,6 +33,7 @@ and URL
     (my-hydra-emms-hint-line-artist custom-face)
     (my-hydra-emms-hint-line-time custom-face)
     (my-hydra-emms-hint-line-title custom-face)
+    (my-gdb-locals-max-type-length custom-variable)
     (my-open-line-and-indent custom-variable)
     (my-org-agenda-context-filter custom-variable)
     (my-org-plan-directory custom-variable)
