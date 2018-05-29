@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 (require 'gdb-mi)
 
 (custom-set gdb-many-windows t)
@@ -56,6 +58,11 @@ printing an expression."
   (my-gdb-eval-in-comint-buffer)
   (insert "p "))
 
+(defun my-gdb-select-frame (number)
+  "Select stack frame by NUMBER."
+  (goto-line (+ number 1))
+  (gdb-select-frame))
+
 (defun my-gdb-select-relative-frame (offset)
   "Select stack frame OFFSET lines down the stack from the
 current frame."
@@ -110,6 +117,12 @@ current frame."
 (define-key gdb-frames-mode-map (kbd "s") #'gud-step)
 (define-key gdb-frames-mode-map (kbd "S") #'my-gud-reverse-step)
 (define-key gdb-frames-mode-map (kbd "u") #'my-gdb-frame-up)
+
+(dolist (num (number-sequence 0 9))
+  (define-key gdb-frames-mode-map (kbd (number-to-string num))
+    (lambda ()
+      (interactive)
+      (my-gdb-select-frame num))))
 
 (define-key gud-mode-map (kbd "C-c s") #'my-gdb-switch-to-stack-buffer)
 
