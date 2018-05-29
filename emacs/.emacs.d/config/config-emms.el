@@ -3,6 +3,15 @@
 (emms-mode-line-disable)
 (emms-playing-time-disable-display)
 
+(defun my-emms-playlist-mode-goto-dired-at-point--default-directory ()
+  "Visit `emms-source-file-default-directory' in Dired if there
+is no track at point."
+  (unless (emms-playlist-track-at)
+    (dired emms-source-file-default-directory)))
+(advice-add 'emms-playlist-mode-goto-dired-at-point
+            :before-until
+            #'my-emms-playlist-mode-goto-dired-at-point--default-directory)
+
 (with-eval-after-load "emms-playlist-mode"
   (define-key emms-playlist-mode-map (kbd "0") #'emms-volume-raise)
   (define-key emms-playlist-mode-map (kbd "9") #'emms-volume-lower)
