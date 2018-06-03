@@ -123,6 +123,7 @@
 (global-set-key (kbd "M-n") #'scroll-up)
 
 ;; Smartparens
+(define-key prog-mode-map (kbd "C-c C-M-t") #'sp-splice-sexp-killing-backward)
 (global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)
 (global-set-key (kbd "C-c C-b") #'sp-previous-sexp)
 (global-set-key (kbd "C-c C-d") #'sp-kill-sexp)
@@ -134,7 +135,7 @@
 (global-set-key (kbd "C-c C-M-j") #'sp-join-sexp)
 (global-set-key (kbd "C-c C-M-r") #'sp-raise-sexp)
 (global-set-key (kbd "C-c C-M-s") #'sp-split-sexp)
-(global-set-key (kbd "C-c C-M-t") #'sp-splice-sexp-killing-backward)
+(global-set-key (kbd "C-c C-M-t") #'sp-splice-sexp)
 (global-set-key (kbd "C-c C-SPC") #'sp-mark-sexp)
 (global-set-key (kbd "C-c C-u C-M-b") #'sp-backward-barf-sexp)
 (global-set-key (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
