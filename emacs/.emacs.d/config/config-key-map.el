@@ -42,13 +42,6 @@
 (global-set-key (kbd "C-x M-3") #'browse-web)
 (global-set-key (kbd "C-x M-4") #'pocket-reader)
 
-;; Go To Char / Word / Line
-(global-set-key (kbd "M-g M-f") #'iy-go-to-char)
-(global-set-key (kbd "M-g M-g") #'iy-go-to-char-backward)
-(global-set-key (kbd "M-g M-j") #'avy-goto-char-timer)
-(global-set-key (kbd "M-g M-w") #'avy-goto-word-1)
-(global-set-key [remap goto-line] #'avy-goto-line)
-
 ;; Goto-last-change
 (global-set-key (kbd "M-_") #'goto-last-change)
 
