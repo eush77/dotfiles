@@ -73,6 +73,10 @@
                            my-sp-c++-point-at-comparison-operator-p
                            my-sp-c++-point-at-shift-operator-p))
 
+  (sp-local-pair '(c-mode c++-mode) "'" "'"
+                 :actions '(autoskip insert navigate wrap)
+                 :post-handlers nil)
+
   (defvar my-sp-c++-restrict-to-blocks-mode-map
     (let ((map (make-sparse-keymap)))
       (dolist (cmd (cl-union (mapcar #'cdr sp-paredit-bindings)
