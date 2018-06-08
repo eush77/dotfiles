@@ -154,6 +154,9 @@
 (global-set-key (kbd "C-S-s") #'swiper-all)
 (global-set-key (kbd "C-M-s") #'swiper-multi)
 
+;; Truncation
+(global-set-key (kbd "C-x C-y") #'toggle-truncate-lines)
+
 ;; View mode
 (global-set-key (kbd "<pause>") #'view-mode)
 (when (not window-system)
