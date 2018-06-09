@@ -1,4 +1,5 @@
 af=scaletempo
+vo=null
 
 [vo.fbdev2]
 quiet=yes
