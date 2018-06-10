@@ -199,6 +199,11 @@ truncated."
 (custom-set org-default-priority ?C)
 (custom-set org-lowest-priority ?D)
 
+;;; Refiling
+
+(custom-set org-refile-targets
+            '((org-files-list :maxlevel . 2)))
+
 ;;; Todo
 
 (custom-set org-todo-keywords
