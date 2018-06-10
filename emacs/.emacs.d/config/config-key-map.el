@@ -100,6 +100,9 @@
 ;; Query-replace
 (global-set-key (kbd "C-r") #'query-replace-regexp)
 
+;; Rectangles
+(global-set-key [remap rectangle-mark-mode] #'my-hydra-rectangle/body)
+
 ;; Rotate
 (global-set-key (kbd "C-c r r") #'rotate-window)
 (global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)

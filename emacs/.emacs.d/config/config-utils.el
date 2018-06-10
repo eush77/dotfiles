@@ -147,6 +147,36 @@ Otherwise print the value in the echo area."
           (delete-char 1))
         (goto-char marker)))))
 
+;;; Rectangles
+
+;;;###autoload
+(defhydra my-hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+                              :foreign-keys run
+                              :post (deactivate-mark))
+  "
+"
+  ("SPC" (if (region-active-p)
+             (deactivate-mark)
+           (rectangle-mark-mode 1)) "reset" :column "Mark")
+  ("x" rectangle-exchange-point-and-mark "exchange")
+
+  ("o" open-rectangle "open" :column "Insert")
+  ("n" rectangle-number-lines "number lines")
+
+  ("d" delete-rectangle "delete" :column "Replace")
+  ("c" clear-rectangle "clear")
+  ("t" string-rectangle "type")
+
+  ("q" nil "cancel" :column "")
+
+  ("C-b" rectangle-backward-char nil)
+  ("C-f" rectangle-forward-char nil)
+  ("C-n" rectangle-next-line nil)
+  ("C-p" rectangle-previous-line nil)
+  ("C-w" kill-rectangle nil)
+  ("C-y" yank-rectangle nil)
+  ("M-w" copy-rectangle-as-kill nil))
+
 ;;; Virtual desktops
 
 ;;;###autoload
