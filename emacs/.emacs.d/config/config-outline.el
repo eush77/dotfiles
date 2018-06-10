@@ -63,13 +63,15 @@ direction. The meaning of COUNT is inverted."
 ;;; Hydra
 
 ;;;###autoload (autoload 'my-outline-hydra/body "config-outline")
-(defhydra my-outline-hydra ()
+(defhydra my-outline-hydra (:body-pre (unless (eq major-mode 'outline-mode)
+                                        (outline-minor-mode 1))
+                            :foreign-keys run)
   "
 %s(cond ((eq major-mode 'outline-mode) \"Outline\")
         (outline-minor-mode \"Outline minor\")
         (t \"No Outline\"))
 "
-  ("u" outline-up-heading "up" :column "Movement")
+  ("u" outline-up-heading "up" :column "Motion")
   ("b" outline-backward-same-level "backward")
   ("p" outline-previous-visible-heading "previous")
   ("n" outline-next-visible-heading "next")
@@ -92,7 +94,9 @@ direction. The meaning of COUNT is inverted."
   ("v" outline-move-subtree-down "move down")
   ("m" outline-insert-heading "insert heading")
 
-  ("q" nil "cancel" :column ""))
+  ("`" (progn (outline-minor-mode 0)
+              (my-hs-hydra/body)) "-> hideshow" :exit t :column "")
+  ("q" nil "cancel"))
 
 ;;; Keymap
 

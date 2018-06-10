@@ -76,6 +76,23 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (when my-open-line-and-indent
     (indent-according-to-mode)))
 
+;;; Defun motion
+
+;;;###autoload
+(defun my-previous-defun ()
+  "Move to the previous defun."
+  (interactive)
+  (forward-char)
+  (beginning-of-defun 2))
+
+;;;###autoload
+(defun my-next-defun ()
+  "Move to the next defun."
+  (interactive)
+  (forward-char)
+  (beginning-of-defun)
+  (beginning-of-defun -1))
+
 ;;; Frame switching
 
 (add-to-list 'package-selected-packages 'dash)
