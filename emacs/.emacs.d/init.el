@@ -36,6 +36,7 @@ and URL
     (my-gdb-locals-max-type-length custom-variable)
     (my-open-line-and-indent custom-variable)
     (my-org-agenda-context-filter custom-variable)
+    (my-org-notes-directory custom-variable)
     (my-org-plan-directory custom-variable)
     (my-window-size-delta custom-variable)
     (my-rr-replay-buffer-name custom-variable)

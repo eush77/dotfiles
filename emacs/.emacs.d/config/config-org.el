@@ -167,6 +167,40 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
 
+;;; Finding files
+
+;;;###autoload
+(defcustom my-org-notes-directory "~/notes"
+  "Directory with textual notes.")
+
+(defun my-org-jump-less-p (left right)
+  "Sorting function for `my-org-jump' and `my-org-notes-jump'.
+
+Top-level files are ordered before nested files. Two top-level
+files are ordered alphabetically."
+  (unless (string-match "/" left)
+    (or (string-match "/" right)
+        (< (elt left 0) (elt right 0)))))
+
+;;;###autoload
+(defun my-org-jump (&optional directory)
+  "Jump to a file in DIRECTORY, which defaults to
+`org-directory'."
+  (interactive (list org-directory))
+  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
+             ((symbol-function 'ivy-read)
+              (lambda (prompt collection &rest args)
+                (apply ivy-read-function prompt collection
+                       :sort t args)))
+             (ivy-sort-functions-alist '((t . my-org-jump-less-p))))
+    (counsel-file-jump nil directory)))
+
+;;;###autoload
+(defun my-org-notes-jump ()
+  "Jump to a file in `my-org-notes-directory'."
+  (interactive)
+  (my-org-jump my-org-notes-directory))
+
 ;;; Formatting
 
 (add-hook 'org-mode-hook #'auto-fill-mode)

@@ -17,6 +17,8 @@
 (key-chord-define-global "xf" #'find-file)
 (key-chord-define-global "xg" #'counsel-git)
 (key-chord-define-global "xl" #'find-library)
+(key-chord-define-global "xm" #'my-org-jump)
+(key-chord-define-global "xn" #'my-org-notes-jump)
 (key-chord-define-global "xr" #'counsel-recentf)
 (key-chord-define-global "xv" #'find-alternate-file)
 
