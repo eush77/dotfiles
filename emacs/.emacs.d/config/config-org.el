@@ -1,13 +1,8 @@
-;;; -*- lexical-binding: t -*-
+;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
 (require 'org-depend)
 
-(custom-set org-todo-keywords
-            '((sequence "TODO(!)" "WAIT(@)" "NEXT(!)" "|" "DONE(!)" "DROP(@)")
-              (sequence "PLAN" "|" "PASS" "FAIL")))
-(custom-set org-todo-keyword-faces
-            '(("PLAN" . "yellow")
-              ("PASS" . "green")
-              ("FAIL" . "red")))
+;;; Agenda
+
 (custom-set org-agenda-custom-commands
             `(("p" "Planned tasks"
                ((my-org-agenda-planned-view "Weekly.org")
@@ -17,44 +12,33 @@
                 (my-org-agenda-planned-view "5 Years.org")
                 (my-org-agenda-planned-view "Life.org"))
                ((org-agenda-prefix-format "  ")))))
-(custom-set org-default-priority ?C)
-(custom-set org-lowest-priority ?D)
-(custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
-(custom-set org-capture-templates
-            `(("n" "New item in the backlog" entry
-               (file org-default-notes-file)
-               ,(concat "* NEW %?\n"
-                        ":LOGBOOK:\n"
-                        "- State \"NEW\"        from              %U\n"
-                        ":END:\n"))
-              ("r" "New item in the backlog (quote region)" entry
-               (file org-default-notes-file)
-               ,(concat "* NEW %?\n"
-                        ":LOGBOOK:\n"
-                        "- State \"NEW\"        from              %U\n"
-                        ":END:\n"
-                        "Captured from %(pcase
-                            (with-current-buffer
-                                (org-capture-get :original-buffer) major-mode)
-                          ('w3m-mode \"%:link\")
-                          ('gnus-article-mode \"%:from\")
-                          (_ \"%f\")):\n"
-                        "#+BEGIN_QUOTE\n"
-                        "%i\n"
-                        "#+END_QUOTE\n"))))
-(custom-set org-columns-default-format
-            "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
 (custom-set org-agenda-span 'fortnight)
 (custom-set org-agenda-todo-list-sublevels nil)
-(custom-set org-archive-location "archive/%s::")
-(custom-set org-enforce-todo-dependencies t)
-(custom-set org-enforce-todo-checkbox-dependencies t)
-(custom-set org-log-done 'time)
-(custom-set org-log-into-drawer t)
-(custom-set org-log-refile 'time)
-(custom-set org-startup-indented t)
 
-(add-hook 'org-mode-hook #'auto-fill-mode)
+;;;###autoload
+(defcustom my-org-agenda-context-filter nil
+  "Context filter to apply in the `org-todo-list' agenda view.
+
+See `org-agenda-tag-filter-preset'."
+  :type '(repeat string)
+  :set #'my-org-agenda-context-filter--set
+  :group 'my)
+
+(defun my-org-agenda-context-filter--set (symbol value)
+  "Set VALUE as a context filter."
+  (unless (cl-every (lambda (str) (string-match "^[+-]@" str)) value)
+    (user-error "Invalid value for a context filter"))
+  (set-default symbol value))
+
+(defun my-org-todo-list--context-filter (func &rest args)
+  "Filter contexts according to `my-org-agenda-context-filter'
+in the `org-todo-list' agenda view."
+  (let ((org-agenda-tag-filter-preset
+         (append my-org-agenda-context-filter
+                 org-agenda-tag-filter-preset)))
+    (apply func args)))
+(with-eval-after-load "org-agenda"
+  (advice-add 'org-todo-list :around #'my-org-todo-list--context-filter))
 
 ;;;###autoload
 (defcustom my-org-plan-directory "~/org/plan"
@@ -132,6 +116,101 @@ If FILE-NAME is not absolute, it is interpreted as relative to
             (org-agenda-finalize-entries entries)
             "\n\n")))
 
+;;; Archive
+
+(custom-set org-archive-location "archive/%s::")
+
+;;; Capture
+
+(custom-set org-capture-templates
+            `(("n" "New item in the backlog" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %?\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"))
+              ("r" "New item in the backlog (quote region)" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %?\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"
+                        "Captured from %(pcase
+                            (with-current-buffer
+                                (org-capture-get :original-buffer) major-mode)
+                          ('w3m-mode \"%:link\")
+                          ('gnus-article-mode \"%:from\")
+                          (_ \"%f\")):\n"
+                        "#+BEGIN_QUOTE\n"
+                        "%i\n"
+                        "#+END_QUOTE\n"))))
+
+;;; Clocking
+
+;;;###autoload (autoload 'my-hydra-org-clock/body "config-org")
+(defhydra my-hydra-org-clock ()
+  "Org Clock"
+  ("i" org-clock-in "clock-in" :exit t)
+  ("x" org-clock-in-last "clock-in last" :exit t)
+  ("p" org-pomodoro "pomodoro" :exit t)
+  ("o" org-clock-out "clock-out" :exit t)
+  ("c" org-clock-cancel "cancel clock" :exit t)
+  ("j" org-clock-goto "goto clock" :exit t)
+  ("q" nil "quit"))
+
+;;; Column view
+
+(custom-set org-columns-default-format
+            "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
+
+;;; Effort
+
+(custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
+
+;;; Formatting
+
+(add-hook 'org-mode-hook #'auto-fill-mode)
+
+(custom-set org-startup-indented t)
+
+(defun my-window-text-width--org-tty (width)
+  "Decrement text width when displaying on a terminal in Org
+Agenda mode.
+
+By default, `org-agenda-align-tags' puts last characters of
+right-aligned strings in the rightmost window column which is the
+margin column on a terminal display, and thus the strings get
+truncated."
+  (if (and (not window-system)
+           (eq major-mode 'org-agenda-mode))
+      (- width 1)
+    width))
+(advice-add 'window-text-width
+            :filter-return #'my-window-text-width--org-tty)
+
+;;; Logbook
+
+(custom-set org-log-done 'time)
+(custom-set org-log-into-drawer t)
+(custom-set org-log-refile 'time)
+
+;;; Priority
+
+(custom-set org-default-priority ?C)
+(custom-set org-lowest-priority ?D)
+
+;;; Todo
+
+(custom-set org-todo-keywords
+            '((sequence "TODO(!)" "WAIT(@)" "NEXT(!)" "|" "DONE(!)" "DROP(@)")
+              (sequence "PLAN" "|" "PASS" "FAIL")))
+(custom-set org-todo-keyword-faces
+            '(("PLAN" . "yellow")
+              ("PASS" . "green")
+              ("FAIL" . "red")))
+(custom-set org-enforce-todo-checkbox-dependencies t)
+(custom-set org-enforce-todo-dependencies t)
+
 (defun my-org-drop-headings (end)
   "Drop headings from point to END."
   (when (< (point) end)
@@ -163,28 +242,7 @@ If the new state is `DROP', drop the whole subtree."
 (advice-add 'org-todo
             :around #'my-org-todo--circumventing-blocking)
 
-(let ((show-and-move
-       (lambda (move-next)
-         (outline-back-to-heading)
-         (outline-end-of-heading)
-         (when (not (outline-invisible-p))
-           (outline-hide-subtree)
-           (funcall move-next 1))
-         (outline-show-entry)
-         (outline-show-children)
-         (outline-back-to-heading))))
-
-  (defun my-outline-show-next-subtree ()
-    "If the subtree under the current heading is hidden, show it.
-Otherwise hide it, and show the next sibling subtree."
-    (interactive)
-    (funcall show-and-move #'outline-forward-same-level))
-
-  (defun my-outline-show-previous-subtree ()
-    "If the subtree under the current heading is hidden, show it.
-Otherwise hide it, and show the previous sibling subtree."
-    (interactive)
-    (funcall show-and-move #'outline-backward-same-level)))
+;;; Keymap
 
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "C-c C-x C-p") #'org-pomodoro)
@@ -199,60 +257,6 @@ Otherwise hide it, and show the previous sibling subtree."
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 
-(defun my-org-agenda-context-filter--set (symbol value)
-  "Set VALUE as a context filter."
-  (unless (cl-every (lambda (str) (string-match "^[+-]@" str)) value)
-    (user-error "Invalid value for a context filter"))
-  (set-default symbol value))
-
-;;;###autoload
-(defcustom my-org-agenda-context-filter nil
-  "Context filter to apply in the `org-todo-list' agenda view.
-
-See `org-agenda-tag-filter-preset'."
-  :type '(repeat string)
-  :set #'my-org-agenda-context-filter--set
-  :group 'my)
-
 (with-eval-after-load "org-agenda"
-  (defun my-org-todo-list--context-filter (func &rest args)
-    "Filter contexts according to `my-org-agenda-context-filter'
-in the `org-todo-list' agenda view."
-    (let ((org-agenda-tag-filter-preset
-           (append my-org-agenda-context-filter
-                   org-agenda-tag-filter-preset)))
-      (apply func args)))
-  (advice-add 'org-todo-list :around #'my-org-todo-list--context-filter)
-
   (define-key org-agenda-mode-map (kbd "C-c C-j")
     #'counsel-org-agenda-headlines))
-
-(defun my-window-text-width--org-tty (width)
-  "Decrement text width when displaying on a terminal in Org
-Agenda mode.
-
-By default, `org-agenda-align-tags' puts last characters of
-right-aligned strings in the rightmost window column which is the
-margin column on a terminal display, and thus the strings get
-truncated."
-  (if (and (not window-system)
-           (eq major-mode 'org-agenda-mode))
-      (- width 1)
-    width))
-(advice-add 'window-text-width
-            :filter-return #'my-window-text-width--org-tty)
-
-;;
-;; Org Clock Hydra
-;;
-
-;;;###autoload (autoload 'my-hydra-org-clock/body "config-org")
-(defhydra my-hydra-org-clock ()
-  "Org Clock"
-  ("i" org-clock-in "clock-in" :exit t)
-  ("x" org-clock-in-last "clock-in last" :exit t)
-  ("p" org-pomodoro "pomodoro" :exit t)
-  ("o" org-clock-out "clock-out" :exit t)
-  ("c" org-clock-cancel "cancel clock" :exit t)
-  ("j" org-clock-goto "goto clock" :exit t)
-  ("q" nil "quit"))
