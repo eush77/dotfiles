@@ -1,6 +1,4 @@
-;;
-;; Editing
-;;
+;;; Editing
 
 (autoload 'copy-from-above-command "misc" nil t)
 
@@ -78,9 +76,7 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (when my-open-line-and-indent
     (indent-according-to-mode)))
 
-;;
-;; Frame switching
-;;
+;;; Frame switching
 
 (add-to-list 'package-selected-packages 'dash)
 (add-to-list 'package-selected-packages 'dash-functional)
@@ -122,9 +118,7 @@ immediately."
                                     (caadr frame-alist))
                    frame-alist))))))
 
-;;
-;; Lisp evaluation
-;;
+;;; Lisp evaluation
 
 ;;;###autoload
 (defun my-eval-sexp (replace-sexp)
@@ -153,9 +147,23 @@ Otherwise print the value in the echo area."
           (delete-char 1))
         (goto-char marker)))))
 
-;;
-;; Window sizing
-;;
+;;; Virtual desktops
+
+;;;###autoload
+(defun my-frame-wm-desktop (frame)
+  "Get virtual desktop number of a frame running in a window
+system, or nil."
+  (when window-system
+    (string-to-number
+     (cadr
+      (split-string
+       (shell-command-to-string
+        (format "xprop -id %s _NET_WM_DESKTOP"
+                (alist-get 'outer-window-id
+                           (frame-parameters frame))))
+       "=")))))
+
+;;; Window sizing
 
 ;;;###autoload
 (defcustom my-window-size-delta 1
@@ -190,9 +198,7 @@ instead of 1."
   (setq delta (or delta my-window-size-delta))
   (shrink-window-horizontally delta))
 
-;;
-;; Window splitting
-;;
+;;; Window splitting
 
 ;;;###autoload
 (defun my-balanced-split-window-vertically ()
@@ -217,27 +223,7 @@ instead of 1."
   (delete-window)
   (balance-windows))
 
-;;
-;; Virtual desktops
-;;
-
-;;;###autoload
-(defun my-frame-wm-desktop (frame)
-  "Get virtual desktop number of a frame running in a window
-system, or nil."
-  (when window-system
-    (string-to-number
-     (cadr
-      (split-string
-       (shell-command-to-string
-        (format "xprop -id %s _NET_WM_DESKTOP"
-                (alist-get 'outer-window-id
-                           (frame-parameters frame))))
-       "=")))))
-
-;;
-;; Window switching
-;;
+;;; Window switching
 
 ;;;###autoload
 (defun my-switch-to-mru-window ()
