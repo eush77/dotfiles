@@ -1,5 +1,7 @@
 (custom-set litable-result-format "=> %s")
 
+;;; Remove impure functions
+
 (setq litable-pure-functions-list
       (seq-difference litable-pure-functions-list
                       '(LaTeX-back-to-indentation
@@ -60,3 +62,66 @@
                         warn
                         y-or-n-p
                         yes-or-no-p)))
+
+;;; Add pure functions
+
+(mapatoms (lambda (sym)
+              (when (string-match "^c[ad]*r$" (symbol-name sym))
+                (add-to-list 'litable-pure-functions-list sym))))
+
+(setq litable-pure-functions-list
+      (cl-union litable-pure-functions-list
+                '(/=
+                  <
+                  <=
+                  =
+                  >
+                  >=
+                  butlast
+                  byte-to-string
+                  char-width
+                  cl-union
+                  eql
+                  last
+                  make-vector
+                  mapcar
+                  mapconcat
+                  nthcdr
+                  prin1-to-string
+                  seq-concatenate
+                  seq-contains
+                  seq-count
+                  seq-difference
+                  seq-drop
+                  seq-drop-while
+                  seq-elt
+                  seq-empty-p
+                  seq-every-p
+                  seq-filter
+                  seq-find
+                  seq-group-by
+                  seq-intersection
+                  seq-into
+                  seq-length
+                  seq-let
+                  seq-map
+                  seq-mapcat
+                  seq-mapn
+                  seq-max
+                  seq-min
+                  seq-partition
+                  seq-position
+                  seq-reduce
+                  seq-remove
+                  seq-some
+                  seq-sort
+                  seq-subseq
+                  seq-take
+                  seq-take-while
+                  seq-uniq
+                  seqp
+                  sequencep
+                  string-width
+                  truncate-string-to-width
+                  vconcat
+                  vectorp)))
