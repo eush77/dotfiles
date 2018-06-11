@@ -1,7 +1,24 @@
 (counsel-mode 1)
 
+;;; Ibuffer
+
+(defun my-counsel-ibuffer--preselect (func &rest args)
+  "Remove current buffer, effectively preselecting last buffer."
+  (require 'ibuffer)
+  (cl-assert (eq ibuffer-default-sorting-mode 'recency))
+  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
+             ((symbol-function 'ivy-read)
+              (lambda (prompt collection &rest args)
+                (apply ivy-read-function prompt (cdr collection) args))))
+    (apply func args)))
+(advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
+
+;;; Finding files
+
 (custom-set counsel-find-file-at-point t)
 (custom-set counsel-preselect-current-file t)
+
+;;; Git grep
 
 ;;;###autoload
 (defun my-counsel-git-grep-at-point (&optional cmd)
@@ -38,16 +55,7 @@ repositories."
 (advice-add 'counsel--git-grep-count-func-default
             :around #'my-counsel-git-grep-count-func-default--projects)
 
-(defun my-counsel-ibuffer--preselect (func &rest args)
-  "Remove current buffer, effectively preselecting last buffer."
-  (require 'ibuffer)
-  (cl-assert (eq ibuffer-default-sorting-mode 'recency))
-  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
-             ((symbol-function 'ivy-read)
-              (lambda (prompt collection &rest args)
-                (apply ivy-read-function prompt (cdr collection) args))))
-    (apply func args)))
-(advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
+;;; Org
 
 ;;;###autoload
 (defun my-counsel-org-goto (arg)
