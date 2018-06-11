@@ -26,6 +26,9 @@
 (global-set-key (kbd "M-=") #'er/expand-region)
 (global-set-key (kbd "M-+") #'er/mark-sentence)
 
+;; Finding directories
+(global-set-key (kbd "C-x C-d") #'my-find-directory)
+
 ;; Follow-mode
 (global-set-key (kbd "C-x 3") #'follow-delete-other-windows-and-split)
 

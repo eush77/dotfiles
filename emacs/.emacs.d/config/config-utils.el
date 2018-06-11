@@ -93,6 +93,46 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (beginning-of-defun)
   (beginning-of-defun -1))
 
+;;; Finding files
+
+;;;###autoload
+(defcustom my-find-directories nil
+  "Alist of directories to find with `my-find-directory'."
+  :type '(alist :key-type directory :value-type (integer :tag "Depth"))
+  :group 'my)
+
+;;;###autoload
+(defun my-find-directory ()
+  "Find a subdirectory of one of the directories in
+`my-find-directories'."
+  (interactive)
+  (let ((subdirectories
+         (with-temp-buffer
+           (mapc (lambda (pair)
+                   (let ((directory (car pair))
+                         (depth (cdr pair)))
+                     ;; TODO: Group find invocations for different starting
+                     ;; points by depth.
+                     (call-process find-program nil t nil
+                                   directory
+                                   "-mindepth" "1"
+                                   "-maxdepth" (number-to-string depth)
+                                   "-type" "d"
+                                   "(" "-name" ".[^.]*" "-prune"
+                                   "-o" "-printf" "%H\t%P\n" ")")))
+                 my-find-directories)
+           (mapcar (lambda (pair)
+                     (seq-let (root subdir) pair
+                       (cons subdir (expand-file-name subdir root))))
+                   (seq-partition (split-string (buffer-string)
+                                                "[\n\t]" t)
+                                  2)))))
+    (find-file (cdr (assoc (completing-read "Find directory: "
+                                            subdirectories
+                                            nil
+                                            t)
+                 subdirectories)))))
+
 ;;; Frame switching
 
 (add-to-list 'package-selected-packages 'dash)

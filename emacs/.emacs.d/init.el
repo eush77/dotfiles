@@ -29,11 +29,12 @@ and URL
 (defgroup my
   '((my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
+    (my-find-directories custom-variable)
+    (my-gdb-locals-max-type-length custom-variable)
     (my-hydra-emms-hint-line-album custom-face)
     (my-hydra-emms-hint-line-artist custom-face)
     (my-hydra-emms-hint-line-time custom-face)
     (my-hydra-emms-hint-line-title custom-face)
-    (my-gdb-locals-max-type-length custom-variable)
     (my-open-line-and-indent custom-variable)
     (my-org-agenda-context-filter custom-variable)
     (my-org-notes-directory custom-variable)
