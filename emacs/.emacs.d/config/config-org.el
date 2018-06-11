@@ -171,7 +171,9 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;;###autoload
 (defcustom my-org-notes-directory "~/notes"
-  "Directory with textual notes.")
+  "Directory with textual notes."
+  :type 'directory
+  :group 'my)
 
 (defun my-org-jump-less-p (left right)
   "Sorting function for `my-org-jump' and `my-org-notes-jump'.
