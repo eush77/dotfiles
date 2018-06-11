@@ -181,6 +181,9 @@
 (global-set-key [remap shrink-window-horizontally]
                 #'my-shrink-window-horizontally)
 
+;; Winner
+(global-set-key (kbd "C-c w") #'my-winner-hydra/body)
+
 ;; Whitespace
 (global-set-key [remap just-one-space] #'cycle-spacing)
 
