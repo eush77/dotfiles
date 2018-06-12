@@ -281,15 +281,20 @@ Otherwise print the value in the echo area."
 
 ;;; Rectangles
 
+(defun my-rectangle-set-mark ()
+  "Set rectangular mark."
+  (interactive)
+  (if (region-active-p)
+      (deactivate-mark)
+    (rectangle-mark-mode 1)))
+
 ;;;###autoload
 (defhydra my-hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                               :foreign-keys run
                               :post (deactivate-mark))
   "
 "
-  ("SPC" (if (region-active-p)
-             (deactivate-mark)
-           (rectangle-mark-mode 1)) "reset" :column "Mark")
+  ("SPC" my-rectangle-set-mark "set mark" :column "Mark")
   ("x" rectangle-exchange-point-and-mark "exchange")
 
   ("o" open-rectangle "open" :column "Insert")
@@ -299,15 +304,17 @@ Otherwise print the value in the echo area."
   ("c" clear-rectangle "clear")
   ("t" string-rectangle "type")
 
+  ("M-w" copy-rectangle-as-kill "copy" :column "Kill Ring")
+  ("C-w" kill-rectangle "kill")
+  ("C-y" yank-rectangle "yank")
+
   ("q" nil "cancel" :column "")
 
+  ("C-@" my-rectangle-set-mark nil)
   ("C-b" rectangle-backward-char nil)
   ("C-f" rectangle-forward-char nil)
   ("C-n" rectangle-next-line nil)
-  ("C-p" rectangle-previous-line nil)
-  ("C-w" kill-rectangle nil)
-  ("C-y" yank-rectangle nil)
-  ("M-w" copy-rectangle-as-kill nil))
+  ("C-p" rectangle-previous-line nil))
 
 ;;; Virtual desktops
 
