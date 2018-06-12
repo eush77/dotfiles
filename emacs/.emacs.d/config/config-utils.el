@@ -109,7 +109,7 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (let ((subdirectories
          (with-temp-buffer
            (mapc (lambda (pair)
-                   (let ((directory (car pair))
+                   (let ((directory (expand-file-name (car pair)))
                          (depth (cdr pair)))
                      ;; TODO: Group find invocations for different starting
                      ;; points by depth.
