@@ -177,10 +177,33 @@ currently visited file."
   (interactive "p")
   (my-find-next-file (- n)))
 
+(defun my-quote-text-string (str)
+  "Quote STR if necessary so that it can be inserted into text."
+  (if (string-match "^[[:alnum:]]+$" str)
+      str
+    (format "\"%s\"" (replace-regexp-in-string "\\(\\\\*\\)\"" "\\1\\1\\\\\""
+                                               str))))
+
+(ert-deftest my-quote-text-string ()
+  (should (string= (my-quote-text-string "alpha") "alpha"))
+  (should (string= (my-quote-text-string "alnum12") "alnum12"))
+  (should (string= (my-quote-text-string "") "\"\""))
+  (should (string= (my-quote-text-string "with spaces") "\"with spaces\""))
+  (should (string= (my-quote-text-string "escape \"quotes\"")
+                   "\"escape \\\"quotes\\\"\""))
+  (should (string= (my-quote-text-string "escape \\\"quotes\\\"")
+                   "\"escape \\\\\\\"quotes\\\\\\\"\"")))
+
 ;;;###autoload (autoload 'my-find-next-file-hydra/my-find-next-file "config-utils")
 ;;;###autoload (autoload 'my-find-next-file-hydra/my-find-previous-file "config-utils")
-(defhydra my-find-next-file-hydra (:timeout 3)
-  "File"
+(defhydra my-find-next-file-hydra (:pre (unless (buffer-file-name)
+                                          (hydra-disable)
+                                          (user-error "No visited file")))
+  "
+File in %s(my-quote-text-string
+           (file-name-nondirectory
+            (directory-file-name
+             (file-name-directory (buffer-file-name))))): "
   ("p" my-find-previous-file "previous")
   ("n" my-find-next-file "next")
   ("RET" nil))
