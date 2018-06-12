@@ -26,8 +26,10 @@
 (global-set-key (kbd "M-=") #'er/expand-region)
 (global-set-key (kbd "M-+") #'er/mark-sentence)
 
-;; Finding directories
+;; Finding files
 (global-set-key (kbd "C-x C-d") #'my-find-directory)
+(global-set-key (kbd "C-x N") #'my-find-next-file-hydra/my-find-next-file)
+(global-set-key (kbd "C-x P") #'my-find-next-file-hydra/my-find-previous-file)
 
 ;; Follow-mode
 (global-set-key (kbd "C-x 3") #'follow-delete-other-windows-and-split)

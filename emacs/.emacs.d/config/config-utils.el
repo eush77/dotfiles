@@ -133,6 +133,58 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
                                             t)
                  subdirectories)))))
 
+(defun my-next-file-name (n &optional verbose)
+  "Get the name of the Nth next file in the directory containing
+the currently visited file.
+
+If VERBOSE, message current position in the directory."
+  (unless (buffer-file-name)
+    (user-error "No visited file"))
+  (let* ((forward-p (>= n 0))
+         (files (seq-filter #'file-regular-p
+                            (directory-files
+                             (file-name-directory (buffer-file-name)))))
+         (current-next-files (member
+                              (file-name-nondirectory (buffer-file-name))
+                              (if forward-p files (reverse files))))
+         (next-files (nthcdr (abs n) current-next-files)))
+    (when verbose
+      (message "File %d / %d%s"
+               (let ((position-next-files
+                      (or next-files current-next-files)))
+                 (if forward-p
+                     (- (length files) (length position-next-files) -1)
+                   (length position-next-files)))
+               (length files)
+               (if next-files ""
+                 (propertize (format " (no %s file)"
+                                     (if forward-p "next" "previous"))
+                             'face 'error))))
+    (car next-files)))
+
+;;;###autoload
+(defun my-find-next-file (&optional n)
+  "Find Nth next file in the directory containing the currently
+visited file."
+  (interactive "p")
+  (when-let ((next-file (my-next-file-name n t)))
+    (find-file next-file)))
+
+;;;###autoload
+(defun my-find-previous-file (&optional n)
+  "Find Nth previous file in the directory containing the
+currently visited file."
+  (interactive "p")
+  (my-find-next-file (- n)))
+
+;;;###autoload (autoload 'my-find-next-file-hydra/my-find-next-file "config-utils")
+;;;###autoload (autoload 'my-find-next-file-hydra/my-find-previous-file "config-utils")
+(defhydra my-find-next-file-hydra (:timeout 3)
+  "File"
+  ("p" my-find-previous-file "previous")
+  ("n" my-find-next-file "next")
+  ("RET" nil))
+
 ;;; Frame switching
 
 (add-to-list 'package-selected-packages 'dash)
