@@ -66,7 +66,8 @@ Hideshow
 
 ;;; Keymap
 
-(define-key hs-minor-mode-map (kbd "C-c @") #'my-hs-hydra/body)
+(with-eval-after-load "hideshow"
+  (define-key hs-minor-mode-map (kbd "C-c @") #'my-hs-hydra/body))
 
 ;;; Outline minor mode compat
 

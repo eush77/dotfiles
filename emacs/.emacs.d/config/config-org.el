@@ -14,15 +14,6 @@
                ((org-agenda-prefix-format "  ")))))
 (custom-set org-agenda-span 'fortnight)
 
-;;;###autoload
-(defcustom my-org-agenda-context-filter nil
-  "Context filter to apply in the `org-todo-list' agenda view.
-
-See `org-agenda-tag-filter-preset'."
-  :type '(repeat string)
-  :set #'my-org-agenda-context-filter--set
-  :group 'my)
-
 (defun my-org-agenda-context-filter--set (symbol value)
   "Set VALUE as a context filter."
   (unless (cl-every (lambda (str) (string-match "^[+-]@" str)) value)
@@ -30,12 +21,12 @@ See `org-agenda-tag-filter-preset'."
   (set-default symbol value))
 
 ;;;###autoload
-(defcustom my-org-agenda-todo-keyword-filter nil
-  "TODO keyword filter to apply in the `org-todo-list' agenda view.
+(defcustom my-org-agenda-context-filter nil
+  "Context filter to apply in the `org-todo-list' agenda view.
 
-See `org-agenda-regexp-filter-preset'."
+See `org-agenda-tag-filter-preset'."
   :type '(repeat string)
-  :set #'my-org-agenda-todo-keyword-filter--set
+  :set #'my-org-agenda-context-filter--set
   :group 'my)
 
 (defun my-org-agenda-todo-keyword-filter--set (symbol value)
@@ -46,6 +37,15 @@ See `org-agenda-regexp-filter-preset'."
        value)
     (user-error "Invalid value for a TODO keyword filter"))
   (set-default symbol value))
+
+;;;###autoload
+(defcustom my-org-agenda-todo-keyword-filter nil
+  "TODO keyword filter to apply in the `org-todo-list' agenda view.
+
+See `org-agenda-regexp-filter-preset'."
+  :type '(repeat string)
+  :set #'my-org-agenda-todo-keyword-filter--set
+  :group 'my)
 
 (defun my-org-agenda-todo-keyword-filter-to-regexp-filter (filter)
   "Turn TODO keyword filter FILTER into a regexp filter.
