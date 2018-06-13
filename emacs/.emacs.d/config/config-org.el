@@ -291,7 +291,6 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
 (define-key org-mode-map (kbd "C-c p") #'org-metaup)
-(define-key org-mode-map (kbd "C-c u") #'org-remove-occur-highlights)
 (define-key org-mode-map (kbd "C-M-b") #'org-previous-link)
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
