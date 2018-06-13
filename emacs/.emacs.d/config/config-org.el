@@ -165,7 +165,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;; Effort
 
-(custom-set org-global-properties '(("EFFORT_ALL" . "0 0:10 0:30 1:00 2:00")))
+(custom-set org-global-properties '(("EFFORT_ALL" . "0:10 0:30 1:00 2:00")))
 
 ;;; Finding files
 
