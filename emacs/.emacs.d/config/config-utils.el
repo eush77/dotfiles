@@ -98,7 +98,8 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
 ;;;###autoload
 (defcustom my-find-directories nil
   "Alist of directories to find with `my-find-directory'."
-  :type '(alist :key-type directory :value-type (integer :tag "Depth"))
+  :type '(alist :key-type directory :value-type (group (integer :tag "Minimum Depth")
+                                                       (integer :tag "Maximum Depth")))
   :group 'my)
 
 ;;;###autoload
@@ -108,22 +109,22 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (interactive)
   (let ((subdirectories
          (with-temp-buffer
-           (mapc (lambda (pair)
-                   (let ((directory (expand-file-name (car pair)))
-                         (depth (cdr pair)))
+           (mapc (pcase-lambda (`(,directory ,min-depth ,max-depth))
+                   (let ((directory (expand-file-name directory)))
                      ;; TODO: Group find invocations for different starting
                      ;; points by depth.
                      (call-process find-program nil t nil
                                    directory
-                                   "-mindepth" "1"
-                                   "-maxdepth" (number-to-string depth)
+                                   "-mindepth" (number-to-string min-depth)
+                                   "-maxdepth" (number-to-string max-depth)
                                    "-type" "d"
                                    "(" "-name" ".[^.]*" "-prune"
-                                   "-o" "-printf" "%H\t%P\n" ")")))
+                                   "-o" "-printf" "%H\t/%P\n" ")")))
                  my-find-directories)
-           (mapcar (lambda (pair)
-                     (seq-let (root subdir) pair
-                       (cons subdir (expand-file-name subdir root))))
+           (mapcar (pcase-lambda (`(,root ,subdir))
+                     (cons (directory-file-name (concat (file-name-nondirectory root)
+                                                        subdir))
+                           (concat root subdir)))
                    (seq-partition (split-string (buffer-string)
                                                 "[\n\t]" t)
                                   2)))))
