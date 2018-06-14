@@ -2,11 +2,12 @@
 
 ;;; Common
 
-(defvar my-c-outline-section-regexp "//\\( [^ ].*[^.]\n//\n\\|[[:punct:]]\\)"
+(defvar my-c-outline-section-regexp
+  "//+\\( +[^[:space:]].*\n//\n\n\\|[^/[:alnum:][:blank:]\n\^M]\\)"
   "Regexp to match the beginning of a major section.")
 
 (defvar my-c-outline-heading-regexp
-  "[^}/ \t\n\^M]\\|[ \t]+[^} \t\n\^M]\\|//+.*[^/\t \n\^M]"
+  "[^}/ \t\n\^M]\\|[ \t]+\\([^} \t\n\^M]\\|}[ \t]*[^/\t \n\^M]\\)\\|//+.*[^/\t \n\^M]"
   "Regexp to match the beginning of a heading.")
 
 (defun my-c-outline-level ()
