@@ -1,8 +1,37 @@
 (set-keymap-parent c-mode-base-map prog-mode-map)
 
-;;
-;; C
-;;
+;;; Common
+
+(defvar my-c-outline-section-regexp "//\\( [^ ].*[^.]\n//\n\\|[[:punct:]]\\)"
+  "Regexp to match the beginning of a major section.")
+
+(defvar my-c-outline-heading-regexp
+  "[^}/ \t\n\^M]\\|[ \t]+[^} \t\n\^M]\\|//+.*[^/\t \n\^M]"
+  "Regexp to match the beginning of a heading.")
+
+(defun my-c-outline-level ()
+  "Return heading level for Outline minor mode in C modes."
+  (let (buffer-invisibility-spec)
+    (cond ((looking-at my-c-outline-section-regexp) 1)
+          ((looking-at "//+ ")
+           (let ((prefix-length (length (match-string 0))))
+             (+ 2 (save-excursion
+                    (forward-char prefix-length)
+                    (skip-chars-forward "\t ")
+                    (- (current-column) prefix-length)))))
+          (t (+ 2 (save-excursion
+                    (skip-chars-forward "\t ")
+                    (current-column)))))))
+
+(defun my-c-common-init--outline (&optional mode)
+  "Tweak configuration for Outline minor mode."
+  (setq outline-regexp (concat my-c-outline-section-regexp
+                               "\\|"
+                               my-c-outline-heading-regexp))
+  (setq outline-level #'my-c-outline-level))
+(advice-add 'c-common-init :after #'my-c-common-init--outline)
+
+;;; C
 
 (defun my-c-hook ()
   "My hook for C mode."
@@ -19,9 +48,7 @@
 (define-key c-mode-map (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
 (define-key c-mode-map [remap indent-region] #'clang-format-region)
 
-;;
-;; C++
-;;
+;;; C++
 
 (defun my-c++-lineup-lambda (langelem)
   "Line up a C++ lambda argument."
