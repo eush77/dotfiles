@@ -29,15 +29,49 @@ See `org-agenda-tag-filter-preset'."
     (user-error "Invalid value for a context filter"))
   (set-default symbol value))
 
-(defun my-org-todo-list--context-filter (func &rest args)
-  "Filter contexts according to `my-org-agenda-context-filter'
-in the `org-todo-list' agenda view."
+;;;###autoload
+(defcustom my-org-agenda-todo-keyword-filter nil
+  "TODO keyword filter to apply in the `org-todo-list' agenda view.
+
+See `org-agenda-regexp-filter-preset'."
+  :type '(repeat string)
+  :set #'my-org-agenda-todo-keyword-filter--set
+  :group 'my)
+
+(defun my-org-agenda-todo-keyword-filter--set (symbol value)
+  "Set VALUE as a TODO keyword filter."
+  (unless
+      (seq-every-p
+       (lambda (str) (string-match "^[+-][[:alnum:]]+$" str))
+       value)
+    (user-error "Invalid value for a TODO keyword filter"))
+  (set-default symbol value))
+
+(defun my-org-agenda-todo-keyword-filter-to-regexp-filter (filter)
+  "Turn TODO keyword filter FILTER into a regexp filter.
+
+See `org-agenda-regexp-filter-preset'."
+  (mapcar (lambda (el)
+            (string-match "^\\([+-]\\)\\(.*\\)$" el)
+            (concat (match-string 1 el) "^" (match-string 2 el) " "))
+          filter))
+
+(defun my-org-todo-list--filters (func &rest args)
+  "Apply context [1] and TODO keyword [2] filters in the
+`org-todo-list' agenda view.
+
+\[1]: `my-org-agenda-context-filter'
+\[2]: `my-org-agenda-todo-keyword-filter'"
   (let ((org-agenda-tag-filter-preset
          (append my-org-agenda-context-filter
-                 org-agenda-tag-filter-preset)))
+                 org-agenda-tag-filter-preset))
+        (org-agenda-regexp-filter-preset
+         (append (my-org-agenda-todo-keyword-filter-to-regexp-filter
+                  my-org-agenda-todo-keyword-filter)
+                 org-agenda-regexp-filter-preset)))
     (apply func args)))
 (with-eval-after-load "org-agenda"
-  (advice-add 'org-todo-list :around #'my-org-todo-list--context-filter))
+  (advice-add 'org-todo-list :around #'my-org-todo-list--filters))
 
 ;;;###autoload
 (defcustom my-org-plan-directory "~/org/plan"
