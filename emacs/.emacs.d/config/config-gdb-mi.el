@@ -1,8 +1,7 @@
 ;;; -*- lexical-binding: t -*-
-
 (require 'gdb-mi)
 
-(custom-set gdb-many-windows t)
+;;; Locals buffer
 
 ;;;###autoload
 (defcustom my-gdb-locals-max-type-length 30
@@ -38,12 +37,18 @@ readable."
 (advice-add 'gdb-locals-handler-custom
             :around #'my-gdb-locals-handler-custom--add-row)
 
+;;; Windows
+
+(custom-set gdb-many-windows t)
+
 (defun my-gdb-setup-windows--dedicate-comint-window ()
   "Make GUD Comint window dedicated so that `display-buffer'
 won't use it for source buffers."
   (set-window-dedicated-p (get-buffer-window gud-comint-buffer) t))
 (advice-add 'gdb-setup-windows
             :after #'my-gdb-setup-windows--dedicate-comint-window)
+
+;;; Commands
 
 (defun my-gdb-eval-in-comint-buffer ()
   "Switch to Gdb Comint buffer and clear the input line."
@@ -85,6 +90,8 @@ current frame."
   (interactive)
   (switch-to-buffer (gdb-get-buffer 'gdb-stack-buffer)))
 
+;;; Hook
+
 (defun my-gdb-mode-hook ()
   "My hook for GDB-MI mode."
   (gud-def my-gud-reverse-cont
@@ -104,6 +111,8 @@ current frame."
            nil
            "Step one source line backwards with display."))
 (add-hook 'gdb-mode-hook #'my-gdb-mode-hook)
+
+;;; Keymap
 
 (define-key gdb-frames-mode-map (kbd "c") #'gud-cont)
 (define-key gdb-frames-mode-map (kbd "C") #'my-gud-reverse-cont)
@@ -125,6 +134,8 @@ current frame."
       (my-gdb-select-frame num))))
 
 (define-key gud-mode-map (kbd "C-c s") #'my-gdb-switch-to-stack-buffer)
+
+;;; rr-gdb
 
 ;;;###autoload
 (defcustom my-rr-replay-buffer-name "*rr replay*"
