@@ -1,18 +1,23 @@
+;;; Notify method
+
 (custom-set Man-notify-method 'aggressive)
+
+(defun my-man--pushy-from-man (func &rest args)
+  "Use `pushy' as `Man-notify-method' if called from a Man
+buffer."
+  (if (eq major-mode 'Man-mode)
+      (let ((Man-notify-method 'pushy))
+        (apply func args))
+    (apply func args)))
+(advice-add 'man :around #'my-man--pushy-from-man)
+
+;;; Switches
+
 (custom-set Man-switches "-a")
-
-;;; Commands
-
-(defun my-man-pushy ()
-  "Like `man', but with `Man-notify-method' set to `pushy'."
-  (interactive)
-  (let ((Man-notify-method 'pushy))
-    (call-interactively #'man)))
 
 ;;; Keymap
 
 (define-key Man-mode-map (kbd "j") #'scroll-up-line)
 (define-key Man-mode-map (kbd "k") #'scroll-down-line)
 (define-key Man-mode-map (kbd "l") #'recenter-top-bottom)
-(define-key Man-mode-map (kbd "m") #'my-man-pushy)
 (define-key Man-mode-map (kbd "q") #'Man-kill)
