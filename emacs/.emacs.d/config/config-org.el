@@ -13,7 +13,6 @@
                 (my-org-agenda-planned-view "Life.org"))
                ((org-agenda-prefix-format "  ")))))
 (custom-set org-agenda-span 'fortnight)
-(custom-set org-agenda-todo-list-sublevels nil)
 
 ;;;###autoload
 (defcustom my-org-agenda-context-filter nil
