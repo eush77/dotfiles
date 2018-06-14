@@ -41,12 +41,31 @@ direction. The meaning of COUNT is inverted."
   (interactive "p")
   (my-outline-show-next-subtree (- count)))
 
+(defun my-outline-overlay-start (point)
+  "Return the start of an invisible overlay."
+  (seq-min (mapcar
+            #'overlay-start
+            (seq-filter (lambda (ov) (overlay-get ov 'invisible))
+                        (overlays-at point)))))
+
 (defun my-outline-subtree-invisible-p ()
   "Non-nil if the subtree at point is (partially) invisible."
-  (let ((end (save-excursion
-               (condition-case nil
-                   (progn (outline-forward-same-level 1) (point))
-                 (error (point-max))))))
+  (let* ((end (save-excursion
+                (or (progn (condition-case nil
+                               (outline-forward-same-level 1)
+                             (error (outline-get-next-sibling)))
+                           (when (equal (char-before) ?\n)
+                             (backward-char))
+                           ;; Skip back a top-level overlay.
+                           (when (outline-invisible-p (1- (point)))
+                             (let ((ov-start
+                                    (my-outline-overlay-start (1- (point)))))
+                               (when (zerop
+                                      (save-excursion (goto-char ov-start)
+                                                      (current-column)))
+                                 (goto-char ov-start))))
+                           (point))
+                    (point-max)))))
     (seq-some (lambda (ov) (overlay-get ov 'invisible))
               (overlays-in (point) end))))
 
