@@ -228,6 +228,14 @@ Returns the absolute file name of the selected trace directory."
           executable
         (user-error "File is not executable")))))
 
+(defun my-gdb-setup-windows--rr ()
+  "Display rr replay buffer in place of the IO buffer."
+  (gdb-set-window-buffer my-rr-replay-buffer-name
+                         t
+                         (get-buffer-window (gdb-get-buffer-create
+                                             'gdb-inferior-io))))
+(advice-add 'gdb-setup-windows :after #'my-gdb-setup-windows--rr)
+
 ;;;###autoload
 (defun my-rr-gdb (trace-dir)
   "Debug rr trace in `gdb'."
@@ -244,13 +252,6 @@ Returns the absolute file name of the selected trace directory."
                  "rr" "replay"
                  "-s" (number-to-string my-rr-replay-port)
                  trace-dir)
-
-  ;; Display replay buffer in place of the IO buffer.
-  (gdb-wait-for-pending
-   (gdb-set-window-buffer my-rr-replay-buffer-name
-                          t
-                          (get-buffer-window (gdb-get-buffer-create
-                                              'gdb-inferior-io))))
 
   ;; Connect to the rr remote.
   (gdb-input "-gdb-set sysroot /" 'ignore)
