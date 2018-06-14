@@ -88,6 +88,7 @@
                   mapconcat
                   nthcdr
                   prin1-to-string
+                  remove
                   seq-concatenate
                   seq-contains
                   seq-count
