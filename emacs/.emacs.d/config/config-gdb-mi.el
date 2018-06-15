@@ -230,10 +230,11 @@ Returns the absolute file name of the selected trace directory."
 
 (defun my-gdb-setup-windows--rr ()
   "Display rr replay buffer in place of the IO buffer."
-  (gdb-set-window-buffer my-rr-replay-buffer-name
-                         t
-                         (get-buffer-window (gdb-get-buffer-create
-                                             'gdb-inferior-io))))
+  (when (get-buffer-process my-rr-replay-buffer-name)
+    (gdb-set-window-buffer my-rr-replay-buffer-name
+                           t
+                           (get-buffer-window (gdb-get-buffer-create
+                                               'gdb-inferior-io)))))
 (advice-add 'gdb-setup-windows :after #'my-gdb-setup-windows--rr)
 
 ;;;###autoload
