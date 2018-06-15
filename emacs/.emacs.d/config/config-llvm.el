@@ -77,7 +77,8 @@ files."
                       (concat "^/" (regexp-quote
                                     (file-name-nondirectory dir)))
                       "\\&Gen"
-                      base)
+                      base
+                      t)
                      ".inc")))
       ((pred (string= ".gen")) (list (concat dir base ".td")))
       ((pred (string= ".inc"))
@@ -86,5 +87,6 @@ files."
                       (format "^\\(/%s\\)Gen"
                               (regexp-quote (file-name-nondirectory dir)))
                       "\\1"
-                      base)
+                      base
+                      t)
                      ".td"))))))
