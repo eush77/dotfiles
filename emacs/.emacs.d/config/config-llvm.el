@@ -66,9 +66,17 @@ files."
         (ext (match-string 4 file)))
     (pcase ext
       ((pred (string= ".cpp")) (list (concat dir base ".h")
-                                     (concat dir ".h")))
+                                     (concat dir ".h")
+                                     (concat (file-name-directory dir)
+                                             "Target"
+                                             base
+                                             ".h")))
       ((pred (string= ".h")) (list (concat dir base ".cpp")
-                                   (concat dir base base ".cpp")))
+                                   (concat dir base base ".cpp")
+                                   (concat (file-name-directory dir)
+                                           "CodeGen"
+                                           base
+                                           ".cpp")))
       ((pred (string= ".td"))
        (list (concat dir base ".gen")
              ;; Target TableGen descriptions
