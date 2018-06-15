@@ -46,7 +46,7 @@
     (setq tablegen-mode-map (make-sparse-keymap)))
 
   (define-key tablegen-mode-map [remap indent-region] #'clang-format-region)
-  (key-chord-define tablegen-mode-map "xw" #'ff-find-other-file)
+  (key-chord-define tablegen-mode-map "xw" #'ff-get-other-file)
 
   (with-eval-after-load "smartparens"
     (sp-local-pair 'tablegen-mode "<" ">")))
