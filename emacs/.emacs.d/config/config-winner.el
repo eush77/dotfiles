@@ -5,4 +5,4 @@
   "Winner"
   ("p" winner-undo "undo")
   ("n" winner-redo "redo")
-  ("RET" nil))
+  ("<return>" nil))

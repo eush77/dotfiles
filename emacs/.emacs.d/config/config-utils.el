@@ -207,7 +207,7 @@ File in %s(my-quote-text-string
              (file-name-directory (buffer-file-name))))): "
   ("p" my-find-previous-file "previous")
   ("n" my-find-next-file "next")
-  ("RET" nil))
+  ("<return>" nil))
 
 ;;; Frame switching
 
