@@ -31,6 +31,8 @@
   (setq outline-level #'my-c-outline-level))
 (advice-add 'c-common-init :after #'my-c-common-init--outline)
 
+(key-chord-define c-mode-base-map "xw" #'ff-find-other-file)
+
 ;;; C
 
 (defun my-c-hook ()
