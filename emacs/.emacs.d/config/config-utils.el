@@ -197,17 +197,18 @@ currently visited file."
 
 ;;;###autoload (autoload 'my-find-next-file-hydra/my-find-next-file "config-utils")
 ;;;###autoload (autoload 'my-find-next-file-hydra/my-find-previous-file "config-utils")
-(defhydra my-find-next-file-hydra (:pre (unless (buffer-file-name)
-                                          (hydra-disable)
-                                          (user-error "No visited file")))
-  "
+(eval `(defhydra my-find-next-file-hydra
+         (:pre (unless (buffer-file-name)
+                 (hydra-disable)
+                 (user-error "No visited file")))
+         "
 File in %s(my-quote-text-string
            (file-name-nondirectory
             (directory-file-name
              (file-name-directory (buffer-file-name))))): "
-  ("p" my-find-previous-file "previous")
-  ("n" my-find-next-file "next")
-  ("<return>" nil))
+         ("p" my-find-previous-file "previous")
+         ("n" my-find-next-file "next")
+         (,(if window-system "<return>" "RET") nil)))
 
 ;;; Frame switching
 
