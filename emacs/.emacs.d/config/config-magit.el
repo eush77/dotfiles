@@ -5,7 +5,7 @@
 
   (let ((show-and-move
          (lambda (move-next)
-           (when (not (magit-section-hidden (magit-current-section)))
+           (when (not (oref (magit-current-section) hidden))
              (magit-section-hide (magit-current-section))
              (funcall move-next))
            (magit-section-show (magit-current-section)))))
