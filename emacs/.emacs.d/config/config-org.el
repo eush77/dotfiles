@@ -211,6 +211,34 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (custom-set org-global-properties '(("EFFORT_ALL" . "0:10 0:30 1:00 2:00")))
 
+;;; ff-get-other-file
+
+(defun my-org-ff-other-file (file)
+  "`ff-other-file-alist' function for Org files.
+
+Returns the archive location for the current file, or the file
+from which entries were archived into the current file last."
+  (when-let ((buffer (get-file-buffer file)))
+    (with-current-buffer buffer
+      (let ((archive-file (org-extract-archive-file)))
+        (if (file-exists-p archive-file)
+            (list archive-file)
+          (save-excursion
+            (goto-char (point-max))
+            (unless (search-backward-regexp
+                     "^ *:ARCHIVE_FILE: *\\([^ ].*\\)$"
+                     nil
+                     t)
+              (user-error "No other file"))
+            (list (match-string 1))))))))
+
+(defun my-org-ff-other-file-setup ()
+  "Setup for `ff-get-other-file'."
+  (setq-local ff-search-directories '("/"))
+  (setq-local ff-other-file-alist
+              '(("\\.org\\'" my-org-ff-other-file))))
+(add-hook 'org-mode-hook #'my-org-ff-other-file-setup)
+
 ;;; Finding files
 
 ;;;###autoload
@@ -340,6 +368,7 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
+(key-chord-define org-mode-map "xw" #'ff-get-other-file)
 
 (with-eval-after-load "org-agenda"
   (define-key org-agenda-mode-map (kbd "C-c C-j")
