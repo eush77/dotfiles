@@ -46,7 +46,6 @@ end of a sexp, scan backward and upward."
     (goto-char (sp-get sexp :end))
     (newline-and-indent)
     (yank)
-    (sp-backward-sexp)
     (setq kill-ring saved-kill-ring)))
 
 (defun my-sp-backward-duplicate-sexp ()
