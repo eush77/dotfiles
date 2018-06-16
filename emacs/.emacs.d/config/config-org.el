@@ -310,8 +310,10 @@ truncated."
 
 ;;; Refiling
 
-(custom-set org-refile-targets
-            '((org-files-list :maxlevel . 2)))
+(custom-set org-refile-targets '((org-files-list :maxlevel . 2)))
+(custom-set org-refile-allow-creating-parent-nodes t)
+(custom-set org-refile-use-outline-path 'file)
+(custom-set org-outline-path-complete-in-steps nil)
 
 ;;; Todo
 
