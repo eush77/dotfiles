@@ -1,7 +1,34 @@
 ;;; -*- lexical-binding: t -*-
 (require 'eshell-z)
 
+;;; Basic setup
+
 (custom-set eshell-prefer-lisp-functions t)
+(custom-set eshell-ls-initial-args '("--classify"
+                                     "--color=auto"
+                                     "--group-directories-first"
+                                     "-v"))
+
+;; Advice `eshell-dirs-substitute-cd' to list directory contents.
+(defun eshell-dirs-substitute-cd--ls (func &rest args)
+  "List directory contents after executing it in the command position.
+
+Like setting `eshell-list-files-after-cd', but applies only when
+`eshell/cd' is called implicitly. It also works correctly when
+`eshell/ls' launches an external process (in which case
+`eshell-list-files-after-cd' would show its output after the
+prompt)."
+  (let* ((cd (catch 'eshell-replace-command (apply func args)))
+         ;; The resulting command will be destructively modified by Eshell,
+         ;; so don't `quote' it.
+         (cd+ls (list 'progn
+                      (list 'eshell-commands cd)
+                      (list 'eshell-named-command "ls"))))
+    (throw 'eshell-replace-command cd+ls)))
+(advice-add 'eshell-dirs-substitute-cd
+            :around #'eshell-dirs-substitute-cd--ls)
+
+;;; Prompt
 
 ;; My Eshell prompt has a fixed length.
 ;;
@@ -217,45 +244,30 @@ including the sigil."
      prompt)
     prompt))
 
-(defun my-eshell-insert-sudo ()
-  "Prefix current command with prefix."
-  (interactive)
-  (eshell-bol)
-  (insert "sudo "))
-
 ;; Set up the prompt.
 ;; It is already propertized, so turn off built-in highlighting.
 (custom-set eshell-highlight-prompt nil)
 (custom-set eshell-prompt-function #'my-eshell-prompt-function)
 (custom-set eshell-prompt-regexp "^[^#$]* [#$][[:digit:]]* ")
 
-;; Set up `emacs/ls'.
-(custom-set eshell-ls-initial-args '("--classify"
-                                     "--color=auto"
-                                     "--group-directories-first"
-                                     "-v"))
+;;; Commands
 
-;; Advice `eshell-dirs-substitute-cd' to list directory contents.
-(defun eshell-dirs-substitute-cd--ls (func &rest args)
-  "List directory contents after executing it in the command position.
+(defun my-eshell-insert-sudo ()
+  "Prefix current command with prefix."
+  (interactive)
+  (eshell-bol)
+  (insert "sudo "))
 
-Like setting `eshell-list-files-after-cd', but applies only when
-`eshell/cd' is called implicitly. It also works correctly when
-`eshell/ls' launches an external process (in which case
-`eshell-list-files-after-cd' would show its output after the
-prompt)."
-  (let* ((cd (catch 'eshell-replace-command (apply func args)))
-         ;; The resulting command will be destructively modified by Eshell,
-         ;; so don't `quote' it.
-         (cd+ls (list 'progn
-                      (list 'eshell-commands cd)
-                      (list 'eshell-named-command "ls"))))
-    (throw 'eshell-replace-command cd+ls)))
-(advice-add 'eshell-dirs-substitute-cd
-            :around #'eshell-dirs-substitute-cd--ls)
+(defun eshell/gdb ()
+  "Debug previous command in `gdb'."
+  (gdb (concat "gdb -i=mi -cd "
+               default-directory
+               " --args " (eshell-previous-input-string 1))))
 
-;; Set up key bindings.
-;; `eshell-mode-map' is local to the buffer, so do it in a hook.
+;;; Keymap
+
+;; `eshell-mode-map' is local to the buffer, so set up key bindings in a hook.
+
 (defun my-eshell-mode-hook ()
   "My hook for Eshell mode."
   (define-key eshell-mode-map (kbd "C-c C-h") #'counsel-esh-history)
@@ -263,9 +275,3 @@ prompt)."
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))
 (add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
-
-(defun eshell/gdb ()
-  "Debug previous command in `gdb'."
-  (gdb (concat "gdb -i=mi -cd "
-               default-directory
-               " --args " (eshell-previous-input-string 1))))
