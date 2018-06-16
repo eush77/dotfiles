@@ -66,3 +66,9 @@ If called with a prefix argument, call `counsel-org-goto-all'."
   (if arg
       (counsel-org-goto-all)
     (counsel-org-goto)))
+
+(defun my-counsel-org-goto-action--push-mark (&rest args)
+  "`push-mark' before jumping to location."
+  (push-mark))
+(advice-add 'counsel-org-goto-action
+            :before #'my-counsel-org-goto-action--push-mark)
