@@ -218,6 +218,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 Returns the archive location for the current file, or the file
 from which entries were archived into the current file last."
+  (require 'org-archive)
   (when-let ((buffer (get-file-buffer file)))
     (with-current-buffer buffer
       (let ((archive-file (org-extract-archive-file)))
