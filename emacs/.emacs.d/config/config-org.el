@@ -195,6 +195,17 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (custom-set org-columns-default-format
             "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
+(custom-set org-columns-summary-types '(("!min" . my-org-timestamp-summarize-min)))
+
+(defun my-org-timestamp-summarize-min (timestamps &optional format)
+  "Summarize TIMESTAMPS by returning the minimum."
+  (seq-reduce (lambda (left right)
+                (cond ((string-empty-p left) right)
+                      ((time-less-p (org-time-string-to-time left)
+                                    (org-time-string-to-time right)) left)
+                      (t right)))
+              timestamps
+              ""))
 
 ;;; Effort
 
