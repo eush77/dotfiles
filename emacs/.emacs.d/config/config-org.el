@@ -371,6 +371,12 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 (key-chord-define org-mode-map "xw" #'ff-get-other-file)
 
+(defhydra my-org-mark-subtree-hydra ()
+  "Mark subtree"
+  ("@" org-mark-subtree))
+(define-key org-mode-map [remap org-mark-subtree]
+  #'my-org-mark-subtree-hydra/org-mark-subtree)
+
 (with-eval-after-load "org-agenda"
   (define-key org-agenda-mode-map (kbd "C-c C-j")
     #'counsel-org-agenda-headlines))
