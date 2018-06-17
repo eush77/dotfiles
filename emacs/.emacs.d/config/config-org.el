@@ -358,6 +358,16 @@ If the new state is `DROP', drop the whole subtree."
 (advice-add 'org-todo
             :around #'my-org-todo--circumventing-blocking)
 
+;;; Visibility
+
+(defun my-org-cycle (arg)
+  "With single prefix argument ARG, call
+`my-outline-cycle-entry'. Otherwise call `org-cycle'."
+  (interactive "P")
+  (if (equal arg '(4))
+      (my-outline-cycle-entry)
+    (org-cycle arg)))
+
 ;;; Keymap
 
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
@@ -370,6 +380,7 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
+(define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 (key-chord-define org-mode-map "xw" #'ff-get-other-file)
 
