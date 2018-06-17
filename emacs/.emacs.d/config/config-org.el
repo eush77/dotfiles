@@ -297,6 +297,10 @@ truncated."
 (advice-add 'window-text-width
             :filter-return #'my-window-text-width--org-tty)
 
+;;; Lists
+
+(custom-set org-list-allow-alphabetical t)
+
 ;;; Logbook
 
 (custom-set org-log-done 'time)
