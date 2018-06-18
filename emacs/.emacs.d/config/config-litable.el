@@ -77,6 +77,7 @@
                   =
                   >
                   >=
+                  alist-get
                   butlast
                   byte-to-string
                   char-width
