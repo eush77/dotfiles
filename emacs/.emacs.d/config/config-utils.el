@@ -102,12 +102,36 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
                                                        (integer :tag "Maximum Depth")))
   :group 'my)
 
+(defun my-unique-prefixes (lists)
+  "Return an alist mapping each list in LISTS to its minimum
+identifying prefix."
+  (seq-mapcat (pcase-lambda (`(,head . ,group))
+                (cond ((null head)
+                       (cl-assert (= (length group) 1)
+                                  t
+                                  "The lists are not unique")
+                       `((,(car group))))
+                      ((= (length group) 1) `((,(car group) ,head)))
+                      (t (mapcar (pcase-lambda (`(,list . ,prefix))
+                                   `((,head . ,list) ,head . ,prefix))
+                                 (my-unique-prefixes (mapcar #'cdr group))))))
+              (seq-group-by #'car lists)))
+
 ;;;###autoload
 (defun my-find-directory ()
   "Find a subdirectory of one of the directories in
 `my-find-directories'."
   (interactive)
-  (let ((subdirectories
+  (let* ((root-names
+          (mapcar (pcase-lambda (`(,dirs . ,prefix-dirs))
+                    (cons (mapconcat #'identity (reverse dirs) "/")
+                          (mapconcat #'identity (reverse prefix-dirs) "/")))
+                  (my-unique-prefixes
+                   (mapcar (pcase-lambda (`(,directory . _))
+                             (reverse (split-string
+                                       (expand-file-name directory) "/")))
+                           my-find-directories))))
+         (subdirectories
          (with-temp-buffer
            (mapc (pcase-lambda (`(,directory ,min-depth ,max-depth))
                    (let ((directory (expand-file-name directory)))
@@ -122,8 +146,9 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
                                    "-o" "-printf" "%H\t/%P\n" ")")))
                  my-find-directories)
            (mapcar (pcase-lambda (`(,root ,subdir))
-                     (cons (directory-file-name (concat (file-name-nondirectory root)
-                                                        subdir))
+                     (cons (directory-file-name (concat
+                                                 (cdr (assoc root root-names))
+                                                 subdir))
                            (concat root subdir)))
                    (seq-partition (split-string (buffer-string)
                                                 "[\n\t]" t)
