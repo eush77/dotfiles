@@ -5,4 +5,5 @@
          "Winner"
          ("p" winner-undo "undo")
          ("n" winner-redo "redo")
-         (,(if window-system "<return>" "RET") nil)))
+         (,(if window-system "<return>" "RET") nil)
+         ("q" nil nil)))
