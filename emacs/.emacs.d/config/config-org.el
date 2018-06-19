@@ -319,6 +319,22 @@ truncated."
 (custom-set org-refile-use-outline-path 'file)
 (custom-set org-outline-path-complete-in-steps nil)
 
+;;; Structure editing
+
+(defun my-org-shiftmetaleft--region (func &rest args)
+  "Promote headings in the active region."
+  (if (region-active-p)
+      (org-map-entries #'org-promote nil 'region)
+    (apply func args)))
+(advice-add 'org-shiftmetaleft :around #'my-org-shiftmetaleft--region)
+
+(defun my-org-shiftmetaright--region (func &rest args)
+  "Demote headings in the active region."
+  (if (region-active-p)
+      (org-map-entries #'org-demote nil 'region)
+    (apply func args)))
+(advice-add 'org-shiftmetaright :around #'my-org-shiftmetaright--region)
+
 ;;; Todo
 
 (custom-set org-todo-keywords
