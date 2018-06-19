@@ -335,30 +335,42 @@ Otherwise print the value in the echo area."
 ;;;###autoload
 (defhydra my-hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                               :foreign-keys run
+                              :hint nil
                               :post (deactivate-mark))
   "
+
+^Mark         ^ | ^^Insert          ^^ | ^^Replace    ^^ | ^Kill Ring     ^ |
+^-------------^ | ^^----------------^^ | ^^-----------^^ | ^--------------^ | ^---------^
+_SPC_: set mark | _o__O_: open         | _d__D_: delete  | _M-w_: copy      | _q_: cancel
+  _x_: exchange | _n__N_: number lines | _c__C_: clear   | _C-w_: kill      |
+^             ^ | ^^                ^^ | _t__T_: type    | _C-y_: yank      |
 "
-  ("SPC" my-rectangle-set-mark "set mark" :column "Mark")
-  ("x" rectangle-exchange-point-and-mark "exchange")
+  ("SPC" my-rectangle-set-mark)
+  ("x" rectangle-exchange-point-and-mark)
 
-  ("o" open-rectangle "open" :column "Insert")
-  ("n" rectangle-number-lines "number lines")
+  ("o" open-rectangle)
+  ("O" open-rectangle :exit t)
+  ("n" rectangle-number-lines)
+  ("N" rectangle-number-lines :exit t)
 
-  ("d" delete-rectangle "delete" :column "Replace")
-  ("c" clear-rectangle "clear")
-  ("t" string-rectangle "type")
+  ("d" delete-rectangle)
+  ("D" delete-rectangle :exit t)
+  ("c" clear-rectangle)
+  ("C" clear-rectangle :exit t)
+  ("t" string-rectangle)
+  ("T" string-rectangle :exit t)
 
-  ("M-w" copy-rectangle-as-kill "copy" :column "Kill Ring")
-  ("C-w" kill-rectangle "kill")
-  ("C-y" yank-rectangle "yank")
+  ("M-w" copy-rectangle-as-kill)
+  ("C-w" kill-rectangle)
+  ("C-y" yank-rectangle)
 
-  ("q" nil "cancel" :column "")
+  ("q" nil)
 
-  ("C-@" my-rectangle-set-mark nil)
-  ("C-b" rectangle-backward-char nil)
-  ("C-f" rectangle-forward-char nil)
-  ("C-n" rectangle-next-line nil)
-  ("C-p" rectangle-previous-line nil))
+  ("C-@" my-rectangle-set-mark)
+  ("C-b" rectangle-backward-char)
+  ("C-f" rectangle-forward-char)
+  ("C-n" rectangle-next-line)
+  ("C-p" rectangle-previous-line))
 
 ;;; Virtual desktops
 
