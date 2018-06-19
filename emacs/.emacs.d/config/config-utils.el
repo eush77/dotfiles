@@ -134,19 +134,36 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
                                             t)
                  subdirectories)))))
 
+;;;###autoload
+(defcustom my-find-next-skipped-extensions completion-ignored-extensions
+  "List of extensions to skip over with `my-find-next-file' and
+`my-find-previous-file'.
+
+File names ending in any string in this list are skipped over,
+unless `buffer-file-name' would be skipped too.")
+
+(defun my-find-next-skipped-file-name-p (filename)
+  "True if FILENAME should be skipped according to
+`my-find-next-skipped-extensions'."
+  (seq-some (lambda (ext) (string-suffix-p ext filename))
+            my-find-next-skipped-extensions))
+
 (defun my-next-file-name (n &optional verbose)
   "Get the name of the Nth next file in the directory containing
 the currently visited file.
 
 If VERBOSE, message current position in the directory."
-  (unless (buffer-file-name)
+  (unless buffer-file-name
     (user-error "No visited file"))
   (let* ((forward-p (>= n 0))
-         (files (seq-filter #'file-regular-p
-                            (directory-files
-                             (file-name-directory (buffer-file-name)))))
+         (all-files (seq-filter #'file-regular-p
+                                (directory-files
+                                 (file-name-directory buffer-file-name))))
+         (files (if (my-find-next-skipped-file-name-p buffer-file-name)
+                    all-files
+                  (seq-remove #'my-find-next-skipped-file-name-p all-files)))
          (current-next-files (member
-                              (file-name-nondirectory (buffer-file-name))
+                              (file-name-nondirectory buffer-file-name)
                               (if forward-p files (reverse files))))
          (next-files (nthcdr (abs n) current-next-files)))
     (when verbose
