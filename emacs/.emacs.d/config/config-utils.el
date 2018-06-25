@@ -332,7 +332,7 @@ Otherwise print the value in the echo area."
       (deactivate-mark)
     (rectangle-mark-mode 1)))
 
-;;;###autoload
+;;;###autoload (autoload 'my-hydra-rectangle/body "config-utils")
 (defhydra my-hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                               :foreign-keys run
                               :hint nil
