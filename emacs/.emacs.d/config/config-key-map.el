@@ -177,11 +177,12 @@
 (global-set-key (kbd "C-M-n") #'window-jump-down)
 
 ;; Window sizing
-(global-set-key [remap enlarge-window] #'my-enlarge-window)
+(global-set-key [remap enlarge-window]
+                #'my-hydra-window-resize/my-enlarge-window)
 (global-set-key [remap enlarge-window-horizontally]
-                #'my-enlarge-window-horizontally)
+                #'my-hydra-window-resize/my-enlarge-window-horizontally)
 (global-set-key [remap shrink-window-horizontally]
-                #'my-shrink-window-horizontally)
+                #'my-hydra-window-resize/my-shrink-window-horizontally)
 
 ;; Winner
 (global-set-key (kbd "C-c w") #'my-winner-hydra/body)

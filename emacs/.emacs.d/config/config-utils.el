@@ -408,6 +408,14 @@ instead of 1."
   (enlarge-window delta))
 
 ;;;###autoload
+(defun my-shrink-window (delta)
+  "Like `shrink-window', but defaults to `my-window-size-delta'
+instead of 1."
+  (interactive "P")
+  (setq delta (or delta my-window-size-delta))
+  (shrink-window delta))
+
+;;;###autoload
 (defun my-enlarge-window-horizontally (delta)
   "Like `enlarge-window-horizontally', but defaults to
 `my-window-size-delta' instead of 1."
@@ -422,6 +430,21 @@ instead of 1."
   (interactive "P")
   (setq delta (or delta my-window-size-delta))
   (shrink-window-horizontally delta))
+
+;;;###autoload (autoload 'my-hydra-window-resize/my-enlarge-window "config-utils")
+;;;###autoload (autoload 'my-hydra-window-resize/my-shrink-window "config-utils")
+;;;###autoload (autoload 'my-hydra-window-resize/my-enlarge-window-horizontally "config-utils")
+;;;###autoload (autoload 'my-hydra-window-resize/my-shrink-window-horizontally "config-utils")
+(eval `(defhydra my-hydra-window-resize ()
+         "
+Resize window
+"
+         ("^" my-enlarge-window "enlarge" :column "Vertically")
+         ("v" my-shrink-window "shrink")
+         ("{" my-shrink-window-horizontally "enlarge" :column "Horizontally")
+         ("}" my-enlarge-window-horizontally "shrink")
+         (,(if window-system "<return>" "RET") nil "cancel" :column "")
+         ("q" nil nil)))
 
 ;;; Window splitting
 
