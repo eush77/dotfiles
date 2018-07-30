@@ -260,9 +260,11 @@ including the sigil."
 
 (defun eshell/gdb ()
   "Debug previous command in `gdb'."
-  (gdb (concat "gdb -i=mi -cd "
-               default-directory
-               " --args " (eshell-previous-input-string 1))))
+  (pcase-let* ((`(,program . ,args)
+                (split-string-and-unquote (eshell-previous-input-string 1)))
+               (cmd (combine-and-quote-strings
+                     (cons (executable-find program) args))))
+    (gdb (concat "gdb -i=mi -cd " default-directory " --args " cmd))))
 
 ;;; Keymap
 
