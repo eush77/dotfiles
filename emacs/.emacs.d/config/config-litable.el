@@ -1,5 +1,16 @@
 (custom-set litable-result-format "=> %s")
 
+;;; Customize display
+
+(advice-add 'litable--print-input :override #'list)
+
+(defun my-litable-find-function-subs-arguments--top-level-only
+    (form &optional depth)
+  (or (null depth) (zerop depth)))
+(advice-add 'litable-find-function-subs-arguments
+            :before-while
+            #'my-litable-find-function-subs-arguments--top-level-only)
+
 ;;; Remove impure functions
 
 (setq litable-pure-functions-list
