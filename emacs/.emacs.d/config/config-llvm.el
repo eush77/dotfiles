@@ -57,11 +57,12 @@
   "`ff-other-file-alist' function for LLVM source and generated
 files."
   (unless (string-match
-           (concat "/\\(include/llvm\\|lib\\)/\\(.*\\)\\(/[^/]+\\)"
+           (concat "^\\(.*/\\(?:include/llvm\\|lib\\)/\\)\\(.*\\)\\(/[^/]+\\)"
                    "\\(\\.cpp\\|\\.h\\|\\.td\\|\\.gen\\|\\.inc\\)$")
            file)
     (user-error "No other file"))
-  (let ((dir (match-string 2 file))
+  (let ((full-prefix (match-string 1 file))
+        (dir (match-string 2 file))
         (base (match-string 3 file))
         (ext (match-string 4 file)))
     (pcase ext
