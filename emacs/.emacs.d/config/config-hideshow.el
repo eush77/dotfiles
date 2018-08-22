@@ -69,6 +69,17 @@ Hideshow
 (with-eval-after-load "hideshow"
   (define-key hs-minor-mode-map (kbd "C-c @") #'my-hs-hydra/body))
 
+;;; CC mode integration
+
+(defun my-c-indent-command--hideshow (func &rest args)
+  "Cycle block on ineffective indentation."
+  (let ((point-before (point)))
+    (apply func args)
+    (when (and (= point-before (point))
+               (or (looking-back "{") (looking-at "{")))
+      (my-hs-cycle-block))))
+(advice-add 'c-indent-command :around #'my-c-indent-command--hideshow)
+
 ;;; Outline minor mode compat
 
 (defun my-outline-minor-mode--hideshow (arg)
