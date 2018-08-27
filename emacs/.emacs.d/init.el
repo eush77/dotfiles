@@ -150,6 +150,7 @@ and URL
 (with-eval-after-load "org-pomodoro" (load "config-org-pomodoro"))
 (with-eval-after-load "outline" (load "config-outline"))
 (with-eval-after-load "pocket-reader" (load "config-pocket-reader"))
+(with-eval-after-load "rst" (load "config-rst"))
 (with-eval-after-load "scroll-all" (load "config-scroll-all"))
 (with-eval-after-load "shr" (load "config-shr"))
 (with-eval-after-load "swap-buffers" (load "config-swap-buffers"))
