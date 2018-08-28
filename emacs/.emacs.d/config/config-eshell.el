@@ -262,8 +262,10 @@ including the sigil."
   "Debug previous command in `gdb'."
   (pcase-let* ((`(,program . ,args)
                 (split-string-and-unquote (eshell-previous-input-string 1)))
-               (cmd (combine-and-quote-strings
-                     (cons (executable-find program) args))))
+               (bin (if (file-executable-p program)
+                        (file-truename program)
+                      (executable-find program)))
+               (cmd (combine-and-quote-strings (cons bin args))))
     (gdb (concat "gdb -i=mi -cd " default-directory " --args " cmd))))
 
 ;;; Keymap
