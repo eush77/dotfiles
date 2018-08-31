@@ -44,6 +44,15 @@ is unchanged."
 (advice-add 'counsel-git-grep
             :filter-args #'my-counsel-git-grep--projects)
 
+(defun my-counsel-git-grep--region (args)
+  "Grep for an active region."
+  (if (region-active-p)
+      (list (car args)
+            (buffer-substring (mark) (point)))
+    args))
+(advice-add 'counsel-git-grep
+            :filter-args #'my-counsel-git-grep--region)
+
 (defun my-counsel-git-grep-count-func-default--projects (func &rest args)
   "Dynamically change `default-directory' to the Git root.
 
