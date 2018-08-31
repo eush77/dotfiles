@@ -80,6 +80,19 @@ Hideshow
       (my-hs-cycle-block))))
 (advice-add 'c-indent-command :around #'my-c-indent-command--hideshow)
 
+;;; Emacs Lisp mode integration
+
+(defun my-indent-for-tab-command--hideshow (func &rest args)
+  "Cycle block on ineffective indentation."
+  (let ((point-before (point)))
+    (apply func args)
+    (when (and (eq major-mode 'emacs-lisp-mode)
+               (= point-before (point))
+               (or (looking-back "(") (looking-at "(")))
+      (my-hs-cycle-block))))
+(advice-add 'indent-for-tab-command
+            :around #'my-indent-for-tab-command--hideshow)
+
 ;;; Outline minor mode compat
 
 (defun my-outline-minor-mode--hideshow (arg)
