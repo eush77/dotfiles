@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
 (require 'org-depend)
+(require 'subr-x)
 
 ;;; Agenda
 
@@ -377,6 +378,24 @@ If the new state is `DROP', drop the whole subtree."
     (funcall func arg)))
 (advice-add 'org-todo
             :around #'my-org-todo--circumventing-blocking)
+
+(defun my-org-todo--skip-wait (func arg)
+  "Skip `WAIT' state when cycling through."
+  (if-let ((next-state
+            (case arg
+              ((nil 'right) (cadr (member "WAIT"
+                                    (append org-todo-keywords-1
+                                            '("")))))
+              ('left (cadr (member "WAIT"
+                                   (reverse
+                                    (cons "" org-todo-keywords-1))))))))
+      (let ((org-todo-get-default-hook
+             (lambda (new-state _)
+               (when (string= new-state "WAIT")
+                 next-state))))
+        (funcall func arg))
+    (funcall func arg)))
+(advice-add 'org-todo :around #'my-org-todo--skip-wait)
 
 ;;; Visibility
 
