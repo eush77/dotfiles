@@ -57,7 +57,7 @@
   "`ff-other-file-alist' function for LLVM source and generated
 files."
   (unless (string-match
-           (concat "^\\(.*/\\(?:include/llvm\\|lib\\)/\\)\\(.*\\)\\(/[^/]+\\)"
+           (concat "^\\(.*/\\(?:include/\\(?:llvm\\|clang\\)\\|lib\\)/\\)\\(.*\\)\\(/[^/]+\\)"
                    "\\(\\.cpp\\|\\.h\\|\\.td\\|\\.gen\\|\\.inc\\)$")
            file)
     (user-error "No other file"))
