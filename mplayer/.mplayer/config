@@ -2,7 +2,12 @@ af=scaletempo
 vo=null
 
 [vo.fbdev2]
+ffactor=10
 quiet=yes
+sub-bg-alpha=1
+subfont-blur=0
+subfont-outline=8
+subpos=80
 zoom=yes
 
 [fs]
