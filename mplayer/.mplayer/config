@@ -2,6 +2,7 @@ af=scaletempo
 vo=null
 
 [vo.fbdev2]
+ass=yes
 ffactor=10
 quiet=yes
 sub-bg-alpha=1
