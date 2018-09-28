@@ -1,3 +1,5 @@
+(require 'org)
+
 (sml/setup)
 
 (custom-set mode-line-format '("%e"
@@ -27,9 +29,9 @@
 (custom-set sml/position-percentage-format "")
 (custom-set sml/prefix-face-list '(("" sml/prefix)))
 (custom-set sml/replacer-regexp-list
-            '(("^~/\\.emacs\\.d/elpa/" ":elpa:")
-              ("^~/Dropbox/notes/" ":notes:")
-              ("^~/Dropbox/org/" ":org:")
+            `(("^~/\\.emacs\\.d/elpa/" ":elpa:")
+              (,(concat "^" my-org-notes-directory "/") ":notes:")
+              (,(concat "^" org-directory "/") ":org:")
               ("^~/src/" ":src:")
               ("^:src:\\([^/]\\)[^/]*/" ":src/\\1:")
               ("^:src/\\(.\\):\\([^/]+\\)/" ":\\1/\\2:")))
