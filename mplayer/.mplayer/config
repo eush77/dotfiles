@@ -1,4 +1,5 @@
 af=scaletempo
+use-filedir-conf=yes
 vo=null
 
 [vo.fbdev2]
