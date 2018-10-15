@@ -24,6 +24,53 @@
       (hlt-unhighlight-region (region-beginning) (region-end))
     (my-hlt-unhighlight-line)))
 
+(defun my-hlt-get-highlights ()
+  "Get list of all highlights in the current buffer."
+  (let* (
+         ;; All highlight regions (represented as pairs) in reverse order
+         (hlt-regions
+          (seq-map (lambda (ov)
+                     (cons (overlay-start ov) (overlay-end ov)))
+                   (seq-sort-by #'overlay-start #'>
+                                (seq-filter (lambda (ov)
+                                              (eq (overlay-get ov 'face)
+                                                  'highlight))
+                                            (overlays-in (point-min)
+                                                         (point-max))))))
+         ;; Merge adjacent highlight regions
+         (hlt-regions
+          (seq-reduce
+           (lambda (hlts hlt)
+             (if (and hlts
+                      (or (= (cdr hlt) (caar hlts))
+                          (and (= (char-after (cdr hlt)) ?\n)
+                               (= (+ (cdr hlt) 1) (caar hlts)))))
+                 (cons (cons (car hlt) (cdar hlts))
+                       (cdr hlts))
+               (cons hlt hlts)))
+           hlt-regions
+           nil)))
+    (seq-map (lambda (hlt)
+               (buffer-substring-no-properties (car hlt) (cdr hlt)))
+             hlt-regions)))
+
+(defun my-hlt-list-highlights ()
+  "Display all highlights of the current buffer."
+  (interactive)
+  (let ((highlights (my-hlt-get-highlights)))
+    (with-current-buffer (get-buffer-create "*highlights*")
+      (setq buffer-read-only t)
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "q") #'quit-window)
+        (use-local-map map))
+
+      (let ((buffer-read-only nil))
+        (erase-buffer)
+        (insert (car highlights))
+        (seq-do (lambda (hlt) (insert "\n\n" hlt)) (cdr highlights)))
+
+      (display-buffer (current-buffer) '((display-buffer-same-window))))))
+
 ;;; Hydra
 
 (defvar my-hlt-highlight-hydra/mode 'move
@@ -108,6 +155,7 @@ highlights\"."
   (my-hlt-jump)
   (my-hlt-highlight-hydra/my-hlt-previous))
 
+(define-key hlt-map (kbd "l") #'my-hlt-list-highlights)
 (define-key hlt-map (kbd "n") #'my-hlt-jump-next)
 (define-key hlt-map (kbd "p") #'my-hlt-jump-previous)
 (define-key hlt-map (kbd "hh") #'my-hlt-highlight-hydra/my-hlt-highlight)
