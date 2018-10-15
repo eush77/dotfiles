@@ -1,4 +1,5 @@
 (require 'dired-x)                      ; Bind `dired-jump'
+(require 'highlight)                    ; Bind `hlt-map'
 (autoload 'swiper-multi "swiper" nil t)
 (autoload 'zap-up-to-char "misc" nil t)
 
