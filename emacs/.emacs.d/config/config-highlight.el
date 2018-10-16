@@ -25,39 +25,44 @@
     (my-hlt-unhighlight-line)))
 
 (defun my-hlt-get-highlights ()
-  "Get list of all highlights in the current buffer."
-  (let* (
+  "Get list of all `(start . end)' positions of highlights in the
+current buffer, in order. "
+  (let ((hlt-regions
          ;; All highlight regions (represented as pairs) in reverse order
-         (hlt-regions
-          (seq-map (lambda (ov)
-                     (cons (overlay-start ov) (overlay-end ov)))
-                   (seq-sort-by #'overlay-start #'>
-                                (seq-filter (lambda (ov)
-                                              (eq (overlay-get ov 'face)
-                                                  'highlight))
-                                            (overlays-in (point-min)
-                                                         (point-max))))))
-         ;; Merge adjacent highlight regions
-         (hlt-regions
-          (seq-reduce
-           (lambda (hlts hlt)
-             (if (and hlts
-                      (or (= (cdr hlt) (caar hlts))
-                          (and (= (char-after (cdr hlt)) ?\n)
-                               (= (+ (cdr hlt) 1) (caar hlts)))))
-                 (cons (cons (car hlt) (cdar hlts))
-                       (cdr hlts))
-               (cons hlt hlts)))
-           hlt-regions
-           nil)))
-    (seq-map (lambda (hlt)
-               (buffer-substring-no-properties (car hlt) (cdr hlt)))
-             hlt-regions)))
+         (seq-map (lambda (ov)
+                    (cons (overlay-start ov) (overlay-end ov)))
+                  (seq-sort-by #'overlay-start #'>
+                               (seq-filter (lambda (ov)
+                                             (eq (overlay-get ov 'face)
+                                                 'highlight))
+                                           (overlays-in (point-min)
+                                                        (point-max)))))))
+    ;; Merge adjacent highlight regions
+    (seq-reduce
+     (lambda (hlts hlt)
+       (if (and hlts
+                (or (= (cdr hlt) (caar hlts))
+                    (and (= (char-after (cdr hlt)) ?\n)
+                         (= (+ (cdr hlt) 1) (caar hlts)))))
+           (cons (cons (car hlt) (cdar hlts))
+                 (cdr hlts))
+         (cons hlt hlts)))
+     hlt-regions
+     nil)))
+
+(defun my-hlt-insert-highlight (buffer hlt)
+  "Insert highlight HLT from BUFFER."
+  (insert (with-current-buffer buffer
+            (buffer-substring-no-properties (car hlt) (cdr hlt)))))
 
 (defun my-hlt-list-highlights ()
   "Display all highlights of the current buffer."
   (interactive)
-  (let ((highlights (my-hlt-get-highlights)))
+  (let ((buffer (current-buffer))
+        (highlights (my-hlt-get-highlights))
+        (point (point))
+        ;; Point in the *highlights* buffer
+        (hlt-point))
     (with-current-buffer (get-buffer-create "*highlights*")
       (setq buffer-read-only t)
       (let ((map (make-sparse-keymap)))
@@ -66,9 +71,15 @@
 
       (let ((buffer-read-only nil))
         (erase-buffer)
-        (insert (car highlights))
-        (seq-do (lambda (hlt) (insert "\n\n" hlt)) (cdr highlights)))
+        (my-hlt-insert-highlight buffer (car highlights))
+        (seq-do (lambda (hlt)
+                  (insert "\n\n")
+                  (when (and (not hlt-point) (<= point (cdr hlt)))
+                    (setq hlt-point (point)))
+                  (my-hlt-insert-highlight buffer hlt))
+                (cdr highlights)))
 
+      (goto-char hlt-point)
       (display-buffer (current-buffer) '((display-buffer-same-window))))))
 
 ;;; Hydra
