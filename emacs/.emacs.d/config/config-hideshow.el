@@ -95,7 +95,7 @@ Hideshow
 
 ;;; Outline minor mode compat
 
-(defun my-outline-minor-mode--hideshow (arg)
+(defun my-outline-minor-mode--hideshow (&optional arg)
   "Disable `hs-minor-mode' while `outline-minor-mode' is
 enabled."
   (if arg
