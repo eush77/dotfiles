@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
+
 ;;; Commands
 
 (defun my-hlt-highlight-line ()
@@ -52,8 +54,30 @@ current buffer, in order. "
 
 (defun my-hlt-insert-highlight (buffer hlt)
   "Insert highlight HLT from BUFFER."
-  (insert (with-current-buffer buffer
-            (buffer-substring-no-properties (car hlt) (cdr hlt)))))
+  (let ((beg (point)))
+    (insert (with-current-buffer buffer
+              (format "%s:%d\n%s"
+                      (buffer-name)
+                      (line-number-at-pos (car hlt))
+                      (buffer-substring-no-properties (car hlt)
+                                                      (cdr hlt)))))
+    (save-excursion
+      (goto-char beg)
+      (make-text-button
+       (point) (line-beginning-position 2)
+       'invisible t
+       'help-echo (format "mouse-2, RET: Go to highlight at line %d"
+                          (line-number-at-pos (car hlt)))
+       'action (lambda (_btn)
+                 (set-buffer buffer)
+                 (goto-char (car hlt))
+                 (display-buffer buffer '((display-buffer-same-window))))))))
+
+(defun my-hlt-toggle-highlight-positions ()
+  "Hide or show highlight positions in the current *highlights* buffer."
+  (interactive)
+  (setq buffer-invisibility-spec (not buffer-invisibility-spec))
+  (redraw-frame))
 
 (defun my-hlt-list-highlights ()
   "Display all highlights of the current buffer."
@@ -66,6 +90,11 @@ current buffer, in order. "
     (with-current-buffer (get-buffer-create "*highlights*")
       (setq buffer-read-only t)
       (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "TAB") #'forward-button)
+        (define-key map (kbd "<backtab>") #'backward-button)
+        (define-key map (kbd "n") #'forward-button)
+        (define-key map (kbd "p") #'backward-button)
+        (define-key map (kbd "h") #'my-hlt-toggle-highlight-positions)
         (define-key map (kbd "q") #'quit-window)
         (use-local-map map))
 
