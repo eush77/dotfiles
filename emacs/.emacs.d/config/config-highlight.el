@@ -62,16 +62,21 @@ current buffer, in order. "
                       (buffer-substring-no-properties (car hlt)
                                                       (cdr hlt)))))
     (save-excursion
-      (goto-char beg)
-      (make-text-button
-       (point) (line-beginning-position 2)
-       'invisible t
-       'help-echo (format "mouse-2, RET: Go to highlight at line %d"
-                          (line-number-at-pos (car hlt)))
-       'action (lambda (_btn)
-                 (set-buffer buffer)
-                 (goto-char (car hlt))
-                 (display-buffer buffer '((display-buffer-same-window))))))))
+      ;; Create a marker to prevent highlight position from moving from under
+      ;; the highlights buffer.
+      (let ((hlt-marker (with-current-buffer buffer
+                          (copy-marker (car hlt)))))
+        (goto-char beg)
+        (make-text-button
+         (point) (line-beginning-position 2)
+         'invisible t
+         'help-echo (format "mouse-2, RET: Go to highlight at line %d"
+                            (with-current-buffer buffer
+                              (line-number-at-pos (marker-position hlt-marker))))
+         'action (lambda (_btn)
+                   (set-buffer buffer)
+                   (goto-char (marker-position hlt-marker))
+                   (display-buffer buffer '((display-buffer-same-window)))))))))
 
 (defun my-hlt-toggle-highlight-positions ()
   "Hide or show highlight positions in the current *highlights* buffer."
