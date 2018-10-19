@@ -79,6 +79,20 @@ current buffer, in order. "
   (setq buffer-invisibility-spec (not buffer-invisibility-spec))
   (redraw-frame))
 
+(defun my-hlt-highlights--filter-buffer-substring (begin end &optional _delete)
+  (let ((points))
+    (while (< begin end)
+      (push end points)
+      (setq end (previous-single-char-property-change end 'button)))
+    (unless (get-char-property begin 'button)
+      (push begin points))
+    (mapconcat (lambda (range)
+                 (if (= (length range) 2)
+                     (buffer-substring (car range) (cadr range))
+                   ""))
+               (seq-partition points 2)
+               "")))
+
 (defun my-hlt-list-highlights ()
   "Display all highlights of the current buffer."
   (interactive)
@@ -89,6 +103,7 @@ current buffer, in order. "
         (hlt-point))
     (with-current-buffer (get-buffer-create "*highlights*")
       (setq buffer-read-only t)
+
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "TAB") #'forward-button)
         (define-key map (kbd "<backtab>") #'backward-button)
@@ -97,6 +112,9 @@ current buffer, in order. "
         (define-key map (kbd "h") #'my-hlt-toggle-highlight-positions)
         (define-key map (kbd "q") #'quit-window)
         (use-local-map map))
+
+      (setq-local filter-buffer-substring-function
+                  #'my-hlt-highlights--filter-buffer-substring)
 
       (let ((buffer-read-only nil))
         (erase-buffer)
