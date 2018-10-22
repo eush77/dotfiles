@@ -22,3 +22,5 @@ buffer."
       (select-window compilation-window)))
   (recompile)
   (select-window (get-buffer-window compilation-last-buffer t)))
+
+(define-key compilation-mode-map (kbd "c") #'compile)
