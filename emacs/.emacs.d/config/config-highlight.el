@@ -201,6 +201,9 @@ current buffer, in order. "
   ("j" my-hlt-jump "jump")
   ("n" my-hlt-next "next")
   ("p" my-hlt-previous "previous")
+  ("j" scroll-up-line "scroll up")
+  ("k" scroll-down-line "scroll down")
+  ("l" my-hlt-list-highlights "list" :exit t)
   ("q" nil))
 
 ;;; Keymap
