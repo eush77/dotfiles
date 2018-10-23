@@ -138,62 +138,59 @@ current buffer, in order. "
 
 ;;; Hydra
 
-(defvar my-hlt-highlight-hydra/mode 'move
-  "State of `my-hlt-highlight-hydra/body':
+(defvar my-hlt-hydra/mode 'move
+  "State of `my-hlt-hydra/body':
   highlight - highlight lines
   unhighlight - unhighlight lines
   move - just move around
   jump - jump between highlights")
 
 (defun my-hlt-highlight--set-hydra-mode ()
-  "Set `my-hlt-highlight-hydra/mode'."
-  (setq my-hlt-highlight-hydra/mode 'highlight))
+  "Set `my-hlt-hydra/mode'."
+  (setq my-hlt-hydra/mode 'highlight))
 (advice-add 'my-hlt-highlight-line
             :after #'my-hlt-highlight--set-hydra-mode)
 
 (defun my-hlt-unhighlight--set-hydra-mode ()
-  "Set `my-hlt-highlight-hydra/mode'."
-  (setq my-hlt-highlight-hydra/mode 'unhighlight))
+  "Set `my-hlt-hydra/mode'."
+  (setq my-hlt-hydra/mode 'unhighlight))
 (advice-add 'my-hlt-unhighlight-line
             :after #'my-hlt-unhighlight--set-hydra-mode)
 
 (defun my-hlt-move ()
   (interactive)
-  "Set `my-hlt-highlight-hydra/mode' to \"just move around\"."
-  (setq my-hlt-highlight-hydra/mode 'move))
+  "Set `my-hlt-hydra/mode' to \"just move around\"."
+  (setq my-hlt-hydra/mode 'move))
 
 (defun my-hlt-jump ()
   (interactive)
-  "Set `my-hlt-highlight-hydra/mode' to \"jump between
-highlights\"."
-  (setq my-hlt-highlight-hydra/mode 'jump))
+  "Set `my-hlt-hydra/mode' to \"jump between highlights\"."
+  (setq my-hlt-hydra/mode 'jump))
 
 (defun my-hlt-next ()
-  "Move to the next line according to
-`my-hlt-highlight-hydra/mode'."
+  "Move to the next line according to `my-hlt-hydra/mode'."
   (interactive)
-  (if (eq my-hlt-highlight-hydra/mode 'jump)
+  (if (eq my-hlt-hydra/mode 'jump)
       (hlt-next-highlight)
     (forward-line))
-  (case my-hlt-highlight-hydra/mode
+  (case my-hlt-hydra/mode
     ('highlight (my-hlt-highlight))
     ('unhighlight (my-hlt-unhighlight))))
 
 (defun my-hlt-previous ()
-  "Move to the previous line according to
-`my-hlt-highlight-hydra/mode'."
+  "Move to the previous line according to `my-hlt-hydra/mode'."
   (interactive)
-  (if (eq my-hlt-highlight-hydra/mode 'jump)
+  (if (eq my-hlt-hydra/mode 'jump)
       (hlt-previous-highlight)
     (forward-line -1))
-  (case my-hlt-highlight-hydra/mode
+  (case my-hlt-hydra/mode
     ('highlight (my-hlt-highlight))
     ('unhighlight (my-hlt-unhighlight))))
 
-;;;###autoload (autoload 'my-hlt-highlight-hydra/body "config-highlight")
-(defhydra my-hlt-highlight-hydra (:foreign-keys run)
+;;;###autoload (autoload 'my-hlt-hydra/body "config-highlight")
+(defhydra my-hlt-hydra (:foreign-keys run)
   "
-%s(case my-hlt-highlight-hydra/mode
+%s(case my-hlt-hydra/mode
     ('highlight \"Highlight\")
     ('unhighlight \"Unhighlight\")
     ('move \"Move\")
@@ -212,18 +209,18 @@ highlights\"."
   "Jump to next highlight."
   (interactive)
   (my-hlt-jump)
-  (my-hlt-highlight-hydra/my-hlt-next))
+  (my-hlt-hydra/my-hlt-next))
 
 (defun my-hlt-jump-previous ()
   "Jump to previous highlight."
   (interactive)
   (my-hlt-jump)
-  (my-hlt-highlight-hydra/my-hlt-previous))
+  (my-hlt-hydra/my-hlt-previous))
 
 (define-key hlt-map (kbd "l") #'my-hlt-list-highlights)
 (define-key hlt-map (kbd "n") #'my-hlt-jump-next)
 (define-key hlt-map (kbd "p") #'my-hlt-jump-previous)
-(define-key hlt-map (kbd "hh") #'my-hlt-highlight-hydra/my-hlt-highlight)
+(define-key hlt-map (kbd "hh") #'my-hlt-hydra/my-hlt-highlight)
 (define-key hlt-map (kbd "hl") #'my-hlt-highlight-line)
-(define-key hlt-map (kbd "uu") #'my-hlt-highlight-hydra/my-hlt-unhighlight)
+(define-key hlt-map (kbd "uu") #'my-hlt-hydra/my-hlt-unhighlight)
 (define-key hlt-map (kbd "ul") #'my-hlt-unhighlight-line)
