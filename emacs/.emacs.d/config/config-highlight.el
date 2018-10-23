@@ -133,7 +133,8 @@ current buffer, in order. "
                   (my-hlt-insert-highlight buffer hlt))
                 (cdr highlights)))
 
-      (goto-char hlt-point)
+      (when hlt-point
+        (goto-char hlt-point))
       (display-buffer (current-buffer) '((display-buffer-same-window))))))
 
 ;;; Hydra
