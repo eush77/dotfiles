@@ -15,16 +15,18 @@
 (defun my-hlt-highlight ()
   "Highlight current line or active region."
   (interactive)
-  (if (region-active-p)
-      (hlt-highlight-region (region-beginning) (region-end))
-    (my-hlt-highlight-line)))
+  (if (not (region-active-p))
+      (my-hlt-highlight-line)
+    (hlt-highlight-region (region-beginning) (region-end))
+    (deactivate-mark)))
 
 (defun my-hlt-unhighlight ()
   "Unhighlight current line or active region."
   (interactive)
-  (if (region-active-p)
-      (hlt-unhighlight-region (region-beginning) (region-end))
-    (my-hlt-unhighlight-line)))
+  (if (not (region-active-p))
+      (my-hlt-unhighlight-line)
+    (hlt-unhighlight-region (region-beginning) (region-end))
+    (deactivate-mark)))
 
 (defun my-hlt-get-highlights ()
   "Get list of all `(start . end)' positions of highlights in the
@@ -146,13 +148,13 @@ current buffer, in order. "
 (defun my-hlt-highlight--set-hydra-mode ()
   "Set `my-hlt-highlight-hydra/mode'."
   (setq my-hlt-highlight-hydra/mode 'highlight))
-(advice-add 'my-hlt-highlight
+(advice-add 'my-hlt-highlight-line
             :after #'my-hlt-highlight--set-hydra-mode)
 
 (defun my-hlt-unhighlight--set-hydra-mode ()
   "Set `my-hlt-highlight-hydra/mode'."
   (setq my-hlt-highlight-hydra/mode 'unhighlight))
-(advice-add 'my-hlt-unhighlight
+(advice-add 'my-hlt-unhighlight-line
             :after #'my-hlt-unhighlight--set-hydra-mode)
 
 (defun my-hlt-move ()
