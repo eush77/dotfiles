@@ -65,6 +65,7 @@ and URL
 (add-to-list 'package-selected-packages 'dired-imenu)
 (add-to-list 'package-selected-packages 'dired-rsync)
 (add-to-list 'package-selected-packages 'direnv)
+(add-to-list 'package-selected-packages 'edit-indirect)
 (add-to-list 'package-selected-packages 'emms)
 (add-to-list 'package-selected-packages 'eshell-z)
 (add-to-list 'package-selected-packages 'expand-region)

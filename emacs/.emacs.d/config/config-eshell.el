@@ -268,6 +268,15 @@ including the sigil."
                (cmd (combine-and-quote-strings (cons bin args))))
     (gdb (concat "gdb -i=mi -cd " default-directory " --args " cmd))))
 
+(defun my-eshell-edit-indirect-output ()
+  "Edit the last output block output in a separate buffer with
+`edit-indirect-region'."
+  (interactive)
+  (let ((display-buffer-overriding-action '(display-buffer-same-window)))
+    (edit-indirect-region (eshell-beginning-of-output)
+                          (eshell-end-of-output)
+                          t)))
+
 ;;; Keymap
 
 ;; `eshell-mode-map' is local to the buffer, so set up key bindings in a hook.
@@ -277,5 +286,7 @@ including the sigil."
   (define-key eshell-mode-map (kbd "C-c C-h") #'counsel-esh-history)
   (define-key eshell-mode-map (kbd "C-c C-l") #'eshell/clear)
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
+  (define-key eshell-mode-map (kbd "C-c C-w")
+    #'my-eshell-edit-indirect-output)
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))
 (add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
