@@ -22,11 +22,15 @@
 
 ;;;###autoload
 (defun my-counsel-git-grep-at-point (&optional cmd)
-  "Grep for the symbol at point in the current Git repository.
+  "Grep for the symbol at point or active region in the current
+Git repository.
 
 See `counsel-git-grep'."
   (interactive "P")
-  (counsel-git-grep cmd (thing-at-point 'symbol)))
+  (if (region-active-p)
+      (counsel-git-grep cmd (buffer-substring (region-beginning)
+                                              (region-end)))
+    (counsel-git-grep cmd (thing-at-point 'symbol))))
 
 (defun my-counsel-git-grep--projects (args)
   "Use `counsel-git-grep-projects-alist' configuration when the
