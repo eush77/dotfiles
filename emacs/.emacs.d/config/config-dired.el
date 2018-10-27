@@ -49,16 +49,40 @@ the same window."
   :type 'directory
   :group 'my)
 
+(defun my-punct-delimited-prefixes (str)
+  "Given a string STR, return a list of all its
+punctuation-delimited prefixes, in order of decreasing length,
+including the original string."
+  (let ((prefixes)
+        (end (string-match "[[:punct:]]" str)))
+    (while end
+      (push (substring str 0 end) prefixes)
+      (setq end (string-match "[[:punct:]]" str (+ end 1))))
+    (cons str prefixes)))
+
+(defun my-dired-ff-expand-relative-name (file
+                                         source-directory
+                                         destination-directory)
+  "Extract relative file name of FILE in SOURCE-DIRECTORY and
+expand it in DESTINATION-DIRECTORY, returning a list of possible
+alternative names."
+  (let* ((filename (directory-file-name (file-relative-name file
+                                                            source-directory)))
+         (dirname (expand-file-name (file-name-directory filename)
+                                    destination-directory)))
+    (mapcar (lambda (basename) (expand-file-name basename dirname))
+            (my-punct-delimited-prefixes (file-name-nondirectory filename)))))
+
 (defun my-dired-ff-other-file (_)
   "`ff-other-file-alist' function for Dired."
   (cond ((file-in-directory-p default-directory my-build-directory)
-         (list (expand-file-name (file-relative-name default-directory
-                                                     my-build-directory)
-                                 my-src-directory)))
+         (my-dired-ff-expand-relative-name default-directory
+                                           my-build-directory
+                                           my-src-directory))
         ((file-in-directory-p default-directory my-src-directory)
-         (list (expand-file-name (file-relative-name default-directory
-                                                     my-src-directory)
-                                 my-build-directory)))))
+         (my-dired-ff-expand-relative-name default-directory
+                                           my-src-directory
+                                           my-build-directory))))
 
 (defun my-dired-ff-mode-hook ()
   (setq ff-other-file-alist '(("\\.none" my-dired-ff-other-file))
