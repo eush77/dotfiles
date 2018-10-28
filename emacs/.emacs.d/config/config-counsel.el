@@ -32,6 +32,17 @@ See `counsel-git-grep'."
                                               (region-end)))
     (counsel-git-grep cmd (thing-at-point 'symbol))))
 
+(defun my-counsel-git-grep-add-project (&rest directories)
+  "Add configuration for a project with DIRECTORIES to
+`counsel-git-grep-projects-alist'. When a new project is used,
+Git Grep will be limited to DIRECTORIES."
+  (let ((cmd (concat "git --no-pager "
+                     "grep --line-number --no-color --ignore-case "
+                     "-e \"%s\" -- "
+                     (mapconcat #'identity directories " "))))
+    (dolist (directory directories)
+      (push (cons directory cmd) counsel-git-grep-projects-alist))))
+
 (defun my-counsel-git-grep--projects (args)
   "Use `counsel-git-grep-projects-alist' configuration when the
 `default-directory' resides in a project. With a prefix argument,
