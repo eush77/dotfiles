@@ -66,7 +66,8 @@ files."
         (base (match-string 3 file))
         (ext (match-string 4 file)))
     (pcase ext
-      ((pred (string= ".cpp")) (list (concat dir base ".h")
+      ((pred (string= ".cpp")) (list (concat (substring base 1) ".h")
+                                     (concat dir base ".h")
                                      (concat dir ".h")
                                      (concat (file-name-directory dir)
                                              "Target"
