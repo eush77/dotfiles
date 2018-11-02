@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+;;; magit
+
 (with-eval-after-load "magit-mode"
   (custom-set git-commit-fill-column 72)
 
@@ -26,14 +28,46 @@ Otherwise hide it, and show the previous sibling section."
   (define-key magit-mode-map (kbd "M-N") #'my-magit-section-show-next)
   (define-key magit-mode-map (kbd "M-P") #'my-magit-section-show-previous))
 
+;;; magit-diff
+
 (with-eval-after-load "magit-diff"
   ;; `C-M-i' equals `M-TAB' on TTY.
   (define-key magit-revision-mode-map (kbd "C-M-i") #'magit-section-cycle))
+
+;;; magit-log
+
+;;;###autoload
+(defcustom my-magit-log-exclude-refs-regexp nil
+  "Regexp to filter out refs from `magit-log-all',
+`magit-log-branches', and `magit-log-all-branches'."
+  :type 'regexp
+  :group 'my)
+
+(defun my-magit-log--exclude-refs (func &optional args files)
+  "Exclude refs matching `my-magit-log-exclude-refs-regexp'."
+  (let ((excluded-refs
+         (when my-magit-log-exclude-refs-regexp
+           (seq-map (lambda (ref) (concat "^" ref))
+                    (seq-filter (lambda (ref)
+                                  (string-match-p
+                                   my-magit-log-exclude-refs-regexp
+                                   ref))
+                                (magit-list-refnames))))))
+    (funcall func (append excluded-refs args) files)))
+
+(with-eval-after-load "magit-log"
+  (advice-add 'magit-log-all :around #'my-magit-log--exclude-refs)
+  (advice-add 'magit-log-branches :around #'my-magit-log--exclude-refs)
+  (advice-add 'magit-log-all-branches :around #'my-magit-log--exclude-refs))
+
+;;; magit-status
 
 (with-eval-after-load "magit-status"
   ;; `C-M-i' equals `M-TAB' on TTY.
   (define-key magit-status-mode-map (kbd "G") #'magit-list-repositories)
   (define-key magit-status-mode-map (kbd "C-M-i") #'magit-section-cycle))
+
+;;; magit-rebase
 
 ;;; Add support for `drop' action in interactive rebase.
 (with-eval-after-load "git-rebase"
