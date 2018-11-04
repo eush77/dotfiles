@@ -12,7 +12,7 @@ minibuffer line."
   (if (and battery-echo-area-format battery-status-function)
       (let ((status (funcall battery-status-function)))
         (if (string= (cdr (assq ?L status)) "BAT")
-            (battery-format (concat battery-echo-area-format ", ")
+            (battery-format (concat "%L %B %p%% (%m min), ")
 		            (funcall battery-status-function))
           ""))
     ""))
