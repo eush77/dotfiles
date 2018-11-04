@@ -6,6 +6,17 @@
 
 (minibuffer-line-mode 1)
 
+(defun my-minibuffer-battery ()
+  "Format battery status information for display in the
+minibuffer line."
+  (if (and battery-echo-area-format battery-status-function)
+      (let ((status (funcall battery-status-function)))
+        (if (string= (cdr (assq ?L status)) "BAT")
+            (battery-format (concat battery-echo-area-format ", ")
+		            (funcall battery-status-function))
+          ""))
+    ""))
+
 (defun my-minibuffer-clock ()
   "Formats the current time to include in the minibuffer line.
 
@@ -21,6 +32,12 @@ to exact time.
                   (file-error (format-time-string "%R")))
                 'help-echo help-echo
                 'mouse-face 'highlight)))
+
+(defun my-format-minibuffer-battery (battery width)
+  "Format minibuffer battery info to the given width."
+  (if (< width (string-width battery))
+      (substring battery (- width))
+    battery))
 
 (defun my-format-minibuffer-clock (clock width)
   "Format minibuffer clock to the given width."
@@ -39,8 +56,13 @@ to exact time.
                             global-mode-string))
              " "))
 
+(defun my-mode-line-escape (mode-line)
+  "Escape literal mode line according to `mode-line-format'."
+  (replace-regexp-in-string "%" "%%" mode-line))
+
 (custom-set minibuffer-line-format
             '(:eval (let* ((globals (my-format-minibuffer-global-mode-string))
+                           (battery (my-minibuffer-battery))
                            (clock (my-minibuffer-clock))
                            (frame-width
                             (apply #'min
@@ -49,22 +71,35 @@ to exact time.
                            (space-width
                             (max 2 (- frame-width
                                       (string-width globals)
+                                      (string-width battery)
                                       (string-width clock))))
+                           (battery-width (max 0 (- frame-width
+                                                    (string-width globals)
+                                                    space-width
+                                                    (string-width clock))))
+                           (battery
+                            (my-format-minibuffer-battery battery
+                                                          battery-width))
                            (clock-width (max 0 (- frame-width
                                                   (string-width globals)
-                                                  space-width)))
+                                                  space-width
+                                                  (string-width battery))))
                            (clock (my-format-minibuffer-clock clock
                                                               clock-width))
                            (space-width
                             (max 2 (- frame-width
                                       (string-width globals)
+                                      (string-width battery)
                                       (string-width clock))))
                            (globals-width (- frame-width
                                              space-width
+                                             (string-width battery)
                                              (string-width clock))))
-                      (concat (substring globals 0 globals-width)
-                              (make-string space-width ? )
-                              clock))))
+                      (my-mode-line-escape
+                       (concat (substring globals 0 globals-width)
+                               (make-string space-width ? )
+                               battery
+                               clock)))))
 
 (defun my-keyboard-quit--minibuffer-line (func)
   "Update minibuffer line after quit."
