@@ -35,9 +35,16 @@
 
 (defun my-gnus-delete-article-window ()
   "Delete Article window."
+  (interactive)
   (when (and (gnus-buffer-live-p gnus-article-buffer)
              (not (one-window-p)))
     (when-let (article-window (get-buffer-window gnus-article-buffer))
+      ;; Switch away from the article window
+      (when (eq (selected-window) article-window)
+        (if-let (((gnus-buffer-live-p gnus-summary-buffer))
+                 (summary-window (get-buffer-window gnus-summary-buffer)))
+            (select-window summary-window)
+          (other-window 1)))
       (delete-window article-window))))
 
 ;;; Summary
@@ -45,6 +52,7 @@
 (add-hook 'gnus-exit-group-hook #'my-gnus-delete-article-window)
 
 (with-eval-after-load "gnus-sum"
+  (define-key gnus-summary-mode-map (kbd "H") #'my-gnus-delete-article-window)
   (define-key gnus-summary-mode-map (kbd "C-M-j") #'window-jump-left)
   (define-key gnus-summary-mode-map (kbd "C-M-k") #'window-jump-right)
   (define-key gnus-summary-mode-map (kbd "C-M-p") #'window-jump-up)
@@ -53,6 +61,7 @@
 ;;; Article
 
 (with-eval-after-load "gnus-art"
+  (define-key gnus-article-mode-map (kbd "H") #'my-gnus-delete-article-window)
   (define-key gnus-article-mode-map (kbd "j") #'scroll-up-line)
   (define-key gnus-article-mode-map (kbd "k") #'scroll-down-line)
   (define-key gnus-article-mode-map (kbd "s") #'my-gnus-article-add-link))
