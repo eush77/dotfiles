@@ -1,3 +1,5 @@
+(require 'battery)
+
 (add-to-list 'package-selected-packages 'dash)
 (add-to-list 'package-selected-packages 'dash-functional)
 (package-install-selected-packages)
