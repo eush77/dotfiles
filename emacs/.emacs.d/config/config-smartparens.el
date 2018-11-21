@@ -75,6 +75,3 @@ Like `sp-point-after-word-p', but checks that the inserted symbol
 is a single quote character and works for `wrap' action, which is
 needed when apostrophe would be considered a close bracked."
   (looking-back "\\w'" nil))
-
-;; Use asymmetric single quotes.
-(sp-pair "`" "'" :unless '(my-sp-point-at-apostrophe-p))
