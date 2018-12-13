@@ -20,6 +20,7 @@
 (custom-set rm-blacklist '(" $"         ; rich-minority-mode
                            " counsel"   ; counsel-mode
                            " FlyC-"     ; flycheck-mode (no-checker)
+                           " Golden"    ; golden-ratio-mode
                            " Guide"     ; guide-key-mode
                            " ivy"       ; ivy-mode
                            "[ln]"))     ; w3m-lnum-mode
