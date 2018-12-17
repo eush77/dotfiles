@@ -40,6 +40,8 @@
 ;;; tablegen-mode
 
 (with-eval-after-load "tablegen-mode"
+  (add-hook 'tablegen-mode-hook #'hs-minor-mode)
+
   ;; Create TableGen mode keymap.
   ;; Based on the code in LLVM trunk - seems like a bug fix.
   (when (not tablegen-mode-map)
