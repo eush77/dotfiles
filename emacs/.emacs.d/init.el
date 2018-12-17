@@ -131,6 +131,7 @@ and URL
 (load "config-vc")
 (load "config-w3m")
 (load "config-winner")
+(with-eval-after-load "bibtex" (load "config-bibtex"))
 (with-eval-after-load "bookmark" (load "config-bookmark"))
 (with-eval-after-load "calendar" (load "config-calendar"))
 (with-eval-after-load "cc-mode" (load "config-cc"))
