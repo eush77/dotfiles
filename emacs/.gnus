@@ -33,6 +33,15 @@
       (when (pocket-lib-add-urls url)
         (message "Added: %s" url))))
 
+(defun my-gnus-article-show-summary ()
+  "Same as `gnus-article-show-summary' but supports article
+window configurations with no summary window."
+  (interactive)
+  (if (eq (caadr (assq 'article gnus-buffer-configuration))
+          'article)
+      (gnus-configure-windows 'summary)
+    (gnus-article-show-summary)))
+
 (defun my-gnus-delete-article-window ()
   "Delete Article window."
   (interactive)
@@ -62,6 +71,7 @@
 
 (with-eval-after-load "gnus-art"
   (define-key gnus-article-mode-map (kbd "H") #'my-gnus-delete-article-window)
+  (define-key gnus-article-mode-map (kbd "h") #'my-gnus-article-show-summary)
   (define-key gnus-article-mode-map (kbd "j") #'scroll-up-line)
   (define-key gnus-article-mode-map (kbd "k") #'scroll-down-line)
   (define-key gnus-article-mode-map (kbd "s") #'my-gnus-article-add-link))
