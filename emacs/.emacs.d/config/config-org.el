@@ -329,6 +329,21 @@ truncated."
 (advice-add 'window-text-width
             :filter-return #'my-window-text-width--org-tty)
 
+;;; LaTeX Export
+
+(defun my-org-latex-plain-text--tilde-nbsp (func text info)
+  "Use `~' for non-breaking space."
+  (mapconcat (lambda (text) (funcall func text info))
+             (split-string text "~")
+             "~"))
+(advice-add 'org-latex-plain-text
+            :around #'my-org-latex-plain-text--tilde-nbsp)
+
+(defun my-insert-tilde ()
+  "Insert \"~\" at point."
+  (interactive)
+  (insert "~"))
+
 ;;; Lists
 
 (custom-set org-list-allow-alphabetical t)
@@ -453,6 +468,7 @@ If the new state is `DROP', drop the whole subtree."
 
 (key-chord-define org-mode-map "xw" #'ff-get-other-file)
 
+(define-key org-mode-map (kbd "C-`") #'my-insert-tilde)
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "C-c C-x C-p") #'org-pomodoro)
 (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
