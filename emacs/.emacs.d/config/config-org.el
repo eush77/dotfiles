@@ -424,7 +424,7 @@ If the new state is `DROP', drop the whole subtree."
 (defun my-org-todo--skip-wait (func arg)
   "Skip `WAIT' state when cycling through."
   (if-let ((next-state
-            (case arg
+            (cl-case arg
               ((nil 'right) (cadr (member "WAIT"
                                     (append org-todo-keywords-1
                                             '("")))))
