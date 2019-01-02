@@ -85,8 +85,8 @@ alternative names."
                                            my-build-directory))))
 
 (defun my-dired-ff-mode-hook ()
-  (setq ff-other-file-alist '(("\\.none" my-dired-ff-other-file))
-        ff-search-directories '("/")))
+  (setq-local ff-other-file-alist '(("\\.none" my-dired-ff-other-file)))
+  (setq-local ff-search-directories '("/")))
 
 (add-hook 'dired-mode-hook #'my-dired-ff-mode-hook)
 
