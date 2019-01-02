@@ -214,6 +214,24 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;; ff-get-other-file
 
+(defun my-locate-org-file (file)
+  "Find FILE in `org-directory'.
+
+If FILE is relative, it is expanded relative to `org-directory'.
+
+If FILE is absolute and not in `org-directory', its root org
+suffix is replaced with `org-directory'."
+  (if (file-name-absolute-p file)
+      (replace-regexp-in-string
+       (concat ".*/"
+               (regexp-quote (file-name-nondirectory
+                              (directory-file-name org-directory)))
+               "/")
+       (file-name-as-directory org-directory)
+       file
+       t t)
+    (expand-file-name file org-directory)))
+
 (defun my-org-ff-other-file (file)
   "`ff-other-file-alist' function for Org files.
 
@@ -232,7 +250,7 @@ from which entries were archived into the current file last."
                      nil
                      t)
               (user-error "No other file"))
-            (list (match-string 1))))))))
+            (list (my-locate-org-file (match-string 1)))))))))
 
 (defun my-org-ff-other-file-setup ()
   "Setup for `ff-get-other-file'."
