@@ -1,3 +1,4 @@
+(require 'dash)
 (require 'dired-imenu)
 
 ;;; Basic setup
@@ -25,6 +26,18 @@ the same window."
   (cl-letf (((symbol-function 'dired-other-window) #'dired)
             ((symbol-function 'find-file-other-window) #'find-file))
     (funcall #'dired-mouse-find-file-other-window event)))
+
+(defun my-dired-other-window ()
+  "Switch to other `dired-mode' window."
+  (interactive)
+  (if-let ((other-window
+            (car (--filter (and (not (eq it (selected-window)))
+                                (eq (buffer-local-value 'major-mode
+                                                        (window-buffer it))
+                                    'dired-mode))
+                           (window-list)))))
+      (select-window other-window)
+    (user-error "No other Dired window")))
 
 (defun my-dired-toggle-dwim-target ()
   "Toggle `dired-dwim-target'."
@@ -102,6 +115,7 @@ alternative names."
 (define-key dired-mode-map (kbd "M-n") #'dired-next-subdir)
 (define-key dired-mode-map (kbd "b") #'my-dired-browse-file)
 (define-key dired-mode-map (kbd "c") #'dired-kill-subdir)
+(define-key dired-mode-map (kbd "h") #'my-dired-other-window)
 (define-key dired-mode-map (kbd "r") #'dired-do-query-replace-regexp)
 (define-key dired-mode-map (kbd "x") nil)
 (define-key dired-mode-map (kbd "X") #'dired-do-flagged-delete)
