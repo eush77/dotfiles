@@ -1,3 +1,7 @@
+(require 'dash)
+
+;;; Basic setup
+
 (custom-set compilation-scroll-output t)
 
 (defun my-compilation-save-buffers-predicate ()
@@ -6,6 +10,22 @@ from `prog-mode'."
   (derived-mode-p 'prog-mode))
 (custom-set compilation-save-buffers-predicate
             #'my-compilation-save-buffers-predicate)
+
+;;; Commands
+
+(defun my-compilation-other-buffer ()
+  "Switch to other `compilation-mode' buffer."
+  (interactive)
+  (let* ((compilation-buffers
+          (--filter (and (eq (buffer-local-value 'major-mode it)
+                             'compilation-mode)
+                         (not (string= (buffer-name it) "*Compile-Log*")))
+                    (buffer-list)))
+         (other-buffer (or (cadr (memq (current-buffer) compilation-buffers))
+                          (car compilation-buffers))))
+    (when (eq other-buffer (current-buffer))
+      (user-error "No other compilation buffer"))
+    (switch-to-buffer other-buffer)))
 
 ;;;###autoload
 (defun my-recompile ()
@@ -23,4 +43,7 @@ buffer."
   (recompile)
   (select-window (get-buffer-window compilation-last-buffer t)))
 
+;;; Keymap
+
 (define-key compilation-mode-map (kbd "c") #'compile)
+(define-key compilation-mode-map (kbd "h") #'my-compilation-other-buffer)
