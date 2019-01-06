@@ -8,6 +8,7 @@
             (concat "-lv --group-directories-first --human-readable"
                     (if window-system " --all" " --almost-all")))
 
+(add-hook 'dired-mode-hook #'dired-filter-mode)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 (add-hook 'dired-mode-hook #'dired-hide-dotfiles-mode)
 
@@ -45,6 +46,10 @@ the same window."
   (setq dired-dwim-target (not dired-dwim-target))
   (message "Dired DWIM target %s"
            (if dired-dwim-target "enabled" "disabled")))
+
+;;; `dired-filter'
+
+(custom-set dired-filter-stack nil)
 
 ;;; Find-file
 

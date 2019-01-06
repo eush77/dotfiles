@@ -62,6 +62,7 @@ and URL
 (add-to-list 'package-selected-packages 'clang-format)
 (add-to-list 'package-selected-packages 'color-identifiers-mode)
 (add-to-list 'package-selected-packages 'counsel)
+(add-to-list 'package-selected-packages 'dired-filter)
 (add-to-list 'package-selected-packages 'dired-hide-dotfiles)
 (add-to-list 'package-selected-packages 'dired-imenu)
 (add-to-list 'package-selected-packages 'dired-rsync)
