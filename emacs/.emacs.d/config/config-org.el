@@ -232,11 +232,11 @@ suffix is replaced with `org-directory'."
        t t)
     (expand-file-name file org-directory)))
 
-(defun my-org-ff-other-file (file)
-  "`ff-other-file-alist' function for Org files.
+(defun my-org-ff-other-file/archive (file)
+  "Get the archive location for FILE, or the file from which
+entries were archived into FILE most recently.
 
-Returns the archive location for the current file, or the file
-from which entries were archived into the current file last."
+Returns either a one-element list or an empty list."
   (require 'org-archive)
   (when-let ((buffer (get-file-buffer file)))
     (with-current-buffer buffer
@@ -245,12 +245,24 @@ from which entries were archived into the current file last."
             (list archive-file)
           (save-excursion
             (goto-char (point-max))
-            (unless (search-backward-regexp
-                     "^ *:ARCHIVE_FILE: *\\([^ ].*\\)$"
-                     nil
-                     t)
-              (user-error "No other file"))
-            (list (my-locate-org-file (match-string 1)))))))))
+            (when (search-backward-regexp
+                   "^ *:ARCHIVE_FILE: *\\([^ ].*\\)$"
+                   nil
+                   t)
+              (list (my-locate-org-file (match-string 1))))))))))
+
+(defun my-org-ff-other-file/export (file)
+  "Return the list of locations of files exported from FILE."
+  (mapcar (lambda (ext)
+            (concat (file-name-sans-extension file) ext))
+          ;; The order of extensions matters for files exported to multiple
+          ;; formats
+          '(".tex" ".html" ".man" ".md" ".txt")))
+
+(defun my-org-ff-other-file (file)
+  "`ff-other-file-alist' function for Org files."
+  (append (my-org-ff-other-file/archive file)
+          (my-org-ff-other-file/export file)))
 
 (defun my-org-ff-other-file-setup ()
   "Setup for `ff-get-other-file'."
