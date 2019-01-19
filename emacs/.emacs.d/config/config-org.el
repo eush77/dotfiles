@@ -427,6 +427,8 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; Keymap
 
+(key-chord-define org-mode-map "xw" #'ff-get-other-file)
+
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "C-c C-x C-p") #'org-pomodoro)
 (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
@@ -439,7 +441,10 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
-(key-chord-define org-mode-map "xw" #'ff-get-other-file)
+
+(define-key org-beamer-mode-map (kbd "C-c C-b") nil)
+(define-key org-beamer-mode-map (kbd "C-c C-x B")
+  #'org-beamer-select-environment)
 
 (defhydra my-org-mark-subtree-hydra ()
   "Mark subtree"
