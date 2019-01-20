@@ -367,6 +367,17 @@ truncated."
     (apply func args)))
 (advice-add 'org-shiftmetaright :around #'my-org-shiftmetaright--region)
 
+;;; Structure Templates
+
+(defun my-org-insert-structure-template--upcase (func &rest args)
+  "Convert block structure in upper case."
+  (let ((begin (point))
+        (end (copy-marker (+ (point) 1))))
+    (apply func args)
+    (upcase-region begin (marker-position end))))
+(advice-add 'org-insert-structure-template
+            :around #'my-org-insert-structure-template--upcase)
+
 ;;; Todo
 
 (custom-set org-todo-keywords
@@ -448,6 +459,7 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
 (define-key org-mode-map (kbd "C-c p") #'org-metaup)
+(define-key org-mode-map (kbd "C-c M-,") #'org-insert-structure-template)
 (define-key org-mode-map (kbd "C-M-b") #'org-previous-link)
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
