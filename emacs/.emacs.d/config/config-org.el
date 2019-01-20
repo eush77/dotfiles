@@ -192,7 +192,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
   ("j" org-clock-goto "goto clock" :exit t)
   ("q" nil "quit"))
 
-;;; Column view
+;;; Column View
 
 (custom-set org-columns-default-format
             "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
@@ -272,7 +272,7 @@ Returns either a one-element list or an empty list."
               '(("\\.org\\'" my-org-ff-other-file))))
 (add-hook 'org-mode-hook #'my-org-ff-other-file-setup)
 
-;;; Finding files
+;;; Finding Files
 
 ;;;###autoload
 (defcustom my-org-notes-directory "~/notes"
@@ -351,7 +351,7 @@ truncated."
 (custom-set org-refile-use-outline-path 'file)
 (custom-set org-outline-path-complete-in-steps nil)
 
-;;; Structure editing
+;;; Structure Editing
 
 (defun my-org-shiftmetaleft--region (func &rest args)
   "Promote headings in the active region."
