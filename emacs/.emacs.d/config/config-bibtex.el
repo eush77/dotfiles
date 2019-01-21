@@ -1,3 +1,5 @@
+(add-hook 'bibtex-mode-hook #'hs-minor-mode)
+
 ;;; Reformat setup
 
 (custom-set bibtex-entry-format t)
