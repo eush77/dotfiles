@@ -483,10 +483,6 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 
-(define-key org-beamer-mode-map (kbd "C-c C-b") nil)
-(define-key org-beamer-mode-map (kbd "C-c C-x B")
-  #'org-beamer-select-environment)
-
 (defhydra my-org-mark-subtree-hydra ()
   "Mark subtree"
   ("@" org-mark-subtree))
@@ -496,3 +492,8 @@ If the new state is `DROP', drop the whole subtree."
 (with-eval-after-load "org-agenda"
   (define-key org-agenda-mode-map (kbd "C-c C-j")
     #'counsel-org-agenda-headlines))
+
+(with-eval-after-load "ox-beamer"
+  (define-key org-beamer-mode-map (kbd "C-c C-b") nil)
+  (define-key org-beamer-mode-map (kbd "C-c C-x B")
+    #'org-beamer-select-environment))
