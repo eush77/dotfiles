@@ -14,7 +14,9 @@ from `prog-mode'."
 ;;; Commands
 
 ;;; ###aytoload
-(defcustom my-compilation-ignored-buffers '("*Compile-Log*")
+(defcustom my-compilation-ignored-buffers '("*Compile-Log*"
+                                            "*Org-Babel Error Output*"
+                                            "*Org PDF LaTeX Output*")
   "Names of buffers ignored by `my-compilation-buffers'."
   :type '(repeat string)
   :group 'my)
