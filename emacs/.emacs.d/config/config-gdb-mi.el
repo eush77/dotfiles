@@ -206,14 +206,7 @@ Returns the absolute file name of the selected trace directory."
 
 (defun my-rr-get-trace-executable (trace-dir)
   "Get the entry-point executable file from the trace directory."
-  (if-let ((executable
-            (car (seq-filter
-                  (lambda (file)
-                    (and (not (string-match "\\.so\\(\\.\\|$\\)"
-                                            (file-name-nondirectory file)))
-                         (file-regular-p file)
-                         (file-executable-p file)))
-                  (directory-files trace-dir t)))))
+  (if-let ((executable (car (directory-files trace-dir t "^mmap_clone_3_"))))
       executable
 
     ;; Older versions of `rr' do not copy executables to trace directories.
