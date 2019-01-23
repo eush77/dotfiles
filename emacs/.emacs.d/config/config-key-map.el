@@ -60,6 +60,9 @@
 ;; IMenu
 (global-set-key (kbd "M-i") #'counsel-imenu)
 
+;; insert-buffer
+(global-set-key (kbd "C-x I") #'insert-buffer)
+
 ;; Ivy
 (global-set-key (kbd "C-x C-r") #'ivy-resume)
 (define-key ivy-minibuffer-map (kbd "C-w") #'ivy-yank-word)
