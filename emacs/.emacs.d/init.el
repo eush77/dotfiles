@@ -27,7 +27,8 @@ and URL
 
 ;; My customization group
 (defgroup my
-  '((my-eshell-prompt-length custom-variable)
+  '((my-compilation-ignored-buffers custom-variable)
+    (my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
     (my-find-directories custom-variable)
     (my-find-next-skipped-extensions custom-variable)

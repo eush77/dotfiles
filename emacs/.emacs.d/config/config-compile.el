@@ -13,16 +13,28 @@ from `prog-mode'."
 
 ;;; Commands
 
+;;; ###aytoload
+(defcustom my-compilation-ignored-buffers '("*Compile-Log*")
+  "Names of buffers ignored by `my-compilation-buffers'."
+  :type '(repeat string)
+  :group 'my)
+
+(defun my-compilation-buffers ()
+  "Get all compilation buffers except `my-compilation-ignored-buffers'."
+  (--filter (and (eq (buffer-local-value 'major-mode it) 'compilation-mode)
+                 (not (member (buffer-name it)
+                              my-compilation-ignored-buffers)))
+            (buffer-list)))
+
 (defun my-compilation-other-buffer ()
   "Switch to other `compilation-mode' buffer."
   (interactive)
-  (let* ((compilation-buffers
-          (--filter (and (eq (buffer-local-value 'major-mode it)
-                             'compilation-mode)
-                         (not (string= (buffer-name it) "*Compile-Log*")))
-                    (buffer-list)))
-         (other-buffer (or (cadr (memq (current-buffer) compilation-buffers))
-                          (car compilation-buffers))))
+  (let* ((buffers
+          ;; Reverse compilation buffers to cycle through all of them - after
+          ;; each buffer switch the new buffer moves to the front of the list
+          (reverse (my-compilation-buffers)))
+         (other-buffer (or (cadr (memq (current-buffer) buffers))
+                           (car buffers))))
     (when (eq other-buffer (current-buffer))
       (user-error "No other compilation buffer"))
     (switch-to-buffer other-buffer)))
