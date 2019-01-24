@@ -13,6 +13,22 @@
     (apply func args)))
 (advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
 
+;;;###autoload
+(defun my-counsel-ibuffer-by-mode (mode)
+  "Like `counsel-ibuffer', but filter the list to buffers in the
+given major MODE (or major mode of the current buffer if run
+interactively)."
+  (interactive (list major-mode))
+  (require 'ibuffer)
+  (require 'dash)
+  (cl-letf* ((get-buffers-function
+              (symbol-function 'counsel-ibuffer--get-buffers))
+             ((symbol-function 'counsel-ibuffer--get-buffers)
+              (lambda ()
+                (--filter (eq (buffer-local-value 'major-mode (cdr it)) mode)
+                          (funcall get-buffers-function)))))
+    (counsel-ibuffer)))
+
 ;;; Finding files
 
 (custom-set counsel-find-file-at-point t)

@@ -2,6 +2,7 @@
 
 ;; Buffer operations
 (key-chord-define-global "xb" #'counsel-ibuffer)
+(key-chord-define-global "XB" #'my-counsel-ibuffer-by-mode)
 (key-chord-define-global "xk" #'kill-buffer)
 (key-chord-define-global "xs" #'save-buffer)
 
