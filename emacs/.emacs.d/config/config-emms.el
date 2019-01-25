@@ -84,7 +84,7 @@ Active sink is defined as the last one in the list printed by
         (title (emms-track-get track 'info-title))
         (tracknumber (when-let ((tracknumber
                                  (emms-track-get track 'info-tracknumber)))
-                       (format "#%d of " (string-to-number tracknumber))))
+                       (format "#%d" (string-to-number tracknumber))))
         (album (emms-track-get track 'info-album))
         (year (when-let ((year (emms-track-get track 'info-year)))
                 (format " (%s)" year))))
@@ -99,7 +99,11 @@ Active sink is defined as the last one in the list printed by
                                    'face 'my-hydra-emms-hint-line-title))
                (right (concat
                        tracknumber
-                       (propertize album 'face 'my-hydra-emms-hint-line-album)
+                       (when album
+                         (concat " of "
+                                 (propertize album
+                                             'face
+                                             'my-hydra-emms-hint-line-album)))
                        year))
                (space (- (frame-text-cols)
                          (length left)
