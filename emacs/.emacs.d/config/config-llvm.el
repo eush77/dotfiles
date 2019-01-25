@@ -1,5 +1,7 @@
 ;;; llvm-mode
 
+(add-to-list 'magic-mode-alist '("; ModuleID = " . llvm-mode))
+
 (with-eval-after-load "llvm-mode"
   (defun my-llvm-indent-line ()
     "Indent current line."
