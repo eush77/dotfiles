@@ -36,7 +36,8 @@
 
   (defun my-llvm-mode-hook ()
     "My hook for LLVM mode."
-    (setq-local indent-line-function #'my-llvm-indent-line))
+    (setq-local indent-line-function #'my-llvm-indent-line)
+    (toggle-truncate-lines 1))
   (add-hook 'llvm-mode-hook #'my-llvm-mode-hook))
 
 ;;; tablegen-mode
