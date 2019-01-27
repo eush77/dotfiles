@@ -213,6 +213,11 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 (custom-set org-global-properties
             '(("EFFORT_ALL" . "0:10 0:30 1:00 2:00 3:00 4:00 6:00")))
 
+;;; Export
+
+(custom-set org-export-async-init-file
+            (locate-user-emacs-file "ox-async-init.el"))
+
 ;;; ff-get-other-file
 
 (defun my-locate-org-file (file)
