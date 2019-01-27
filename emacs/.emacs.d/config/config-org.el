@@ -456,6 +456,8 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; Visibility
 
+(custom-set org-cycle-global-at-bob t)
+
 (defun my-org-cycle (arg)
   "With single prefix argument ARG, call
 `my-outline-cycle-entry'. Otherwise call `org-cycle'."
