@@ -97,6 +97,18 @@ repositories."
 
 ;;; Org
 
+(defun my-counsel-org-entity--default-action (func &rest args)
+  "Insert Org entity by default."
+  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
+             ((symbol-function 'ivy-read)
+              (lambda (prompt collection &rest args)
+                (apply ivy-read-function prompt collection
+                       :action `(2 . ,(cdr (plist-get args :action)))
+                       (org-plist-delete args :action)))))
+    (apply func args)))
+(advice-add 'counsel-org-entity
+            :around #'my-counsel-org-entity--default-action)
+
 ;;;###autoload
 (defun my-counsel-org-goto (arg)
   "If called without a prefix argument, call `counsel-org-goto'.

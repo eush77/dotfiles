@@ -485,6 +485,7 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "C-c M-,") #'org-insert-structure-template)
 (define-key org-mode-map (kbd "C-M-b") #'org-previous-link)
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
+(define-key org-mode-map (kbd "C-x 8 e") #'counsel-org-entity)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
