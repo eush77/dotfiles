@@ -157,6 +157,7 @@ and URL
 (with-eval-after-load "org" (load "config-org"))
 (with-eval-after-load "org-pomodoro" (load "config-org-pomodoro"))
 (with-eval-after-load "outline" (load "config-outline"))
+(with-eval-after-load "pass" (load "config-pass"))
 (with-eval-after-load "pocket-reader" (load "config-pocket-reader"))
 (with-eval-after-load "purescript-mode" (load "config-purescript"))
 (with-eval-after-load "racket" (load "config-racket"))
