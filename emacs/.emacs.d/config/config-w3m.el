@@ -88,3 +88,11 @@ point instead."
   (setq w3m-lnum-actions-link-alist
         (append w3m-lnum-actions-link-alist
                 `((?P ,#'my-w3m-lnum-pocket-link-action "Add to Pocket")))))
+
+(defun my-w3m-filter--catch-errors (func &rest args)
+  (condition-case nil
+      (funcall func args)
+    (error)))
+
+(with-eval-after-load "w3m-filter"
+  (advice-add 'w3m-filter :around #'my-w3m-filter--catch-errors))
