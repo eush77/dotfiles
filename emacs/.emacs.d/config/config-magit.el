@@ -3,6 +3,7 @@
 ;;; magit
 
 (with-eval-after-load "magit-mode"
+  (put 'magit-clean 'disabled nil)
   (custom-set git-commit-fill-column 72)
 
   (let ((show-and-move
