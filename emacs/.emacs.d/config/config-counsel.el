@@ -32,6 +32,7 @@ interactively)."
 ;;; Finding files
 
 (custom-set counsel-find-file-at-point t)
+(custom-set counsel-find-file-ignore-regexp "\\`\\.")
 (custom-set counsel-preselect-current-file t)
 
 ;;; Git grep
