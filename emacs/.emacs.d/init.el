@@ -161,7 +161,7 @@ and URL
 (with-eval-after-load "pass" (load "config-pass"))
 (with-eval-after-load "pocket-reader" (load "config-pocket-reader"))
 (with-eval-after-load "purescript-mode" (load "config-purescript"))
-(with-eval-after-load "racket" (load "config-racket"))
+(with-eval-after-load "racket-mode" (load "config-racket"))
 (with-eval-after-load "rst" (load "config-rst"))
 (with-eval-after-load "scroll-all" (load "config-scroll-all"))
 (with-eval-after-load "shr" (load "config-shr"))
