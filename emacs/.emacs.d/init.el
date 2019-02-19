@@ -85,6 +85,7 @@ and URL
 (add-to-list 'package-selected-packages 'litable)
 (add-to-list 'package-selected-packages 'key-chord)
 (add-to-list 'package-selected-packages 'magit)
+(add-to-list 'package-selected-packages 'markdown-mode)
 (add-to-list 'package-selected-packages 'minibuffer-line)
 (add-to-list 'package-selected-packages 'multiple-cursors)
 (add-to-list 'package-selected-packages 'multitran)
