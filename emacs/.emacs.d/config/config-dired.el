@@ -90,7 +90,8 @@ alternative names."
                                                             source-directory)))
          (dirname (expand-file-name (file-name-directory filename)
                                     destination-directory)))
-    (mapcar (lambda (basename) (expand-file-name basename dirname))
+    (mapcar (lambda (basename)
+              (file-name-as-directory (expand-file-name basename dirname)))
             (my-punct-delimited-prefixes (file-name-nondirectory filename)))))
 
 (defun my-dired-ff-other-file (_)
