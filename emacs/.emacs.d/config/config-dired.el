@@ -51,6 +51,8 @@ the same window."
 
 (custom-set dired-filter-stack nil)
 
+(define-key dired-filter-map (kbd "w") #'dired-filter-pop)
+
 ;;; Find-file
 
 ;;;###autoload
