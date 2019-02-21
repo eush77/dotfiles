@@ -50,6 +50,7 @@ well."
 
 (with-eval-after-load "erc-track"
   (custom-set erc-track-enable-keybindings t)
+  (custom-set erc-track-exclude-server-buffer t)
 
   (add-to-list 'erc-track-exclude-types "JOIN")
   (add-to-list 'erc-track-exclude-types "PART")
