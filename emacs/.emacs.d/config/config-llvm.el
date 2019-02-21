@@ -1,6 +1,9 @@
 ;;; llvm-mode
 
+(add-to-list 'auto-mode-alist '("\\.mir\\'" . yaml-mode))
 (add-to-list 'magic-mode-alist '("; ModuleID = " . llvm-mode))
+(add-to-list 'magic-mode-alist '("target datalayout = " . llvm-mode))
+(add-to-list 'magic-mode-alist '("target triple = " . llvm-mode))
 
 (with-eval-after-load "llvm-mode"
   (defun my-llvm-indent-line ()
