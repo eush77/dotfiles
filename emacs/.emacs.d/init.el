@@ -167,6 +167,7 @@ and URL
 (with-eval-after-load "scroll-all" (load "config-scroll-all"))
 (with-eval-after-load "sgml-mode" (load "config-sgml"))
 (with-eval-after-load "shr" (load "config-shr"))
+(with-eval-after-load "smerge-mode" (load "config-smerge"))
 (with-eval-after-load "swap-buffers" (load "config-swap-buffers"))
 (with-eval-after-load "switch-window" (load "config-switch-window"))
 (with-eval-after-load "tex-mode" (load "config-tex"))
