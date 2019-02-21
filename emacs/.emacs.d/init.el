@@ -89,6 +89,7 @@ and URL
 (add-to-list 'package-selected-packages 'minibuffer-line)
 (add-to-list 'package-selected-packages 'multiple-cursors)
 (add-to-list 'package-selected-packages 'multitran)
+(add-to-list 'package-selected-packages 'narrow-reindent)
 (add-to-list 'package-selected-packages 'org-plus-contrib)
 (add-to-list 'package-selected-packages 'org-pomodoro)
 (add-to-list 'package-selected-packages 'pass)
@@ -174,6 +175,7 @@ and URL
 (with-eval-after-load "view" (load "config-view"))
 (with-eval-after-load "window-jump" (load "config-window-jump"))
 (with-eval-after-load "xref" (load "config-xref"))
+(with-eval-after-load "yaml-mode" (load "config-yaml"))
 
 (when window-system
   (load "config-pdf-tools")
