@@ -85,6 +85,14 @@ is unchanged."
 (advice-add 'counsel-git-grep
             :filter-args #'my-counsel-git-grep--region)
 
+(defun my-counsel-git-grep--rg (func &rest args)
+  "Fall back to `counsel-rg' if not in a Git project."
+  (if (condition-case nil (counsel-locate-git-root) (error))
+      (apply func args)
+    (counsel-rg (cadr args))))
+(advice-add 'counsel-git-grep
+            :around #'my-counsel-git-grep--rg)
+
 (defun my-counsel-git-grep-count-func-default--projects (func &rest args)
   "Dynamically change `default-directory' to the Git root.
 
