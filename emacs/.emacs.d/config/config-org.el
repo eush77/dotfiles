@@ -371,6 +371,15 @@ truncated."
 (custom-set org-refile-use-outline-path 'file)
 (custom-set org-outline-path-complete-in-steps nil)
 
+(defun my-org-remove-new-keywords ()
+  "Remove NEW keyword from entries after refiling.
+This may silently modify any entry from the point onward."
+  (org-back-to-heading t)
+  (perform-replace (concat "^\\(" org-outline-regexp "\\)NEW ")
+                   "\\1" nil t nil))
+
+(add-hook 'org-after-refile-insert-hook #'my-org-remove-new-keywords)
+
 ;;; Structure Editing
 
 (defun my-org-shiftmetaleft--region (func &rest args)
