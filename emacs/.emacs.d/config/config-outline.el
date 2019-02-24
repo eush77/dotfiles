@@ -2,7 +2,7 @@
 
 (defun my-outline-next-visible-heading--multiline (arg)
   "Move to the beginning of a multiline heading."
-  (when (> arg 0)
+  (when (and (> arg 0) (not (eq (point) (point-max))))
     (forward-line (- (cl-count ?\n (match-string 0))))))
 (advice-add 'outline-next-visible-heading
             :after 'my-outline-next-visible-heading--multiline)
