@@ -108,6 +108,7 @@ point instead."
   (define-key w3m-mode-map (kbd "p") #'w3m-previous-anchor)
   (define-key w3m-mode-map (kbd "P") #'my-w3m-pocket-add-url)
   (define-key w3m-mode-map (kbd "C-c M-p") #'w3m-tab-move-left)
+  (define-key w3m-mode-map (kbd "q") #'my-w3m-close-window)
   (define-key w3m-mode-map (kbd "w") #'w3m-lnum-universal))
 
 ;;; w3m
@@ -120,6 +121,21 @@ point instead."
   (custom-set w3m-make-new-session t)
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode))
+
+;;; w3m-close-window
+
+(defun my-w3m-close-window ()
+  "Version of `w3m-close-window' that doesn't close windows and
+frames."
+  (interactive)
+  (w3m-history-store-position)
+  (let ((buffers (w3m-list-buffers t)))
+    (dolist (buffer buffers)
+      (w3m-cancel-refresh-timer buffer)
+      (bury-buffer buffer))
+    (dolist (buffer buffers)
+      (when-let ((window (get-buffer-window buffer t)))
+        (set-window-buffer window (other-buffer))))))
 
 ;;; w3m-filter
 
