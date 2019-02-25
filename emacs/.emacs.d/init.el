@@ -158,6 +158,7 @@ and URL
 (with-eval-after-load "man" (load "config-man"))
 (with-eval-after-load "markdown-mode" (load "config-markdown"))
 (with-eval-after-load "multitran" (load "config-multitran"))
+(with-eval-after-load "narrow-reindent" (load "config-narrow-reindent"))
 (with-eval-after-load "org" (load "config-org"))
 (with-eval-after-load "org-pomodoro" (load "config-org-pomodoro"))
 (with-eval-after-load "outline" (load "config-outline"))
