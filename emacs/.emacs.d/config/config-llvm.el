@@ -4,6 +4,8 @@
 (add-to-list 'magic-mode-alist '("; ModuleID = " . llvm-mode))
 (add-to-list 'magic-mode-alist '("target datalayout = " . llvm-mode))
 (add-to-list 'magic-mode-alist '("target triple = " . llvm-mode))
+(add-to-list 'magic-mode-alist '("bb\\.0 (" . llvm-mode))
+(add-to-list 'magic-mode-alist '("bb\\.0\\.[[:alnum:]._-]+:" . llvm-mode))
 
 (with-eval-after-load "llvm-mode"
   (defun my-llvm-indent-line ()
