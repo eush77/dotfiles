@@ -48,6 +48,11 @@ well."
 
 ;;; erc-track
 
+(defun my-erc-track-switch-buffer--no-op (&rest args)
+  "Do not switch to `erc-track-last-non-erc-buffer' if already
+visiting a non-ERC buffer."
+  (or erc-modified-channels-alist (eq major-mode 'erc-mode)))
+
 (with-eval-after-load "erc-track"
   (custom-set erc-track-enable-keybindings t)
   (custom-set erc-track-exclude-server-buffer t)
@@ -55,6 +60,9 @@ well."
   (add-to-list 'erc-track-exclude-types "JOIN")
   (add-to-list 'erc-track-exclude-types "PART")
   (add-to-list 'erc-track-exclude-types "QUIT")
+
+  (advice-add 'erc-track-switch-buffer
+              :before-while #'my-erc-track-switch-buffer--no-op)
 
   (define-key erc-track-minor-mode-map (kbd "C-c C-@") nil)
   (define-key erc-track-minor-mode-map (kbd "C-c C-SPC") nil)
