@@ -142,6 +142,7 @@ and URL
 (with-eval-after-load "compile" (load "config-compile"))
 (with-eval-after-load "custom" (load "config-custom"))
 (with-eval-after-load "dired" (load "config-dired"))
+(with-eval-after-load "edit-indirect" (load "config-edit-indirect"))
 (with-eval-after-load "elisp-mode" (load "config-elisp"))
 (with-eval-after-load "erc" (load "config-erc"))
 (with-eval-after-load "eshell" (load "config-eshell"))
