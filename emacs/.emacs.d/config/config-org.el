@@ -154,6 +154,18 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (custom-set org-archive-location "archive/%s::")
 
+(defun my-org-save-archive-buffer ()
+  "Save the live archive buffer for the current buffer."
+  (interactive)
+  (when-let ((buffer (get-file-buffer (org-extract-archive-file))))
+    (with-current-buffer buffer
+      (save-buffer))))
+
+(defun my-org-add-save-archive-buffer-hook ()
+  (add-hook 'after-save-hook #'my-org-save-archive-buffer nil t))
+
+(add-hook 'org-mode-hook #'my-org-add-save-archive-buffer-hook)
+
 ;;; Capture
 
 (custom-set org-capture-templates
