@@ -12,3 +12,7 @@
 
 (advice-add 'save-buffer :before #'my-narrow-reindent--before-save)
 (advice-add 'save-buffer :after #'my-narrow-reindent--after-save)
+
+;;; Widening
+
+(advice-add 'narrow-reindent-widen :before-while #'buffer-narrowed-p)
