@@ -10,8 +10,8 @@
   (when (and narrow-reindent-mode (buffer-narrowed-p))
     (narrow-reindent--after-narrow)))
 
-(advice-add 'save-buffer :before #'my-narrow-reindent--before-save)
-(advice-add 'save-buffer :after #'my-narrow-reindent--after-save)
+(advice-add 'basic-save-buffer :before #'my-narrow-reindent--before-save)
+(advice-add 'basic-save-buffer :after #'my-narrow-reindent--after-save)
 
 ;;; Widening
 
