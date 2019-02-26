@@ -127,6 +127,9 @@
 (global-set-key (kbd "M-p") #'scroll-down)
 (global-set-key (kbd "M-n") #'scroll-up)
 
+;; Shell commands
+(global-set-key (kbd "M-#") #'my-shell-command-on-buffer)
+
 ;; Smartparens
 (define-key prog-mode-map (kbd "C-c C-M-t") #'sp-splice-sexp-killing-backward)
 (global-set-key (kbd "C-c C-a") #'sp-beginning-of-sexp)

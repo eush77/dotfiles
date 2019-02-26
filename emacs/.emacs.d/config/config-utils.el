@@ -372,6 +372,13 @@ _SPC_: set mark | _o__O_: open         | _d__D_: delete  | _M-w_: copy      | _q
   ("C-n" rectangle-next-line)
   ("C-p" rectangle-previous-line))
 
+;;; Shell commands
+
+(defun my-shell-command-on-buffer (command)
+  "Run shell command on the current buffer as input."
+  (interactive "sShell command on buffer: ")
+  (shell-command-on-region (point-min) (point-max) command))
+
 ;;; Virtual desktops
 
 ;;;###autoload
