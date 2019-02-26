@@ -374,9 +374,33 @@ _SPC_: set mark | _o__O_: open         | _d__D_: delete  | _M-w_: copy      | _q
 
 ;;; Shell commands
 
+(defvar my-pinned-shell-command nil
+  "Command to execute with `my-shell-command-on-buffer'. If nil,
+prompt for the command each time.")
+
+(defvar my-shell-command-on-buffer-history nil
+  "Command history of `my-shell-command-on-buffer'.")
+
 (defun my-shell-command-on-buffer (command)
-  "Run shell command on the current buffer as input."
-  (interactive "sShell command on buffer: ")
+  "Run shell command on the current buffer as input.
+
+If the same command is executed twice in succession, it is
+suggested as a new value for `my-pinned-shell-command'. If set,
+`my-pinned-shell-command' is used as the value of COMMAND by
+default.
+
+With prefix argument, reset `my-pinned-shell-command'."
+  (interactive
+   (list (if (and my-pinned-shell-command (not current-prefix-arg))
+             my-pinned-shell-command
+           (let ((last-command (car my-shell-command-on-buffer-history))
+                 (command (read-from-minibuffer
+                           "Shell command on buffer: " nil nil nil
+                           'my-shell-command-on-buffer-history)))
+             (setq my-pinned-shell-command (and (string= command last-command)
+                                                (y-or-n-p "Pin this command? ")
+                                                command))
+             command))))
   (shell-command-on-region (point-min) (point-max) command))
 
 ;;; Virtual desktops
