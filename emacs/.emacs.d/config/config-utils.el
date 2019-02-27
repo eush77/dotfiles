@@ -382,25 +382,29 @@ prompt for the command each time.")
   "Command history of `my-shell-command-on-buffer'.")
 
 (defun my-shell-command-on-buffer (command)
-  "Run shell command on the current buffer as input.
+  "Run shell command on the current buffer as input. Use
+`my-pinned-shell-command' if set, otherwise prompt for a command.
 
-If the same command is executed twice in succession, it is
-suggested as a new value for `my-pinned-shell-command'. If set,
-`my-pinned-shell-command' is used as the value of COMMAND by
-default.
+With `C-u' prefix argument, prompt even if
+`my-pinned-shell-command' is set, and ask prompt to set entered
+command as a new `my-pinned-shell-command'.
 
-With prefix argument, reset `my-pinned-shell-command'."
+With `C-u C-u' prefix argument, just reset
+`my-pinned-shell-command'."
   (interactive
-   (list (if (and my-pinned-shell-command (not current-prefix-arg))
-             my-pinned-shell-command
-           (let ((last-command (car my-shell-command-on-buffer-history))
-                 (command (read-from-minibuffer
-                           "Shell command on buffer: " nil nil nil
-                           'my-shell-command-on-buffer-history)))
-             (setq my-pinned-shell-command (and (string= command last-command)
-                                                (y-or-n-p "Pin this command? ")
-                                                command))
-             command))))
+   (list (cond ((equal current-prefix-arg '(16))
+                (setq my-pinned-shell-command nil)
+                (message "Pinned shell command is cleared")
+                "true")
+               ((and my-pinned-shell-command (not current-prefix-arg))
+                my-pinned-shell-command)
+               (t (let ((command (read-from-minibuffer
+                                  "Shell command on buffer: " nil nil nil
+                                  'my-shell-command-on-buffer-history)))
+                    (when (and (equal current-prefix-arg '(4))
+                               (y-or-n-p "Pin this command? "))
+                      (setq my-pinned-shell-command command))
+                    command)))))
   (shell-command-on-region (point-min) (point-max) command))
 
 ;;; Virtual desktops
