@@ -35,3 +35,12 @@ point is outside a block literal."
 
 (define-key yaml-mode-map (kbd "C-c C-w") #'my-yaml-edit-indirect-block-literal)
 (define-key yaml-mode-map (kbd "C-x n b") #'yaml-narrow-to-block-literal)
+
+;;; Units
+
+(defun my-yaml-setup-units ()
+  (setq-local page-delimiter "\n---\\( |\\)?\n")
+  (setq-local paragraph-start "\\w+:")
+  (setq-local paragraph-separate ":$"))
+
+(add-hook 'yaml-mode-hook #'my-yaml-setup-units)
