@@ -119,6 +119,7 @@ and URL
 (load "config-base")
 (load "config-color-identifiers-mode")
 (load "config-counsel")
+(load "config-diary")
 (load "config-direnv")
 (load "config-emms")
 (load "config-flycheck")
