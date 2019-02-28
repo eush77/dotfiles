@@ -117,6 +117,7 @@ alternative names."
 (define-key dired-mode-map (kbd "C-M-n") #'window-jump-down)
 
 (define-key dired-mode-map (kbd ".") #'dired-hide-dotfiles-mode)
+(define-key dired-mode-map [remap dired-diff] #'ediff-files)
 (define-key dired-mode-map (kbd "SPC") #'dired-up-directory)
 (define-key dired-mode-map (kbd "C-x C-y") #'my-dired-toggle-dwim-target)
 (define-key dired-mode-map (kbd "M-p") #'dired-prev-subdir)
