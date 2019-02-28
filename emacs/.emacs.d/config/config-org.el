@@ -189,7 +189,13 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                           (_ \"%f\")):\n"
                         "#+BEGIN_QUOTE\n"
                         "%i\n"
-                        "#+END_QUOTE\n"))))
+                        "#+END_QUOTE\n"))
+              ("l" "Store link in the backlog" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %a\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"))))
 
 ;;; Clocking
 
