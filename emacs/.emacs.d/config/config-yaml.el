@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
 
+(add-to-list 'magic-mode-alist '("--- |" . yaml-mode))
+
 ;;; Command
 
 (defun my-yaml-edit-indirect-block-literal ()
