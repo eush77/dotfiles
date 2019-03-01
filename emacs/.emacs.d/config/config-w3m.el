@@ -146,3 +146,33 @@ frames."
 
 (with-eval-after-load "w3m-filter"
   (advice-add 'w3m-filter :around #'my-w3m-filter--catch-errors))
+
+;;; w3m-select-buffer
+
+(defun my-w3m-select-buffer-delete-buffer--show-this-line (&rest _)
+  "Show the buffer on the current menu line."
+  (w3m-select-buffer-show-this-line))
+
+(defun my-w3m-select-buffer-quit ()
+  "Quit the buffers selection without changing the shown buffer."
+  (interactive)
+  (and (get-buffer-window w3m-select-buffer-name)
+       (delete-windows-on w3m-select-buffer-name)))
+
+(defun my-w3m-select-buffer-print-this-url ()
+  "Display the url of the current menu line in the echo area and
+put it into ‘kill-ring’."
+  (interactive)
+  (with-current-buffer (w3m-select-buffer-current-buffer)
+    (w3m-print-current-url)))
+
+(with-eval-after-load "w3m"
+  (advice-add 'w3m-select-buffer-delete-buffer
+              :after #'my-w3m-select-buffer-delete-buffer--show-this-line)
+  (advice-add 'w3m-select-buffer-quit
+              :override #'my-w3m-select-buffer-quit)
+
+  (define-key w3m-select-buffer-mode-map (kbd "C-n") #'next-line)
+  (define-key w3m-select-buffer-mode-map (kbd "C-p") #'previous-line)
+  (define-key w3m-select-buffer-mode-map (kbd "u")
+    #'my-w3m-select-buffer-print-this-url))
