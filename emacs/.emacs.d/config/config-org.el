@@ -169,6 +169,13 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;; Capture
 
+(defun my-w3m-anchor-text ()
+  "Get anchor anchor at point."
+  (when (w3m-anchor)
+    (let ((begin (previous-single-property-change (+ (point) 1) 'face))
+          (end (next-single-property-change (point) 'face)))
+      (buffer-substring-no-properties begin end ))))
+
 (custom-set org-capture-templates
             `(("n" "New item in the backlog" entry
                (file org-default-notes-file)
@@ -191,12 +198,52 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                         "#+BEGIN_QUOTE\n"
                         "%i\n"
                         "#+END_QUOTE\n"))
-              ("l" "Store link in the backlog" entry
+              ("c" "Store link in the backlog" entry
                (file org-default-notes-file)
-               ,(concat "* NEW %a\n"
+               ,(concat "* NEW %f%:description\n"
+                        ":PROPERTIES:\n"
+                        ":URL:      %(pcase
+                            (with-current-buffer
+                                (org-capture-get :original-buffer) major-mode)
+                             ((or 'w3m-mode 'gnus-article-mode) \"%:link\")
+                             (_ \"file:%F\"))\n"
+                        ":END:\n"
+                        ":LOGBOOK:\n"
+                        "- State \"NEW\"        from              %U\n"
+                        ":END:\n"))
+              ("u" "Store link at point in the backlog" entry
+               (file org-default-notes-file)
+               ,(concat "* NEW %(with-current-buffer
+                                    (org-capture-get :original-buffer)
+                              (or (my-w3m-anchor-text)
+                                  (thing-at-point 'url)
+                                  (w3m-buffer-title
+                                   (w3m-select-buffer-current-buffer))))\n"
+                        ":PROPERTIES:\n"
+                        ":URL:      %(with-current-buffer
+                                         (org-capture-get :original-buffer)
+                              (or (w3m-anchor)
+                                  (thing-at-point 'url)
+                                  (buffer-local-value
+                                   'w3m-current-url
+                                   (w3m-select-buffer-current-buffer))))\n"
+                        ":END:\n"
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"))))
+
+(defun my-org-capture-c-context ()
+  (or (memq major-mode '(w3m-mode gnus-article-mode))
+      (buffer-file-name)))
+
+(defun my-org-capture-u-context ()
+  (or (eq major-mode 'w3m-select-buffer-mode)
+      (w3m-anchor)
+      (thing-at-point 'url)))
+
+(custom-set org-capture-templates-contexts
+            '(("c" (my-org-capture-c-context))
+              ("u" (my-org-capture-u-context))))
 
 ;;; Clocking
 
