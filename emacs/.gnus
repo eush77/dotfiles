@@ -50,7 +50,7 @@ window configurations with no summary window."
     (when-let (article-window (get-buffer-window gnus-article-buffer))
       ;; Switch away from the article window
       (when (eq (selected-window) article-window)
-        (if-let (((gnus-buffer-live-p gnus-summary-buffer))
+        (if-let ((_ (gnus-buffer-live-p gnus-summary-buffer))
                  (summary-window (get-buffer-window gnus-summary-buffer)))
             (select-window summary-window)
           (other-window 1)))
