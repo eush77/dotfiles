@@ -176,3 +176,10 @@ put it into ‘kill-ring’."
   (define-key w3m-select-buffer-mode-map (kbd "C-p") #'previous-line)
   (define-key w3m-select-buffer-mode-map (kbd "u")
     #'my-w3m-select-buffer-print-this-url))
+
+;;; w3m-uri-replace
+
+(add-to-list 'w3m-uri-replace-alist
+             '("\\`\\(https://github\\.com/[^/]+/[^/]+\\)/blob/"
+               w3m-pattern-uri-replace
+               "\\1/raw/"))
