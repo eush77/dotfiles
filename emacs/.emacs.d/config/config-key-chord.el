@@ -30,6 +30,9 @@
 (key-chord-define-global "gq" #'avy-goto-line)
 (key-chord-define-global "gw" #'avy-goto-word-1)
 
+;; Org
+(key-chord-define-global "x," #'counsel-org-goto-all)
+
 ;; Switching windows
 (key-chord-define-global "xh" #'my-switch-to-mru-window)
 (key-chord-define-global "xj" #'switch-window)
