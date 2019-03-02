@@ -200,34 +200,30 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                         "#+END_QUOTE\n"))
               ("c" "Store link in the backlog" entry
                (file org-default-notes-file)
-               ,(concat "* NEW %f%:description\n"
-                        ":PROPERTIES:\n"
-                        ":URL:      %(pcase
+               ,(concat "* NEW [[%(pcase
                             (with-current-buffer
                                 (org-capture-get :original-buffer) major-mode)
                              ((or 'w3m-mode 'gnus-article-mode) \"%:link\")
-                             (_ \"file:%F\"))\n"
-                        ":END:\n"
+                             (_ \"file:%F\")
+                           )][%f%:description]]\n"
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"))
               ("u" "Store link at point in the backlog" entry
                (file org-default-notes-file)
-               ,(concat "* NEW %(with-current-buffer
-                                    (org-capture-get :original-buffer)
-                              (or (my-w3m-anchor-text)
-                                  (thing-at-point 'url)
-                                  (w3m-buffer-title
-                                   (w3m-select-buffer-current-buffer))))\n"
-                        ":PROPERTIES:\n"
-                        ":URL:      %(with-current-buffer
+               ,(concat "* NEW [[%(with-current-buffer
                                          (org-capture-get :original-buffer)
                               (or (w3m-anchor)
                                   (thing-at-point 'url)
                                   (buffer-local-value
                                    'w3m-current-url
-                                   (w3m-select-buffer-current-buffer))))\n"
-                        ":END:\n"
+                                   (w3m-select-buffer-current-buffer)))
+                           )][%(with-current-buffer
+                                    (org-capture-get :original-buffer)
+                              (or (my-w3m-anchor-text)
+                                  (thing-at-point 'url)
+                                  (w3m-buffer-title
+                                   (w3m-select-buffer-current-buffer))))]]\n"
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"))))
