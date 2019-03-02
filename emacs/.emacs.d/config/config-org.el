@@ -274,6 +274,41 @@ If FILE-NAME is not absolute, it is interpreted as relative to
               timestamps
               ""))
 
+;;; Commands
+
+(defun my-org-convert-url-property (type)
+  "Convert between URL property of a current headline to a link
+in its title.
+
+If TYPE is a symbol `link', convert URL property to link.
+
+If TYPE is symbol `property', convert link to a URL property.
+
+If TYPE is symbol `toggle', convert between a property and a
+link."
+  (interactive '(toggle))
+  (save-excursion
+    (org-back-to-heading)
+    (let* ((element (org-element-at-point))
+           (title (org-element-property :title element))
+           (url-prop (org-element-property :URL element))
+           (title-context (save-excursion
+                            (re-search-forward org-outline-regexp)
+                            (org-element-context)))
+           (link (and (eq (org-element-type title-context) 'link)
+                      (org-element-property :raw-link title-context)))
+           (link-contents
+            (and (eq (org-element-type title-context) 'link)
+                 (buffer-substring
+                  (org-element-property :contents-begin title-context)
+                  (org-element-property :contents-end title-context)))))
+      (cond ((and url-prop (not link) (memq type '(link toggle)))
+             (org-edit-headline (org-make-link-string url-prop title))
+             (org-delete-property "URL"))
+            ((and (not url-prop) link (memq type '(property toggle)))
+             (org-edit-headline link-contents)
+             (org-set-property "URL" link))))))
+
 ;;; Effort
 
 (custom-set org-global-properties
