@@ -463,7 +463,23 @@ truncated."
 
 ;;; Refiling
 
-(custom-set org-refile-targets '((org-files-list :maxlevel . 2)))
+;;;###autoload
+(defcustom my-org-cabinet-directory "cabinet"
+  "Directory with non-actionable Org files, relative to
+`org-directory'."
+  :type 'directory
+  :group 'my)
+
+(defun my-org-cabinet-files ()
+  "Get list of non-actionable Org files stored for the reference
+value."
+  (directory-files (expand-file-name my-org-cabinet-directory
+                                     org-directory)
+                   t
+                   "\\`[^#]+.org\\'"))
+
+(custom-set org-refile-targets '((org-files-list :maxlevel . 2)
+                                 (my-org-cabinet-files :maxlevel . 2)))
 (custom-set org-refile-allow-creating-parent-nodes t)
 (custom-set org-refile-use-outline-path 'file)
 (custom-set org-outline-path-complete-in-steps nil)

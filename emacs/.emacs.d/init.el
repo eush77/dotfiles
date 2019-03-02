@@ -41,6 +41,7 @@ and URL
     (my-open-line-and-indent custom-variable)
     (my-org-agenda-context-filter custom-variable)
     (my-org-agenda-todo-keyword-filter custom-variable)
+    (my-org-cabinet-directory custom-variable)
     (my-org-notes-directory custom-variable)
     (my-org-plan-directory custom-variable)
     (my-window-size-delta custom-variable)
