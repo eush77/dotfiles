@@ -167,6 +167,22 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (add-hook 'org-mode-hook #'my-org-add-save-archive-buffer-hook)
 
+(defun my-org-archive-all-matches--highlight-line (func &rest args)
+  "Highlight line with the current match."
+  (cl-letf* ((hl-line-mode t)
+             (y-or-n-p-function (symbol-function 'y-or-n-p))
+             ((symbol-function 'y-or-n-p)
+              (lambda (prompt)
+                (hl-line-highlight)
+                (condition-case err (funcall y-or-n-p-function prompt)
+                  ((error quit)
+                   (hl-line-unhighlight)
+                   (signal (car err) (cdr err)))))))
+    (apply func args)))
+
+(advice-add 'org-archive-all-matches
+            :around #'my-org-archive-all-matches--highlight-line)
+
 ;;; Capture
 
 (defun my-w3m-anchor-text ()
