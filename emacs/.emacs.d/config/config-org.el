@@ -247,12 +247,16 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"
-                        "Captured from %(pcase
-                            (with-current-buffer
-                                (org-capture-get :original-buffer) major-mode)
+                        "Captured from %(with-current-buffer
+                                         (org-capture-get :original-buffer)
+                         (pcase major-mode
                           ('w3m-mode \"%:link\")
                           ('gnus-article-mode \"%:from\")
-                          (_ \"%f\")):\n"
+                          ('magit-revision-mode
+                           (let ((id (save-excursion (goto-char (point-min))
+                                                     (thing-at-point 'word))))
+                             (magit-rev-format \"\\%h (by \\%an)\" id)))
+                          (_ \"%f\"))):\n"
                         "#+BEGIN_QUOTE\n"
                         "%i\n"
                         "#+END_QUOTE\n"))
