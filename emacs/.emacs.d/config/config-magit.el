@@ -35,6 +35,12 @@ Otherwise hide it, and show the previous sibling section."
   ;; `C-M-i' equals `M-TAB' on TTY.
   (define-key magit-revision-mode-map (kbd "C-M-i") #'magit-section-cycle))
 
+;;; magit-files
+
+(with-eval-after-load "magit-files"
+  (define-key magit-file-mode-map "\C-cf" 'magit-file-popup)
+  (define-key magit-file-mode-map "\C-cg" 'magit-dispatch-popup))
+
 ;;; magit-log
 
 ;;;###autoload
