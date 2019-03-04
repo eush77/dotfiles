@@ -1,3 +1,5 @@
+(require 'dash)
+
 ;;; browse-web
 
 (defalias 'browse-web #'w3m)
@@ -125,17 +127,17 @@ point instead."
 ;;; w3m-close-window
 
 (defun my-w3m-close-window ()
-  "Version of `w3m-close-window' that doesn't close windows and
-frames."
+  "Version of `w3m-close-window' that doesn't change window
+configuration and doesn't close buffers in other windows."
   (interactive)
   (w3m-history-store-position)
-  (let ((buffers (w3m-list-buffers t)))
-    (dolist (buffer buffers)
-      (w3m-cancel-refresh-timer buffer)
-      (bury-buffer buffer))
-    (dolist (buffer buffers)
-      (when-let ((window (get-buffer-window buffer t)))
-        (set-window-buffer window (other-buffer))))))
+  (if (--all? (eq (buffer-local-value 'major-mode it)
+                  'w3m-mode)
+              (buffer-list))
+      (message "All buffers are W3m buffers!")
+    (while (eq (buffer-local-value 'major-mode (window-buffer)) 'w3m-mode)
+      (bury-buffer (window-buffer))
+      (set-window-buffer (selected-window) (other-buffer)))))
 
 ;;; w3m-filter
 
