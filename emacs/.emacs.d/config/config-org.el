@@ -441,11 +441,14 @@ Returns either a one-element list or an empty list."
 (defun my-org-jump-less-p (left right)
   "Sorting function for `my-org-jump' and `my-org-notes-jump'.
 
-Top-level files are ordered before nested files. Two top-level
-files are ordered alphabetically."
-  (unless (string-match "/" left)
-    (or (string-match "/" right)
-        (< (elt left 0) (elt right 0)))))
+Org files are ordered before anything else. Top-level files are
+ordered before nested files. Top-level org files are ordered
+alphabetically."
+  (or (and (string= (file-name-extension left) "org")
+           (not (string= (file-name-extension right) "org")))
+      (and (not (string-match-p "/" left))
+           (or (string-match-p "/" right)
+               (< (elt left 0) (elt right 0))))))
 
 ;;;###autoload
 (defun my-org-jump (&optional directory)
