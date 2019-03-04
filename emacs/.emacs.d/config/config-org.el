@@ -288,22 +288,34 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;; Commands
 
-(defun my-org-convert-url-property (type)
-  "Convert between URL property of a current headline to a link
-in its title.
+(defun my-org-convert-url-property (type &optional property)
+  "Move URL from a headling property to a link in the title and back.
 
 If TYPE is a symbol `link', convert URL property to link.
 
 If TYPE is symbol `property', convert link to a URL property.
 
 If TYPE is symbol `toggle', convert between a property and a
-link."
-  (interactive '(toggle))
+link.
+
+Optional argument PROPERTY specifies the name of property,
+defaults to \"URL\"."
+  (interactive
+   (list 'toggle
+         (let ((url-property
+                (car (seq-find
+                      (lambda (prop)
+                        (url-type (url-generic-parse-url (cdr prop))))
+                      (org-entry-properties)))))
+           (read-string "Property: " (or url-property "URL")))))
+  (unless property
+    (setq property "URL"))
   (save-excursion
     (org-back-to-heading)
     (let* ((element (org-element-at-point))
            (title (org-element-property :title element))
-           (url-prop (org-element-property :URL element))
+           (url-prop (org-element-property (intern (concat ":" property))
+                                           element))
            (title-context (let ((case-fold-search))
                             (looking-at org-todo-line-regexp)
                             (goto-char (match-beginning 3))
@@ -317,10 +329,10 @@ link."
                   (org-element-property :contents-end title-context)))))
       (cond ((and url-prop (not link) (memq type '(link toggle)))
              (org-edit-headline (org-make-link-string url-prop title))
-             (org-delete-property "URL"))
+             (org-delete-property property))
             ((and (not url-prop) link (memq type '(property toggle)))
              (org-edit-headline link-contents)
-             (org-set-property "URL" link))))))
+             (org-set-property property link))))))
 
 ;;; Effort
 
