@@ -179,7 +179,8 @@ put it into ‘kill-ring’."
 
 ;;; w3m-uri-replace
 
-(add-to-list 'w3m-uri-replace-alist
-             '("\\`\\(https://github\\.com/[^/]+/[^/]+\\)/blob/"
-               w3m-pattern-uri-replace
-               "\\1/raw/"))
+(with-eval-after-load "w3m"
+  (add-to-list 'w3m-uri-replace-alist
+               '("\\`\\(https://github\\.com/[^/]+/[^/]+\\)/blob/"
+                 w3m-pattern-uri-replace
+                 "\\1/raw/")))
