@@ -36,7 +36,7 @@
 (defun my-w3m-setup-font ()
   "Set up the font for `w3m-mode'."
   (face-remap-add-relative 'default :family "Droid Serif")
-  (text-scale-adjust 1))
+  (text-scale-increase 1))
 
 (with-eval-after-load "w3m"
   (when window-system
