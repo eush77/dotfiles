@@ -304,8 +304,9 @@ link."
     (let* ((element (org-element-at-point))
            (title (org-element-property :title element))
            (url-prop (org-element-property :URL element))
-           (title-context (save-excursion
-                            (re-search-forward org-outline-regexp)
+           (title-context (let ((case-fold-search))
+                            (looking-at org-todo-line-regexp)
+                            (goto-char (match-beginning 3))
                             (org-element-context)))
            (link (and (eq (org-element-type title-context) 'link)
                       (org-element-property :raw-link title-context)))
