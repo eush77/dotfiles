@@ -144,6 +144,7 @@ and URL
 (with-eval-after-load "compile" (load "config-compile"))
 (with-eval-after-load "custom" (load "config-custom"))
 (with-eval-after-load "dired" (load "config-dired"))
+(with-eval-after-load "doc-view" (load "config-doc-view"))
 (with-eval-after-load "ediff" (load "config-ediff"))
 (with-eval-after-load "edit-indirect" (load "config-edit-indirect"))
 (with-eval-after-load "elisp-mode" (load "config-elisp"))
@@ -183,8 +184,7 @@ and URL
 (with-eval-after-load "yaml-mode" (load "config-yaml"))
 
 (when window-system
-  (load "config-pdf-tools")
-  (with-eval-after-load "doc-view" (load "config-doc-view")))
+  (load "config-pdf-tools"))
 
 ;; Host file - tweak things if necessary.
 (let ((host-file (expand-file-name "host.el" user-emacs-directory)))
