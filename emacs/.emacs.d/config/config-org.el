@@ -169,6 +169,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (defun my-org-archive-all-matches--highlight-line (func &rest args)
   "Highlight line with the current match."
+  (require 'hl-line)
   (cl-letf* ((hl-line-mode t)
              (y-or-n-p-function (symbol-function 'y-or-n-p))
              ((symbol-function 'y-or-n-p)
