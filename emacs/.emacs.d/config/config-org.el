@@ -203,7 +203,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                   (format "\"%s\" (by %s)" %:subject %:from))
                  ('magit-revision-mode
                   (magit-rev-format "\"%s\" (%h by %an)" magit-id))
-                 (_ %f)))
+                 (_ (if (string-empty-p %f) (buffer-name) %f))))
          (subject (or w3m-current-title
                       (and (not (string-empty-p %:subject)) %:subject)
                       (and magit-id (magit-rev-format "%s" magit-id)))))
