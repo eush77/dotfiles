@@ -293,6 +293,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 (custom-set org-capture-templates-contexts
             '(("c" (my-org-capture-c-context))
+              ("r" (region-active-p))
               ("u" (my-org-capture-link-context))))
 
 ;;; Clocking
