@@ -271,7 +271,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"))
-              ("u" ,(documentation 'my-org-capture-links) entry
+              ("u" ,(documentation 'my-org-capture-link) entry
                (file org-default-notes-file)
                "%(with-current-buffer (org-capture-get :original-buffer)
                   (my-org-capture-link))")))
