@@ -192,7 +192,34 @@ If FILE-NAME is not absolute, it is interpreted as relative to
           (end (next-single-property-change (point) 'face)))
       (buffer-substring-no-properties begin end ))))
 
-(defun my-org-capture-link ()
+(defun my-org-capture-region (%f %i %U %:from %:link %:subject)
+  "Quote active region"
+  (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
+                        (save-excursion (goto-char (point-min))
+                                        (thing-at-point 'word))))
+         (from (pcase major-mode
+                 ('w3m-mode %:link)
+                 ('gnus-article-mode
+                  (format "\"%s\" (by %s)" %:subject %:from))
+                 ('magit-revision-mode
+                  (magit-rev-format "\"%s\" (%h by %an)" magit-id))
+                 (_ %f)))
+         (subject (or w3m-current-title
+                      (and (not (string-empty-p %:subject)) %:subject)
+                      (and magit-id (magit-rev-format "%s" magit-id)))))
+    (concat "* NEW %?" subject "\n"
+            ":LOGBOOK:\n"
+            "- State \"NEW\"        from              " %U "\n"
+            ":END:\n"
+            (with-temp-buffer
+              (insert "Captured from " from ":\n")
+              (fill-region (point-min) (point-max))
+              (buffer-string))
+            "#+BEGIN_QUOTE\n"
+            (string-trim %i) "\n"
+            "#+END_QUOTE\n")))
+
+(defun my-org-capture-link (%U)
   "Store link at point / in the active region"
   (if (region-active-p)
       (let ((headings))
@@ -218,12 +245,10 @@ If FILE-NAME is not absolute, it is interpreted as relative to
           (description (or (my-w3m-anchor-text)
                            (thing-at-point 'url)
                            (w3m-buffer-title
-                            (w3m-select-buffer-current-buffer))))
-          (timestamp (format-time-string (org-time-stamp-format t t)
-                                         (current-time))))
+                            (w3m-select-buffer-current-buffer)))))
       (concat "* NEW " (org-make-link-string link description) "\n"
               ":LOGBOOK:\n"
-              "- State \"NEW\"        from              " timestamp "\n"
+              "- State \"NEW\"        from              " %U "\n"
               ":END:\n"))))
 
 (defun my-org-capture-link-context ()
@@ -241,25 +266,11 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                         ":LOGBOOK:\n"
                         "- State \"NEW\"        from              %U\n"
                         ":END:\n"))
-              ("r" "Quote active region" entry
+              ("r" ,(documentation 'my-org-capture-region) entry
                (file org-default-notes-file)
-               ,(concat "* NEW %?\n"
-                        ":LOGBOOK:\n"
-                        "- State \"NEW\"        from              %U\n"
-                        ":END:\n"
-                        "Captured from %(with-current-buffer
-                                         (org-capture-get :original-buffer)
-                         (pcase major-mode
-                          ('w3m-mode \"%:link\")
-                          ('gnus-article-mode \"%:from\")
-                          ('magit-revision-mode
-                           (let ((id (save-excursion (goto-char (point-min))
-                                                     (thing-at-point 'word))))
-                             (magit-rev-format \"\\%h (by \\%an)\" id)))
-                          (_ \"%f\"))):\n"
-                        "#+BEGIN_QUOTE\n"
-                        "%i\n"
-                        "#+END_QUOTE\n"))
+                "%(with-current-buffer (org-capture-get :original-buffer)
+                   (my-org-capture-region
+                    \"%f\" \"%i\" \"%U\" \"%:from\" \"%:link\" \"%:subject\"))")
               ("c" "Store link to the current buffer" entry
                (file org-default-notes-file)
                ,(concat "* NEW [[%(pcase
@@ -274,7 +285,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
               ("u" ,(documentation 'my-org-capture-link) entry
                (file org-default-notes-file)
                "%(with-current-buffer (org-capture-get :original-buffer)
-                  (my-org-capture-link))")))
+                  (my-org-capture-link \"%U\"))")))
 
 (defun my-org-capture-c-context ()
   (or (memq major-mode '(w3m-mode gnus-article-mode))
