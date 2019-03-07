@@ -205,9 +205,10 @@ If FILE-NAME is not absolute, it is interpreted as relative to
                  ('magit-revision-mode
                   (magit-rev-format "\"%s\" (%h by %an)" magit-id))
                  (_ (if (string-empty-p %f) (buffer-name) %f))))
-         (subject (or w3m-current-title
-                      (and (not (string-empty-p %:subject)) %:subject)
-                      (and magit-id (magit-rev-format "%s" magit-id)))))
+         (subject (pcase major-mode
+                    ('w3m-mode w3m-current-title)
+                    ('gnus-article-mode %:subject)
+                    ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
     (concat "* NEW %?" subject "\n"
             ":LOGBOOK:\n"
             "- State \"NEW\"        from              " %U "\n"
