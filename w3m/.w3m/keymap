@@ -16,7 +16,9 @@ keymap	l	CENTER_V
 keymap	m	EXTERN_LINK
 keymap	M	EXTERN
 keymap	n	NEXT_LINK
+keymap	N	SEARCH_NEXT
 keymap	p	PREV_LINK
+keymap	P	SEARCH_PREV
 keymap	q	QUIT
 keymap	Q	QUIT
 keymap	r	RELOAD
