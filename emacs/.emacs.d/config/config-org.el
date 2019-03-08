@@ -20,6 +20,19 @@ or the whole buffer otherwise."
           (cons (point) end-of-subtree)
         (cons (point-min) (point-max))))))
 
+(defvar my-org-agenda-goto-hd-point nil
+  "Heading to go to after creating an agenda buffer.")
+
+(defun my-org-search-view--go-to-heading (&rest _)
+  "Go to heading at `my-org-agenda-goto-hd-point'."
+  (when my-org-agenda-goto-hd-point
+    (org-agenda-next-item 1)
+    (while (/= (org-get-at-bol 'org-hd-marker)
+               my-org-agenda-goto-hd-point)
+      (org-agenda-next-item 1))))
+(advice-add 'org-search-view
+            :after #'my-org-search-view--go-to-heading)
+
 (custom-set org-agenda-custom-commands
             `(("b" "Batch view" search "{..}"
                ((org-agenda-restrict
@@ -29,7 +42,9 @@ or the whole buffer otherwise."
                 (org-agenda-restrict-begin
                  (car (my-org-agenda-get-batch-view-region)))
                 (org-agenda-restrict-end
-                 (cdr (my-org-agenda-get-batch-view-region)))))
+                 (cdr (my-org-agenda-get-batch-view-region)))
+                (my-org-agenda-goto-hd-point
+                 (save-excursion (org-back-to-heading) (point)))))
               ("p" "Planned tasks"
                ((my-org-agenda-planned-view "Weekly.org")
                 (my-org-agenda-planned-view "Monthly.org")
