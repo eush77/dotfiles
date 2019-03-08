@@ -143,9 +143,8 @@ configuration and doesn't close buffers in other windows."
 ;;; w3m-filter
 
 (defun my-w3m-filter--catch-errors (func &rest args)
-  (condition-case nil
-      (funcall func args)
-    (error)))
+  (with-demoted-errors "Error in w3m-filter: %S"
+    (apply func args)))
 
 (with-eval-after-load "w3m-filter"
   (advice-add 'w3m-filter :around #'my-w3m-filter--catch-errors))
