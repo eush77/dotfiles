@@ -6,5 +6,5 @@ editor $EDITOR
 emacs_like_lineedit true
 extbrowser $SHELL -s
 history 1000
-user_agent w3m/0.5 (like Android)
+user_agent w3m/0.5
 wrap_search
