@@ -4,8 +4,33 @@
 
 ;;; Agenda
 
+(defun my-org-agenda-get-batch-view-region ()
+  "Get restriction region for the batch view.
+
+Return the current subtree if the subtree is (partially) visible
+or the whole buffer otherwise."
+  (save-excursion
+    (org-back-to-heading)
+    (let* ((next-visible-heading
+            (save-excursion (org-next-visible-heading 1) (point)))
+           (end-of-subtree
+            (save-excursion (org-end-of-subtree 1) (point)))
+           (subtree-p (< next-visible-heading end-of-subtree)))
+      (if subtree-p
+          (cons (point) end-of-subtree)
+        (cons (point-min) (point-max))))))
+
 (custom-set org-agenda-custom-commands
-            `(("p" "Planned tasks"
+            `(("b" "Batch view" search "{..}"
+               ((org-agenda-restrict
+                 (progn (put 'org-agenda-files 'org-restrict
+                             (list (buffer-file-name (buffer-base-buffer))))
+                        (current-buffer)))
+                (org-agenda-restrict-begin
+                 (car (my-org-agenda-get-batch-view-region)))
+                (org-agenda-restrict-end
+                 (cdr (my-org-agenda-get-batch-view-region)))))
+              ("p" "Planned tasks"
                ((my-org-agenda-planned-view "Weekly.org")
                 (my-org-agenda-planned-view "Monthly.org")
                 (my-org-agenda-planned-view "Quarterly.org")
