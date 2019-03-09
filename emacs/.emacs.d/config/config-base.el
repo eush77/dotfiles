@@ -95,6 +95,17 @@ the name of the current buffer."
 ;; View mode
 (custom-set view-read-only t)
 
+;; yes-or-no-p
+(defun yay-or-nay-p (prompt)
+  "Like `yes-or-no-p', but asks for \"yay\" or \"nay\" instead."
+  (catch 'yay-or-nay
+    (while (not (pcase (read-string (concat prompt "(yay or nay) ") nil t)
+                  ((or "yay" "yes") (throw 'yay-or-nay t))
+                  ((or "nay" "no") (throw 'yay-or-nay nil))))
+      (message "Please answer yay or nay.")
+      (sit-for 0.5))))
+(advice-add 'yes-or-no-p :override #'yay-or-nay-p)
+
 ;; Enable base modes.
 (pending-delete-mode 1)
 (show-paren-mode 1)
