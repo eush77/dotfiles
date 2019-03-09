@@ -415,6 +415,42 @@ defaults to \"URL\"."
              (org-edit-headline link-contents)
              (org-set-property property link))))))
 
+(defun my-org-convert-url-quote ()
+  "Move URL from a quote to a link in the title.
+
+Before:
+
+    * Foo
+    #+BEGIN_QUOTE
+    http://example.com
+    #+END_QUOTE
+
+After:
+
+    * [[http://example.com][Foo]]"
+  (save-excursion
+    (org-back-to-heading)
+    (let* ((title (let ((case-fold-search))
+                    (looking-at org-todo-line-regexp)
+                    (goto-char (match-beginning 3))
+                    (org-element-context)))
+           (block (progn (org-next-block 1) (org-element-at-point)))
+           (url (progn
+                  (goto-char (org-element-property :contents-begin block))
+                  (thing-at-point 'url))))
+      (when (and (not (eq (org-element-type title) 'link))
+                 (eq (org-element-type block) 'quote-block)
+                 url
+                 (progn (end-of-thing 'url)
+                        (= (char-after) ?\n)
+                        (= (+ (point) 1)
+                           (org-element-property :contents-end block))))
+        (delete-region (org-element-property :begin block)
+                       (org-element-property :end block))
+        (org-edit-headline (org-make-link-string
+                            url
+                            (org-element-property :raw-value title)))))))
+
 ;;; Effort
 
 (custom-set org-global-properties
