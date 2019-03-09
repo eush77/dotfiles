@@ -748,6 +748,8 @@ If the new state is `DROP', drop the whole subtree."
 
 (define-key org-mode-map (kbd "C-`") #'my-insert-tilde)
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
+(define-key org-mode-map (kbd "C-c C-/ C-p") #'my-org-convert-url-property)
+(define-key org-mode-map (kbd "C-c C-/ C-q") #'my-org-convert-url-quote)
 (define-key org-mode-map (kbd "C-c C-x C-p") #'org-pomodoro)
 (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
