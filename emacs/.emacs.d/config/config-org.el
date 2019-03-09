@@ -672,7 +672,7 @@ This may silently modify any entry from the point onward."
 ;;; Todo
 
 (custom-set org-todo-keywords
-            '((sequence "TODO(!)" "WAIT(@)" "NEXT(!)" "|" "DONE(!)" "DROP(@)")
+            '((type  "TODO(!)" "NEXT(!)" "WAIT(@)" "|" "DONE(!)" "DROP(@)")
               (sequence "PLAN" "|" "PASS" "FAIL")))
 (custom-set org-todo-keyword-faces
             '(("PLAN" . "yellow")
