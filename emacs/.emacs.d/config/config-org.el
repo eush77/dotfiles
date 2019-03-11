@@ -429,6 +429,7 @@ Before:
 After:
 
     * [[http://example.com][Foo]]"
+  (interactive)
   (save-excursion
     (org-back-to-heading)
     (let* ((title (let ((case-fold-search))
