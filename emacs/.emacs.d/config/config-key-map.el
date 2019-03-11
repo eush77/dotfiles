@@ -3,6 +3,9 @@
 (autoload 'swiper-multi "swiper" nil t)
 (autoload 'zap-up-to-char "misc" nil t)
 
+;; Bookmarks
+(global-set-key (kbd "C-x r B") #'counsel-bookmarked-directory)
+
 ;; Calendar
 (global-set-key (kbd "C-c z") #'calendar)
 
