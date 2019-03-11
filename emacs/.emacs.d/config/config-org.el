@@ -764,6 +764,10 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)
 
+(unless (display-graphic-p)
+  (define-key org-mode-map (kbd "C-c DEL C-p") #'my-org-convert-url-property)
+  (define-key org-mode-map (kbd "C-c DEL C-q") #'my-org-convert-url-quote))
+
 (defhydra my-org-mark-subtree-hydra ()
   "Mark subtree"
   ("@" org-mark-subtree))
