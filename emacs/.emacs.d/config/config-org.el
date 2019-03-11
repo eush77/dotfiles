@@ -446,6 +446,7 @@ After:
                         (= (char-after) ?\n)
                         (= (+ (point) 1)
                            (org-element-property :contents-end block))))
+        (org-back-to-heading)
         (delete-region (org-element-property :begin block)
                        (org-element-property :end block))
         (org-edit-headline (org-make-link-string
