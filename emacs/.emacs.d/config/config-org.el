@@ -45,6 +45,7 @@ or the whole buffer otherwise."
                  (cdr (my-org-agenda-get-batch-view-region)))
                 (my-org-agenda-goto-hd-point
                  (save-excursion (org-back-to-heading) (point)))))
+              ("n" "Next actions" todo "NEXT")
               ("p" "Planned tasks"
                ((my-org-agenda-planned-view "Weekly.org")
                 (my-org-agenda-planned-view "Monthly.org")
