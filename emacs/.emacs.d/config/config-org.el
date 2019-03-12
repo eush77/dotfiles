@@ -1,4 +1,5 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
+(require 'dash)
 (require 'org-depend)
 (require 'subr-x)
 
@@ -644,6 +645,41 @@ This may silently modify any entry from the point onward."
                    "\\1" nil t nil))
 
 (add-hook 'org-after-refile-insert-hook #'my-org-remove-new-keywords)
+
+;;; Reverting
+
+(defvar my-revert-buffer--org-revert-in-progress nil
+  "t if in the process of reverting all Org buffers.
+
+This variable is needed to avoid asking to revert buffers
+recursively.")
+
+(defun my-revert-buffer--org-revert-all (&rest _)
+  "Revert all unmodified Org buffers that are changed on disk."
+  (require 'ibuffer)
+  (when (and (derived-mode-p 'org-mode)
+             (not my-revert-buffer--org-revert-in-progress))
+    (let ((my-revert-buffer--org-revert-in-progress t)
+          (buffers (--filter (and (with-current-buffer it
+                                    (derived-mode-p 'org-mode))
+                                  (not (verify-visited-file-modtime it))
+                                  (not (buffer-modified-p it)))
+                             (buffer-list))))
+      (when (and buffers
+                 (with-temp-buffer
+                   (rename-buffer " *Org Buffers*")
+                   (save-window-excursion
+                     (display-buffer (current-buffer)
+                                     (cons 'display-buffer-at-bottom
+                                           '((window-height . 0.15))))
+                     (ibuffer-columnize-and-insert-list
+                      (mapcar #'buffer-name buffers))
+                     (yes-or-no-p "Reread these other Org files as well? "))))
+        (dolist (buffer buffers)
+          (with-current-buffer buffer
+            (revert-buffer t t)))))))
+(advice-add 'revert-buffer
+            :after #'my-revert-buffer--org-revert-all)
 
 ;;; Structure Editing
 
