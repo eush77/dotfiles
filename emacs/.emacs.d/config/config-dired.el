@@ -47,6 +47,23 @@ the same window."
   (message "Dired DWIM target %s"
            (if dired-dwim-target "enabled" "disabled")))
 
+;;; dired-do-delete
+
+(defun my-dired-do-delete--rmdir (&optional arg)
+  "Remove empty directories without asking."
+  (unless arg
+    (pcase (dired-get-marked-files nil nil nil t)
+      (`(,directory)
+       (when (and (file-directory-p directory)
+                  (equal (directory-files directory) '("." "..")))
+         ;; Found an empty directory - delete it
+         (delete-directory directory)
+         (dired-revert)
+         (message "Empty directory \"%s\" deleted"
+                  (file-name-nondirectory directory))
+         t)))))
+(advice-add 'dired-do-delete :before-until #'my-dired-do-delete--rmdir)
+
 ;;; `dired-filter'
 
 (custom-set dired-filter-stack nil)
