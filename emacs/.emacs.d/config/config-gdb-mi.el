@@ -96,6 +96,13 @@ current frame."
   (interactive)
   (my-gdb-select-relative-frame -1))
 
+(defun my-gdb-quit ()
+  "Send a quit command to GDB."
+  (interactive)
+  (my-gdb-eval-in-comint-buffer)
+  (insert "quit")
+  (comint-send-input t t))
+
 (defun my-gdb-switch-to-stack-buffer ()
   "Switch to call stack buffer."
   (interactive)
@@ -137,6 +144,9 @@ current frame."
 (define-key gdb-frames-mode-map (kbd "s") #'gud-step)
 (define-key gdb-frames-mode-map (kbd "S") #'my-gud-reverse-step)
 (define-key gdb-frames-mode-map (kbd "u") #'my-gdb-frame-up)
+
+(define-key gud-mode-map [remap gdb-delchar-or-quit] #'delete-char)
+(global-set-key (vconcat gud-key-prefix "\C-q") #'my-gdb-quit)
 
 (dolist (num (number-sequence 0 9))
   (define-key gdb-frames-mode-map (kbd (number-to-string num))
