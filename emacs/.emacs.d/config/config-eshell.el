@@ -277,6 +277,21 @@ including the sigil."
                           (eshell-end-of-output)
                           t)))
 
+;;; eshell/dirs
+
+(defun my-eshell-dirs (&optional if-verbose)
+  "Like `eshell/dirs', but prints the list vertically and
+numbered."
+  (when (or (not if-verbose) eshell-dirtrack-verbose)
+    (mapconcat #'identity
+               (seq-map-indexed (lambda (directory index)
+                                  (concat (number-to-string index)
+                                          "\t"
+                                          directory))
+                                (cons (eshell/pwd) eshell-dirstack))
+               "\n")))
+(advice-add 'eshell/dirs :override #'my-eshell-dirs)
+
 ;;; Keymap
 
 ;; `eshell-mode-map' is local to the buffer, so set up key bindings in a hook.
