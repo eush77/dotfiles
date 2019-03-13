@@ -4,16 +4,33 @@
 
 ;;; Ibuffer
 
-(defun my-counsel-ibuffer--preselect (func &rest args)
-  "Remove current buffer, effectively preselecting last buffer."
+(defun my-counsel-ibuffer--get-buffers--preselect (candidates)
+  "Remove the current buffer from the list of candidates."
   (require 'ibuffer)
-  (cl-assert (eq ibuffer-default-sorting-mode 'recency))
-  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
-             ((symbol-function 'ivy-read)
-              (lambda (prompt collection &rest args)
-                (apply ivy-read-function prompt (cdr collection) args))))
-    (apply func args)))
-(advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
+  (cl-assert (and (eq ibuffer-default-sorting-mode 'recency)
+                  (eq (cdar candidates) (current-buffer))))
+  (cdr candidates))
+(advice-add 'counsel-ibuffer--get-buffers
+            :filter-return #'my-counsel-ibuffer--get-buffers--preselect)
+
+;;;###autoload
+(defcustom my-counsel-ibuffer-excluded-buffers
+  '("\\`\\*Compile-Log\\*\\'"
+    "\\`\\*Flycheck\\b")
+  "Regexes of buffer names to exclude from `counsel-ibuffer'."
+  :type '(repeat string)
+  :group 'my)
+
+(defun my-counsel-ibuffer--get-buffers--exclude (candidates)
+  "Exclude `my-counsel-ibuffer-excluded-buffers'"
+  (seq-remove (pcase-lambda (`(_ . ,buffer))
+                (seq-some (lambda (regexp)
+                            (string-match-p regexp
+                                            (buffer-name buffer)))
+                          my-counsel-ibuffer-excluded-buffers))
+              candidates))
+(advice-add 'counsel-ibuffer--get-buffers
+            :filter-return #'my-counsel-ibuffer--get-buffers--exclude)
 
 (defun my-counsel-ibuffer--small-cases (func &rest args)
   "Don't complete buffer name if there aren't any options."
