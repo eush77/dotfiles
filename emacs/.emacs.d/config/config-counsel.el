@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 (counsel-mode 1)
 
 ;;; Ibuffer
@@ -12,6 +14,18 @@
                 (apply ivy-read-function prompt (cdr collection) args))))
     (apply func args)))
 (advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--preselect)
+
+(defun my-counsel-ibuffer--small-cases (func &rest args)
+  "Don't complete buffer name if there aren't any options."
+  (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
+             ((symbol-function 'ivy-read)
+              (lambda (prompt collection &rest args)
+                (cl-case (length collection)
+                  (0 (message "No other buffer"))
+                  (1 (counsel-ibuffer-visit-buffer (car collection)))
+                  (otherwise (apply ivy-read-function prompt collection args))))))
+    (apply func args)))
+(advice-add 'counsel-ibuffer :around #'my-counsel-ibuffer--small-cases)
 
 ;;;###autoload
 (defun my-counsel-ibuffer-by-mode (mode)
