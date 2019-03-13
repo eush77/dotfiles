@@ -4,6 +4,7 @@
 
 ;;; Keymap
 
+(define-key markdown-mode-map "\C-c\C-j" #'counsel-outline)
 (define-key markdown-mode-map (kbd "M-<left>") #'markdown-promote)
 (define-key markdown-mode-map (kbd "M-<right>") #'markdown-demote)
 (define-key markdown-mode-map (kbd "M-<up>") #'markdown-move-up)

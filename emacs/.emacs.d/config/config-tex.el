@@ -15,4 +15,6 @@ Returns the location of an Org file the FILE is exported from."
 
 ;;; Keymap
 
+(define-key latex-mode-map "\C-c\C-j" #'counsel-outline)
+
 (key-chord-define latex-mode-map "xw" #'ff-get-other-file)

@@ -130,6 +130,8 @@ direction. The meaning of COUNT is inverted."
 
 (define-key outline-minor-mode-map outline-minor-mode-prefix
   #'my-outline-hydra/body)
+(define-key outline-minor-mode-map "\C-c\C-j"
+  #'counsel-outline)
 (define-key outline-mode-prefix-map (kbd "M-N")
   #'my-outline-show-next-subtree)
 (define-key outline-mode-prefix-map (kbd "M-P")
