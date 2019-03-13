@@ -13,7 +13,7 @@ from `prog-mode'."
 
 ;;; Commands
 
-;;; ###aytoload
+;;;###autoload
 (defcustom my-compilation-ignored-buffers '("*Compile-Log*"
                                             "*Org-Babel Error Output*"
                                             "*Org PDF LaTeX Output*")
