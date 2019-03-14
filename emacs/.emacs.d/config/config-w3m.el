@@ -83,7 +83,7 @@ point instead."
 
 (defun my-w3m-canonicalize-url--domain-name (args)
   "Auto-prepend \"http://\" to domain-looking names."
-  (if (string-match-p "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+$" (car args))
+  (if (string-match-p "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+\\(?:/.*\\)?$" (car args))
       (cons (concat "http://" (car args)) (cdr args))
     args))
 
