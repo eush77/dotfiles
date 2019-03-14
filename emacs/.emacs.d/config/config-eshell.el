@@ -277,6 +277,15 @@ including the sigil."
                           (eshell-end-of-output)
                           t)))
 
+;;; Completion
+
+(defun pcomplete/eshell-mode/pushd ()
+  (pcomplete-here
+   (completion-table-merge
+    (seq-map-indexed (lambda (_ index) (format "+%d" (+ index 1)))
+                     eshell-dirstack)
+    (pcomplete-dirs))))
+
 ;;; eshell/dirs
 
 (defun my-eshell-dirs (&optional if-verbose)
