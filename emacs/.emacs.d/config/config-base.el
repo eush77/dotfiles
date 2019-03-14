@@ -11,12 +11,6 @@
 ;; Backups
 (custom-set backup-directory-alist '(("." . "~/.emacs.d/backups/")))
 
-;; Delete trailing space on save.
-(add-hook 'before-save-hook
-          (lambda ()
-            (unless (eq major-mode 'diff-mode)
-              (delete-trailing-whitespace))))
-
 ;; Commenting style
 (custom-set comment-multi-line t)
 (custom-set comment-style 'extra-line)
