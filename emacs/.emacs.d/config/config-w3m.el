@@ -87,9 +87,17 @@ point instead."
       (cons (concat "http://" (car args)) (cdr args))
     args))
 
+(defun my-w3m-string-match-url-components (args)
+  "Don't match strings with spaces as URLs."
+  (if (string-match-p " " (car args))
+      '("")
+    args))
+
 (with-eval-after-load "w3m"
   (advice-add 'w3m-canonicalize-url
-              :filter-args #'my-w3m-canonicalize-url--domain-name))
+              :filter-args #'my-w3m-canonicalize-url--domain-name)
+  (advice-add 'w3m-string-match-url-components
+              :filter-args #'my-w3m-string-match-url-components))
 
 ;;; w3m-mode-map
 
