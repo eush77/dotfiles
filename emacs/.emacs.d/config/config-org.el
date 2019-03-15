@@ -348,6 +348,14 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 (advice-add 'org-capture-refile
             :around #'my-org-capture-refile--save-target-buffer)
 
+(defun my-org-capture-refile--jump-to-refiled (&rest args)
+  "Jump to refiled items."
+  (unless (eq (marker-buffer org-capture-last-stored-marker)
+              (current-buffer))
+    (org-goto-marker-or-bmk org-capture-last-stored-marker)))
+(advice-add 'org-capture-refile
+            :after #'my-org-capture-refile--jump-to-refiled)
+
 ;;; Clocking
 
 ;;;###autoload (autoload 'my-hydra-org-clock/body "config-org")
