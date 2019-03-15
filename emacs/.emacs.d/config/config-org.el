@@ -300,7 +300,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
   (if (region-active-p)
       (eq major-mode 'w3m-mode)
     (or (eq major-mode 'w3m-select-buffer-mode)
-        (w3m-anchor)
+        (and (fboundp 'w3m-anchor) (w3m-anchor))
         (thing-at-point 'url))))
 
 (custom-set org-capture-templates
