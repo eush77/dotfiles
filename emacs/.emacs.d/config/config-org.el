@@ -340,6 +340,14 @@ If FILE-NAME is not absolute, it is interpreted as relative to
               ("r" (region-active-p))
               ("u" (my-org-capture-link-context))))
 
+(defun my-org-capture-refile--save-target-buffer (func &rest args)
+  "Save target buffer after refiling an item from it."
+  (let ((base (or (buffer-base-buffer) (current-buffer))))
+    (apply func args)
+    (with-current-buffer base (save-buffer))))
+(advice-add 'org-capture-refile
+            :around #'my-org-capture-refile--save-target-buffer)
+
 ;;; Clocking
 
 ;;;###autoload (autoload 'my-hydra-org-clock/body "config-org")
