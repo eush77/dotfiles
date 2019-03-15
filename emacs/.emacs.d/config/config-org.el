@@ -226,6 +226,30 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 (advice-add 'org-archive-all-matches
             :around #'my-org-archive-all-matches--highlight-line)
 
+(defun my-org-files-list--remove-archive (files)
+  "Remove archive files.
+
+Archive files are those matching `org-archive-location'."
+  (let* ((archive-file (car (split-string org-archive-location "::")))
+         (archive-file-regexp
+          (concat
+           "\\(?:\\`\\|/\\)"
+           (if (string-match "\\`\\(.*[^%]\\(?:%%\\)*\\)?%s\\(.*\\)\\'"
+                             archive-file)
+               (concat (regexp-quote (substring archive-file
+                                                (match-beginning 1)
+                                                (match-end 1)))
+                       "[^/]+"
+                       (regexp-quote (substring archive-file
+                                                (match-beginning 2)
+                                                (match-end 2))))
+             (regexp-quote archive-file))
+           "\\'")))
+    (seq-remove (apply-partially #'string-match-p archive-file-regexp)
+                files)))
+(advice-add 'org-files-list
+            :filter-return #'my-org-files-list--remove-archive)
+
 ;;; Capture
 
 (defun my-w3m-anchor-text ()
