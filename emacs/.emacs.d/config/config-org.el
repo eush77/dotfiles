@@ -200,7 +200,9 @@ If FILE-NAME is not absolute, it is interpreted as relative to
   "Save the live archive buffer for the current buffer."
   (interactive)
   (require 'org-archive)
-  (when-let ((buffer (get-file-buffer (org-extract-archive-file))))
+  (dolist (buffer (seq-remove
+                   #'null
+                   (seq-map #'get-file-buffer (org-all-archive-files))))
     (with-current-buffer buffer
       (save-buffer))))
 
@@ -533,16 +535,14 @@ Returns either a one-element list or an empty list."
   (require 'org-archive)
   (when-let ((buffer (get-file-buffer file)))
     (with-current-buffer buffer
-      (let ((archive-file (org-extract-archive-file)))
-        (if (file-exists-p archive-file)
-            (list archive-file)
+      (or (seq-filter #'file-exists-p (org-all-archive-files))
           (save-excursion
             (goto-char (point-max))
             (when (search-backward-regexp
                    "^ *:ARCHIVE_FILE: *\\([^ ].*\\)$"
                    nil
                    t)
-              (list (my-locate-org-file (match-string 1))))))))))
+              (list (my-locate-org-file (match-string 1)))))))))
 
 (defun my-org-ff-other-file/export (file)
   "Return the list of locations of files exported from FILE."
