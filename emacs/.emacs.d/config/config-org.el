@@ -411,92 +411,6 @@ Archive files are those matching `org-archive-location'."
               timestamps
               ""))
 
-;;; Commands
-
-(defun my-org-convert-url-property (type &optional property)
-  "Move URL from a headling property to a link in the title and back.
-
-If TYPE is a symbol `link', convert URL property to link.
-
-If TYPE is symbol `property', convert link to a URL property.
-
-If TYPE is symbol `toggle', convert between a property and a
-link.
-
-Optional argument PROPERTY specifies the name of property,
-defaults to \"URL\"."
-  (interactive
-   (list 'toggle
-         (let ((url-property
-                (car (seq-find
-                      (lambda (prop)
-                        (url-type (url-generic-parse-url (cdr prop))))
-                      (org-entry-properties)))))
-           (read-string "Property: " (or url-property "URL")))))
-  (unless property
-    (setq property "URL"))
-  (save-excursion
-    (org-back-to-heading)
-    (let* ((element (org-element-at-point))
-           (title (org-element-property :title element))
-           (url-prop (org-element-property (intern (concat ":" property))
-                                           element))
-           (title-context (let ((case-fold-search))
-                            (looking-at org-todo-line-regexp)
-                            (goto-char (match-beginning 3))
-                            (org-element-context)))
-           (link (and (eq (org-element-type title-context) 'link)
-                      (org-element-property :raw-link title-context)))
-           (link-contents
-            (and (eq (org-element-type title-context) 'link)
-                 (buffer-substring
-                  (org-element-property :contents-begin title-context)
-                  (org-element-property :contents-end title-context)))))
-      (cond ((and url-prop (not link) (memq type '(link toggle)))
-             (org-edit-headline (org-make-link-string url-prop title))
-             (org-delete-property property))
-            ((and (not url-prop) link (memq type '(property toggle)))
-             (org-edit-headline link-contents)
-             (org-set-property property link))))))
-
-(defun my-org-convert-url-quote ()
-  "Move URL from a quote to a link in the title.
-
-Before:
-
-    * Foo
-    #+BEGIN_QUOTE
-    http://example.com
-    #+END_QUOTE
-
-After:
-
-    * [[http://example.com][Foo]]"
-  (interactive)
-  (save-excursion
-    (org-back-to-heading)
-    (let* ((title (let ((case-fold-search))
-                    (looking-at org-todo-line-regexp)
-                    (goto-char (match-beginning 3))
-                    (org-element-context)))
-           (block (progn (org-next-block 1) (org-element-at-point)))
-           (url (progn
-                  (goto-char (org-element-property :contents-begin block))
-                  (thing-at-point 'url))))
-      (when (and (not (eq (org-element-type title) 'link))
-                 (eq (org-element-type block) 'quote-block)
-                 url
-                 (progn (end-of-thing 'url)
-                        (= (char-after) ?\n)
-                        (= (+ (point) 1)
-                           (org-element-property :contents-end block))))
-        (org-back-to-heading)
-        (delete-region (org-element-property :begin block)
-                       (org-element-property :end block))
-        (org-edit-headline (org-make-link-string
-                            url
-                            (org-element-property :raw-value title)))))))
-
 ;;; Effort
 
 (custom-set org-global-properties
@@ -809,6 +723,102 @@ If the new state is `DROP', drop the whole subtree."
     (funcall func arg)))
 (advice-add 'org-todo :around #'my-org-todo--skip-wait)
 
+;;; URLs
+
+(defun my-org-convert-url-property (type &optional property)
+  "Move URL from a headling property to a link in the title and back.
+
+If TYPE is a symbol `link', convert URL property to link.
+
+If TYPE is symbol `property', convert link to a URL property.
+
+If TYPE is symbol `toggle', convert between a property and a
+link.
+
+Optional argument PROPERTY specifies the name of property,
+defaults to \"URL\"."
+  (interactive
+   (list 'toggle
+         (let ((url-property
+                (car (seq-find
+                      (lambda (prop)
+                        (url-type (url-generic-parse-url (cdr prop))))
+                      (org-entry-properties)))))
+           (read-string "Property: " (or url-property "URL")))))
+  (unless property
+    (setq property "URL"))
+  (save-excursion
+    (org-back-to-heading)
+    (let* ((element (org-element-at-point))
+           (title (org-element-property :title element))
+           (url-prop (org-element-property (intern (concat ":" property))
+                                           element))
+           (title-context (let ((case-fold-search))
+                            (looking-at org-todo-line-regexp)
+                            (goto-char (match-beginning 3))
+                            (org-element-context)))
+           (link (and (eq (org-element-type title-context) 'link)
+                      (org-element-property :raw-link title-context)))
+           (link-contents
+            (and (eq (org-element-type title-context) 'link)
+                 (buffer-substring
+                  (org-element-property :contents-begin title-context)
+                  (org-element-property :contents-end title-context)))))
+      (cond ((and url-prop (not link) (memq type '(link toggle)))
+             (org-edit-headline (org-make-link-string url-prop title))
+             (org-delete-property property))
+            ((and (not url-prop) link (memq type '(property toggle)))
+             (org-edit-headline link-contents)
+             (org-set-property property link))))))
+
+(defun my-org-convert-url-quote ()
+  "Move URL from a quote to a link in the title.
+
+Before:
+
+    * Foo
+    #+BEGIN_QUOTE
+    http://example.com
+    #+END_QUOTE
+
+After:
+
+    * [[http://example.com][Foo]]"
+  (interactive)
+  (save-excursion
+    (org-back-to-heading)
+    (let* ((title (let ((case-fold-search))
+                    (looking-at org-todo-line-regexp)
+                    (goto-char (match-beginning 3))
+                    (org-element-context)))
+           (block (progn (org-next-block 1) (org-element-at-point)))
+           (url (progn
+                  (goto-char (org-element-property :contents-begin block))
+                  (thing-at-point 'url))))
+      (when (and (not (eq (org-element-type title) 'link))
+                 (eq (org-element-type block) 'quote-block)
+                 url
+                 (progn (end-of-thing 'url)
+                        (= (char-after) ?\n)
+                        (= (+ (point) 1)
+                           (org-element-property :contents-end block))))
+        (org-back-to-heading)
+        (delete-region (org-element-property :begin block)
+                       (org-element-property :end block))
+        (org-edit-headline (org-make-link-string
+                            url
+                            (org-element-property :raw-value title)))))))
+
+(defun my-org-pocket-add-url ()
+  "Save URL under point to Pocket."
+  (interactive)
+  (require 'pocket-lib)
+  (let* ((context (org-element-context))
+         (url (and (eq (org-element-type context) 'link)
+                   (org-element-property :raw-link context))))
+    (when (and url (pocket-lib-add-urls url))
+      (message "Added: %s" url))))
+
 ;;; Visibility
 
 (custom-set org-cycle-global-at-bob t)
@@ -834,6 +844,7 @@ If the new state is `DROP', drop the whole subtree."
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
 (define-key org-mode-map (kbd "C-c p") #'org-metaup)
+(define-key org-mode-map (kbd "C-c P") #'my-org-pocket-add-url)
 (define-key org-mode-map (kbd "C-c M-,") #'org-insert-structure-template)
 (define-key org-mode-map (kbd "C-M-b") #'org-previous-link)
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
