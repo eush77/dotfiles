@@ -657,6 +657,7 @@ recursively.")
   "Convert block structure in upper case."
   (let ((begin (point))
         (end (copy-marker (+ (point) 1))))
+    (set-marker-insertion-type end t)
     (apply func args)
     (upcase-region begin (marker-position end))))
 (advice-add 'org-insert-structure-template
