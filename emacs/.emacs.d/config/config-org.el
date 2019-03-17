@@ -655,11 +655,25 @@ recursively.")
 
 (defun my-org-insert-structure-template--upcase (func &rest args)
   "Convert block structure in upper case."
-  (let ((begin (point))
-        (end (copy-marker (+ (point) 1))))
-    (set-marker-insertion-type end t)
-    (apply func args)
-    (upcase-region begin (marker-position end))))
+  (if (region-active-p)
+      (let ((begin (copy-marker (region-beginning) t))
+            (end (copy-marker (save-excursion
+                                (goto-char (region-end))
+                                (skip-chars-backward " \r\t\n"
+                                                     (region-beginning))
+                                (point)))))
+        (apply func args)
+        (save-excursion
+          (goto-char begin)
+          (re-search-backward "#\\+begin_")
+          (upcase-region (line-beginning-position) (line-end-position))
+          (goto-char end)
+          (re-search-forward "#\\+end_")
+          (upcase-region (line-beginning-position) (line-end-position))))
+    (let ((begin (point))
+          (end (copy-marker (point) t)))
+      (apply func args)
+      (upcase-region begin end))))
 (advice-add 'org-insert-structure-template
             :around #'my-org-insert-structure-template--upcase)
 
