@@ -310,12 +310,12 @@ Archive files are those matching `org-archive-location'."
             (when (w3m-anchor)
               (save-restriction
                 (widen)
-                (push (my-org-capture-link) headings)))
+                (push (my-org-capture-link %U) headings)))
             (while (w3m-goto-next-anchor)
               (save-restriction
                 (widen)
-                (push (my-org-capture-link) headings)))))
-        (mapconcat #'identity headings ""))
+                (push (my-org-capture-link %U) headings)))))
+        (mapconcat #'identity (reverse headings) ""))
     (let ((link (or (w3m-anchor)
                     (thing-at-point 'url)
                     (buffer-local-value
