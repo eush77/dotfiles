@@ -9,17 +9,26 @@
   "Get restriction region for the batch view.
 
 Return the current subtree if the subtree is (partially) visible
-or the whole buffer otherwise."
+or the containing subtree or the whole buffer otherwise."
   (save-excursion
     (org-back-to-heading)
-    (let* ((next-visible-heading
-            (save-excursion (org-next-visible-heading 1) (point)))
-           (end-of-subtree
-            (save-excursion (org-end-of-subtree 1) (point)))
-           (subtree-p (< next-visible-heading end-of-subtree)))
-      (if subtree-p
-          (cons (point) end-of-subtree)
-        (cons (point-min) (point-max))))))
+    (cond
+     ;; Return the current subtree
+     ((< (save-excursion (org-next-visible-heading 1)
+                         (point))
+         (save-excursion (org-end-of-subtree 1)
+                         (point)))
+      (cons (point) (save-excursion
+                      (org-end-of-subtree 1)
+                      (point))))
+     ;; Return the containing subtree
+     ((< 1 (org-current-level))
+      (progn (outline-up-heading 1)
+             (cons (point) (save-excursion
+                             (org-end-of-subtree 1)
+                             (point)))))
+     ;; Return the whole buffer
+     (t (cons (point-min) (point-max))))))
 
 (defvar my-org-agenda-goto-hd-point nil
   "Heading to go to after creating an agenda buffer.")
