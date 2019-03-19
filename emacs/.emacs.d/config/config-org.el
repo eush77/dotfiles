@@ -8,11 +8,16 @@
 (defun my-org-agenda-get-batch-view-region ()
   "Get restriction region for the batch view.
 
-Return the current subtree if the subtree is (partially) visible
-or the containing subtree or the whole buffer otherwise."
+If called with an active region, return the active region.
+
+If called with no active region, return the current subtree if
+the subtree is (partially) visible or the containing subtree or
+the whole buffer otherwise."
   (save-excursion
     (org-back-to-heading)
     (cond
+     ;; Return the active region
+     ((region-active-p) (cons (region-beginning) (region-end)))
      ;; Return the current subtree
      ((< (save-excursion (org-next-visible-heading 1)
                          (point))
@@ -54,7 +59,8 @@ or the containing subtree or the whole buffer otherwise."
                 (org-agenda-restrict-end
                  (cdr (my-org-agenda-get-batch-view-region)))
                 (my-org-agenda-goto-hd-point
-                 (save-excursion (org-back-to-heading) (point)))))
+                 (unless (region-active-p)
+                   (save-excursion (org-back-to-heading) (point))))))
               ("n" "Next actions" todo "NEXT")
               ("p" "Planned tasks"
                ((my-org-agenda-planned-view "Weekly.org")
