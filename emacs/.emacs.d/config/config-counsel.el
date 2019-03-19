@@ -44,10 +44,20 @@
 
 ;;;###autoload
 (defun my-counsel-ibuffer-by-mode (mode)
-  "Like `counsel-ibuffer', but filter the list to buffers in the
-given major MODE (or major mode of the current buffer if run
-interactively)."
-  (interactive (list major-mode))
+  "Like `counsel-ibuffer', but filter by the given major MODE.
+
+If called interactively, select the mode with completion if
+passed a prefix argument, or use the major mode of the current
+buffer otherwise."
+  (interactive
+   (list (if current-prefix-arg
+             (intern (completing-read
+                      "Major mode: "
+                      (cl-remove-duplicates
+                       (seq-map (apply-partially #'buffer-local-value
+                                                 'major-mode)
+                                (buffer-list)))))
+           major-mode)))
   (require 'ibuffer)
   (require 'dash)
   (cl-letf* ((get-buffers-function
