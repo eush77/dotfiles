@@ -6,10 +6,8 @@
 
 (defun my-counsel-ibuffer--get-buffers--preselect (candidates)
   "Remove the current buffer from the list of candidates."
-  (require 'ibuffer)
-  (cl-assert (and (eq ibuffer-default-sorting-mode 'recency)
-                  (eq (cdar candidates) (current-buffer))))
-  (cdr candidates))
+  (seq-remove (pcase-lambda (`(_ . ,buffer)) (eq buffer (current-buffer)))
+              candidates))
 (advice-add 'counsel-ibuffer--get-buffers
             :filter-return #'my-counsel-ibuffer--get-buffers--preselect)
 
