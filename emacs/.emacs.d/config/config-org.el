@@ -5,6 +5,9 @@
 
 ;;; Agenda
 
+(custom-set org-agenda-span 'fortnight)
+(custom-set org-agenda-window-setup 'current-window)
+
 (defun my-org-agenda-get-batch-view-region ()
   "Get restriction region for the batch view.
 
@@ -70,7 +73,16 @@ the whole buffer otherwise."
                 (my-org-agenda-planned-view "5 Years.org")
                 (my-org-agenda-planned-view "Life.org"))
                ((org-agenda-prefix-format "  ")))))
-(custom-set org-agenda-span 'fortnight)
+
+(defun my-org-agenda-get-restriction-and-command--display-buffer-action
+    (func &rest args)
+  "Set up `display-buffer' action."
+  (cl-letf ((display-buffer-overriding-action '(display-buffer-at-bottom))
+            ((symbol-function 'delete-other-windows) #'ignore))
+    (apply func args)))
+(advice-add 'org-agenda-get-restriction-and-command
+            :around
+            #'my-org-agenda-get-restriction-and-command--display-buffer-action)
 
 (defun my-org-agenda-context-filter--set (symbol value)
   "Set VALUE as a context filter."
@@ -380,6 +392,14 @@ Archive files are those matching `org-archive-location'."
             '(("c" (my-org-capture-c-context))
               ("r" (region-active-p))
               ("u" (my-org-capture-link-context))))
+
+(defun my-org-capture-select-template--display-buffer-action (func &rest args)
+  "Set up `display-buffer' action."
+  (let ((display-buffer-overriding-action '(display-buffer-at-bottom
+                                            . ((window-height . 0.15)))))
+    (apply func args)))
+(advice-add 'org-capture-select-template
+            :around #'my-org-capture-select-template--display-buffer-action)
 
 (defun my-org-capture-refile--save-target-buffer (func &rest args)
   "Save target buffer after refiling an item from it."
