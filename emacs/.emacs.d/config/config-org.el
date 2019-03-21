@@ -866,14 +866,18 @@ After:
                             url
                             (org-element-property :raw-value title)))))))
 
-(defun my-org-pocket-add-url ()
-  "Save URL under point to Pocket."
-  (interactive)
+(defun my-org-pocket-add-url (&optional no-mark-done)
+  "Save URL under point to Pocket and mark the entry DONE.
+
+If NO-MARK-DONE is non-nil, don't change the entry state."
+  (interactive "P")
   (require 'pocket-lib)
   (let* ((context (org-element-context))
          (url (and (eq (org-element-type context) 'link)
                    (org-element-property :raw-link context))))
     (when (and url (pocket-lib-add-urls url))
+      (unless (or no-mark-done (org-entry-is-done-p))
+        (org-todo 'done))
       (message "Added: %s" url))))
 
 ;;; Visibility
