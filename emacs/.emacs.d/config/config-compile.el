@@ -41,6 +41,15 @@ from `prog-mode'."
       (user-error "No other compilation buffer"))
     (switch-to-buffer other-buffer)))
 
+(defun my-compile-in-compilation-buffer ()
+  "Like `compile', but command defaults to the last command."
+  (interactive)
+  (let ((last-command
+         (save-excursion (goto-char (point-min))
+                         (beginning-of-line 4)
+                         (buffer-substring (point) (line-end-position)))))
+    (compile (compilation-read-command last-command))))
+
 ;;;###autoload
 (defun my-recompile ()
   "Save current buffer, recompile, then switch to the compilation
@@ -59,5 +68,5 @@ buffer."
 
 ;;; Keymap
 
-(define-key compilation-mode-map (kbd "c") #'compile)
+(define-key compilation-mode-map (kbd "c") #'my-compile-in-compilation-buffer)
 (define-key compilation-mode-map (kbd "h") #'my-compilation-other-buffer)
