@@ -558,6 +558,13 @@ alphabetically."
 
 (custom-set org-startup-indented t)
 
+(defun my-org-align-tags ()
+  "Align all tags in the visible part of the buffer.
+
+Interactive wrapper around `org-align-tags'."
+  (interactive)
+  (org-align-tags t))
+
 (defun my-window-text-width--org-tty (width)
   "Decrement text width when displaying on a terminal in Org
 Agenda mode.
