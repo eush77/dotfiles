@@ -446,6 +446,14 @@ Archive files are those matching `org-archive-location'."
               timestamps
               ""))
 
+;;; Ediff
+
+(defun my-org-setup-ediff-prepare-buffer-hook ()
+  "Set up `ediff-prepare-buffer-hook' for Org buffer."
+  (add-hook 'ediff-prepare-buffer-hook #'org-show-all nil t))
+
+(add-hook 'org-mode-hook #'my-org-setup-ediff-prepare-buffer-hook)
+
 ;;; Effort
 
 (custom-set org-global-properties
