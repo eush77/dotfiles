@@ -454,6 +454,14 @@ Archive files are those matching `org-archive-location'."
 
 (add-hook 'org-mode-hook #'my-org-setup-ediff-prepare-buffer-hook)
 
+(defun my-org-mode--in-ediff-session (func &rest args)
+  "Show all contents of the buffer if in a Ediff session."
+  (let ((in-ediff-p (member 'ediff-diff-status mode-line-format)))
+    (apply func args)
+    (when in-ediff-p
+      (org-show-all))))
+(advice-add 'org-mode :around #'my-org-mode--in-ediff-session)
+
 ;;; Effort
 
 (custom-set org-global-properties
