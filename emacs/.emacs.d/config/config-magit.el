@@ -38,8 +38,8 @@ Otherwise hide it, and show the previous sibling section."
 ;;; magit-files
 
 (with-eval-after-load "magit-files"
-  (define-key magit-file-mode-map "\C-cf" 'magit-file-popup)
-  (define-key magit-file-mode-map "\C-cg" 'magit-dispatch-popup))
+  (define-key magit-file-mode-map "\C-cf" 'magit-file-dispatch)
+  (define-key magit-file-mode-map "\C-cg" 'magit-dispatch))
 
 ;;; magit-log
 
