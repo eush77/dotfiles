@@ -54,6 +54,13 @@ Otherwise hide it, and show the previous sibling section."
 
 ;;; magit-files
 
+(defun my-magit-file-mode-turn-on--directories (func &rest args)
+  "Add support for directories"
+  (let ((buffer-file-name (magit-file-relative-name)))
+    (apply func args)))
+(advice-add 'magit-file-mode-turn-on
+            :around #'my-magit-file-mode-turn-on--directories)
+
 (with-eval-after-load "magit-files"
   (define-key magit-file-mode-map "\C-cf" 'magit-file-dispatch)
   (define-key magit-file-mode-map "\C-cg" 'magit-dispatch))
