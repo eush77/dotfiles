@@ -35,6 +35,23 @@ Otherwise hide it, and show the previous sibling section."
   ;; `C-M-i' equals `M-TAB' on TTY.
   (define-key magit-revision-mode-map (kbd "C-M-i") #'magit-section-cycle))
 
+;;; magit-dispatch
+
+(defun my-magit-dispatch--disable-file-limit (func &rest args)
+  "Disable file limiting if command is run via `magit-dispatch'."
+  (if (eq last-command 'magit-dispatch)
+      (cl-letf (((symbol-function 'magit-file-relative-name) #'ignore))
+        (apply func args))
+    (apply func args)))
+
+(with-eval-after-load "magit-diff"
+  (advice-add 'magit-diff--initial-value
+              :around #'my-magit-dispatch--disable-file-limit))
+
+(with-eval-after-load "magit-log"
+  (advice-add 'magit-log--initial-value
+              :around #'my-magit-dispatch--disable-file-limit))
+
 ;;; magit-files
 
 (with-eval-after-load "magit-files"
