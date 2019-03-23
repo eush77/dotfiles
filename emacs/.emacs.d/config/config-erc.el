@@ -22,6 +22,13 @@ well."
   (advice-add 'erc-unfill-notice
               :override #'my-erc-unfill-notice--read-only))
 
+;;; erc-join
+
+(with-eval-after-load "erc-join"
+  (custom-set-variables
+   '(erc-autojoin-channels-alist
+     '(("freenode.net" "#emacs" "#org-mode")))))
+
 ;;; erc-log
 
 (add-to-list 'erc-modules 'log)
