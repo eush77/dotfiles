@@ -50,6 +50,7 @@
 (global-set-key (kbd "C-x M-2") #'gnus)
 (global-set-key (kbd "C-x M-3") #'browse-web)
 (global-set-key (kbd "C-x M-4") #'pocket-reader)
+(global-set-key (kbd "C-x M-5") #'erc)
 
 ;; Goto-last-change
 (global-set-key (kbd "M-_") #'goto-last-change)
