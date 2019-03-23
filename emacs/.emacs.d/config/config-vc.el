@@ -1,5 +1,5 @@
 (with-eval-after-load "vc"
-  (custom-set vc-follow-symlinks t))
+  (custom-set-variables '(vc-follow-symlinks t)))
 
 (with-eval-after-load "vc-annotate"
   (defun my-vc-annotate--same-window (func &rest args)

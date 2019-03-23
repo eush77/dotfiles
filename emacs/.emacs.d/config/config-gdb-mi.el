@@ -39,7 +39,7 @@ readable."
 
 ;;; Windows
 
-(custom-set gdb-many-windows t)
+(custom-set-variables '(gdb-many-windows t))
 
 (defun my-gdb-setup-windows--dedicate-comint-window ()
   "Make GUD Comint window dedicated so that `display-buffer'

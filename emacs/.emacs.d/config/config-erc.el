@@ -1,6 +1,6 @@
 ;;; erc
 
-(custom-set erc-prompt-for-password nil)
+(custom-set-variables '(erc-prompt-for-password nil))
 
 ;;; erc-imenu
 
@@ -27,8 +27,9 @@ well."
 (add-to-list 'erc-modules 'log)
 
 (with-eval-after-load "erc-log"
-  (custom-set erc-log-channels-directory
-              (expand-file-name "erc" user-emacs-directory)))
+  (custom-set-variables
+   '(erc-log-channels-directory
+     (expand-file-name "erc" user-emacs-directory))))
 
 ;;; erc-pcomplete
 
@@ -40,8 +41,9 @@ well."
     (pcomplete-erc-commands))))
 
 (with-eval-after-load "erc-pcomplete"
-  (custom-set erc-pcomplete-nick-postfix ": ")
-  (custom-set erc-pcomplete-order-nickname-completions t)
+  (custom-set-variables
+   '(erc-pcomplete-nick-postfix ": ")
+   '(erc-pcomplete-order-nickname-completions t))
 
   (advice-add 'pcomplete/erc-mode/complete-command
               :override #'my-pcomplete/erc-mode/complete-command))
@@ -54,8 +56,9 @@ visiting a non-ERC buffer."
   (or erc-modified-channels-alist (eq major-mode 'erc-mode)))
 
 (with-eval-after-load "erc-track"
-  (custom-set erc-track-enable-keybindings t)
-  (custom-set erc-track-exclude-server-buffer t)
+  (custom-set-variables
+   '(erc-track-enable-keybindings t)
+   '(erc-track-exclude-server-buffer t))
 
   (add-to-list 'erc-track-exclude-types "JOIN")
   (add-to-list 'erc-track-exclude-types "PART")

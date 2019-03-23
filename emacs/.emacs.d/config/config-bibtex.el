@@ -2,9 +2,10 @@
 
 ;;; Reformat setup
 
-(custom-set bibtex-entry-format t)
-(custom-set bibtex-align-at-equal-sign t)
-(custom-set bibtex-comma-after-last-field t)
+(custom-set-variables
+ '(bibtex-align-at-equal-sign t)
+ '(bibtex-comma-after-last-field t)
+ '(bibtex-entry-format t))
 
 ;;; Keymap
 

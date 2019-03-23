@@ -1,2 +1,2 @@
 (unless window-system
-  (custom-set switch-window-shortcut-appearance 'asciiart))
+  (custom-set-variables '(switch-window-shortcut-appearance 'asciiart)))

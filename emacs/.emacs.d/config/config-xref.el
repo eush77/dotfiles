@@ -1,4 +1,4 @@
-(custom-set xref-show-xrefs-function #'ivy-xref-show-xrefs)
+(custom-set-variables '(xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (defun my-xref-show-pos-in-buf--same-window (func &rest args)
   "Display xref location in the same window. See

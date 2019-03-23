@@ -4,23 +4,9 @@
 (push (expand-file-name "config" user-emacs-directory) load-path)
 (load "config-autoloads")
 
-;; Custom-set macro - use instead of `setq' for customization variables.
-(defmacro custom-set (var value)
-  "Set VAR to VALUE using `custom-set-variables`.
-
-Unlike `setq', this honors customization hooks (see Info
-node `(elisp) Variable Definitions').
-
-See also URL
-`https://emacs.stackexchange.com/questions/102/advantages-of-setting-variables-with-setq-instead-of-custom-el'
-and URL
-`https://stackoverflow.com/questions/2079095/how-to-modularize-an-emacs-configuration'."
-  (custom-set-variables
-   `(,var ,value nil nil
-          ,(format "!!! CAREFUL: CUSTOM-SET IN %s !!!" load-file-name))))
-
 ;; Customization file
-(custom-set custom-file (expand-file-name "custom.el" user-emacs-directory))
+(custom-set-variables
+ '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
 (unless (file-exists-p custom-file)
   (write-region "" nil custom-file))
 (load-file custom-file)
@@ -53,10 +39,11 @@ and URL
   :link `(file-link ,(expand-file-name "init.el" user-emacs-directory)))
 
 ;; Package archives
-(custom-set package-archives
-	    '(("gnu" . "http://elpa.gnu.org/packages/")
-	      ("melpa" . "http://melpa.org/packages/")
-              ("org" . "https://orgmode.org/elpa/")))
+(custom-set-variables
+ '(package-archives
+   '(("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa" . "http://melpa.org/packages/")
+     ("org" . "https://orgmode.org/elpa/"))))
 (package-refresh-contents)
 
 ;; Check and install missing packages.

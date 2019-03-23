@@ -1,4 +1,4 @@
-(custom-set help-window-select t)
+(custom-set-variables '(help-window-select t))
 
 (define-key help-mode-map "j" #'scroll-up-line)
 (define-key help-mode-map "k" #'scroll-down-line)

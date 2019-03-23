@@ -62,46 +62,47 @@ to exact time.
   "Escape literal mode line according to `mode-line-format'."
   (replace-regexp-in-string "%" "%%" mode-line))
 
-(custom-set minibuffer-line-format
-            '(:eval (let* ((globals (my-format-minibuffer-global-mode-string))
-                           (battery (my-minibuffer-battery))
-                           (clock (my-minibuffer-clock))
-                           (frame-width
-                            (apply #'min
-                                   (mapcar #'frame-text-cols
-                                           (minibuffer-frame-list))))
-                           (space-width
-                            (max 2 (- frame-width
-                                      (string-width globals)
-                                      (string-width battery)
-                                      (string-width clock))))
-                           (battery-width (max 0 (- frame-width
-                                                    (string-width globals)
-                                                    space-width
-                                                    (string-width clock))))
-                           (battery
-                            (my-format-minibuffer-battery battery
-                                                          battery-width))
-                           (clock-width (max 0 (- frame-width
-                                                  (string-width globals)
-                                                  space-width
-                                                  (string-width battery))))
-                           (clock (my-format-minibuffer-clock clock
-                                                              clock-width))
-                           (space-width
-                            (max 2 (- frame-width
-                                      (string-width globals)
-                                      (string-width battery)
-                                      (string-width clock))))
-                           (globals-width (- frame-width
-                                             space-width
-                                             (string-width battery)
-                                             (string-width clock))))
-                      (my-mode-line-escape
-                       (concat (substring globals 0 globals-width)
-                               (make-string space-width ? )
-                               battery
-                               clock)))))
+(custom-set-variables
+ '(minibuffer-line-format
+   '(:eval (let* ((globals (my-format-minibuffer-global-mode-string))
+                  (battery (my-minibuffer-battery))
+                  (clock (my-minibuffer-clock))
+                  (frame-width
+                   (apply #'min
+                          (mapcar #'frame-text-cols
+                                  (minibuffer-frame-list))))
+                  (space-width
+                   (max 2 (- frame-width
+                             (string-width globals)
+                             (string-width battery)
+                             (string-width clock))))
+                  (battery-width (max 0 (- frame-width
+                                           (string-width globals)
+                                           space-width
+                                           (string-width clock))))
+                  (battery
+                   (my-format-minibuffer-battery battery
+                                                 battery-width))
+                  (clock-width (max 0 (- frame-width
+                                         (string-width globals)
+                                         space-width
+                                         (string-width battery))))
+                  (clock (my-format-minibuffer-clock clock
+                                                     clock-width))
+                  (space-width
+                   (max 2 (- frame-width
+                             (string-width globals)
+                             (string-width battery)
+                             (string-width clock))))
+                  (globals-width (- frame-width
+                                    space-width
+                                    (string-width battery)
+                                    (string-width clock))))
+             (my-mode-line-escape
+              (concat (substring globals 0 globals-width)
+                      (make-string space-width ? )
+                      battery
+                      clock))))))
 
 (defun my-keyboard-quit--minibuffer-line (func)
   "Update minibuffer line after quit."

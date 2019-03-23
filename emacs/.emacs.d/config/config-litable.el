@@ -1,4 +1,4 @@
-(custom-set litable-result-format "=> %s")
+(custom-set-variables '(litable-result-format "=> %s"))
 
 ;;; Customize display
 

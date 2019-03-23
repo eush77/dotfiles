@@ -1,1 +1,2 @@
-(custom-set pocket-reader-open-url-default-function #'browse-url)
+(custom-set-variables
+ '(pocket-reader-open-url-default-function #'browse-url))

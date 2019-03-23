@@ -1,4 +1,4 @@
-(custom-set shr-width fill-column)
-
-;; Eliminate grey background issue when using a dark theme.
-(custom-set shr-color-visible-luminance-min 80)
+(custom-set-variables
+ ;; Eliminate grey background issue when using a dark theme.
+ '(shr-color-visible-luminance-min 80)
+ '(shr-width fill-column))

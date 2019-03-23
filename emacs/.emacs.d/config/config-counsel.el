@@ -70,10 +70,11 @@ buffer otherwise."
 
 ;;; Finding files
 
-(custom-set counsel-file-jump-args "* -not -path '*\/.git*'")
-(custom-set counsel-find-file-at-point t)
-(custom-set counsel-find-file-ignore-regexp "\\`\\.")
-(custom-set counsel-preselect-current-file t)
+(custom-set-variables
+ '(counsel-file-jump-args "* -not -path '*\/.git*'")
+ '(counsel-find-file-at-point t)
+ '(counsel-find-file-ignore-regexp "\\`\\.")
+ '(counsel-preselect-current-file t))
 
 ;;; Git grep
 

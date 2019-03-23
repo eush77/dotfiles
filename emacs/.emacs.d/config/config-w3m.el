@@ -6,9 +6,10 @@
 
 ;;; browse-url
 
-(custom-set browse-url-browser-function #'w3m-browse-url)
-(custom-set browse-url-generic-program nil)
-(custom-set browse-url-new-window-flag t)
+(custom-set-variables
+ '(browse-url-browser-function #'w3m-browse-url)
+ '(browse-url-generic-program nil)
+ '(browse-url-new-window-flag t))
 
 ;;; completing-read
 
@@ -125,11 +126,12 @@ point instead."
 ;;; w3m
 
 (with-eval-after-load "w3m"
-  (custom-set w3m-add-referer nil)
-  (custom-set w3m-default-display-inline-images t)
-  (custom-set w3m-fill-column 78)
-  (custom-set w3m-home-page "about:")
-  (custom-set w3m-make-new-session t)
+  (custom-set-variables
+   '(w3m-add-referer nil)
+   '(w3m-default-display-inline-images t)
+   '(w3m-fill-column 78)
+   '(w3m-home-page "about:")
+   '(w3m-make-new-session t))
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode))
 

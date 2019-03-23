@@ -1,6 +1,7 @@
 ;; Interface & startup
-(custom-set frame-title-format "%b @ emacs")
-(custom-set initial-scratch-message nil)
+(custom-set-variables
+ '(frame-title-format "%b @ emacs")
+ '(initial-scratch-message nil))
 (blink-cursor-mode 0)
 (column-number-mode 1)
 (menu-bar-mode 0)
@@ -9,17 +10,19 @@
 (tool-bar-mode 0)
 
 ;; Backups
-(custom-set backup-directory-alist '(("." . "~/.emacs.d/backups/")))
+(custom-set-variables
+ '(backup-directory-alist '(("." . "~/.emacs.d/backups/"))))
 
 ;; Commenting style
-(custom-set comment-multi-line t)
-(custom-set comment-style 'extra-line)
+(custom-set-variables
+ '(comment-multi-line t)
+ '(comment-style 'extra-line))
 
 ;; Input method
-(custom-set default-input-method "russian-computer")
+(custom-set-variables '(default-input-method "russian-computer"))
 
 ;; Recursive minibuffer - use minibuffer while in minibuffer.
-(custom-set enable-recursive-minibuffers t)
+(custom-set-variables '(enable-recursive-minibuffers t))
 
 ;; Do not expand HTTP URLs with `expand-file-name'. This is needed for opening
 ;; a URL with `emacsclient'.
@@ -31,7 +34,7 @@
 (advice-add 'expand-file-name :around #'expand-file-name--http-url)
 
 ;; Paragraph filling
-(custom-set fill-column 78)
+(custom-set-variables '(fill-column 78))
 
 ;; Advice `find-file' to use `browse-url' to open HTTP URLs.
 (defun find-file--browse-url (func filename &rest rest)
@@ -53,13 +56,13 @@
   (advice-add 'frame-text-cols :filter-return #'1-))
 
 ;; Indentation
-(custom-set indent-tabs-mode nil)
+(custom-set-variables '(indent-tabs-mode nil))
 
 ;; Enable narrowing.
 (put 'narrow-to-region 'disabled nil)
 
 ;; `quoted-insert' radix
-(custom-set read-quoted-char-radix 16)
+(custom-set-variables '(read-quoted-char-radix 16))
 
 ;; Enable region case conversion commands.
 (put 'downcase-region 'disabled nil)
@@ -74,20 +77,20 @@ the name of the current buffer."
 (advice-add 'rename-buffer :around #'my-rename-buffer)
 
 ;; Set a minimal scroll margin for `recenter-top-bottom'.
-(custom-set scroll-margin 1)
+(custom-set-variables '(scroll-margin 1))
 
 ;; Fix sentence boundaries (used for e.g. navigation commands
 ;; `backward-sentence' and `forward-sentence').
-(custom-set sentence-end-double-space nil)
+(custom-set-variables '(sentence-end-double-space nil))
 
 ;; Repeatedly pop mark with `C-SPC' after single `C-u C-SPC'.
-(custom-set set-mark-command-repeat-pop t)
+(custom-set-variables '(set-mark-command-repeat-pop t))
 
 ;; Ignore case when sorting lines.
-(custom-set sort-fold-case t)
+(custom-set-variables '(sort-fold-case t))
 
 ;; View mode
-(custom-set view-read-only t)
+(custom-set-variables '(view-read-only t))
 
 ;; yes-or-no-p
 (defun yay-or-nay-p (prompt)

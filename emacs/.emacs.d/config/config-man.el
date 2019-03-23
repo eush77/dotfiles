@@ -1,6 +1,6 @@
 ;;; Notify method
 
-(custom-set Man-notify-method 'aggressive)
+(custom-set-variables '(Man-notify-method 'aggressive))
 
 (defun my-man--pushy-from-man (func &rest args)
   "Use `pushy' as `Man-notify-method' if called from a Man
@@ -13,7 +13,7 @@ buffer."
 
 ;;; Switches
 
-(custom-set Man-switches "-a")
+(custom-set-variables '(Man-switches "-a"))
 
 ;;; Keymap
 

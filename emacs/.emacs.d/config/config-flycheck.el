@@ -1,5 +1,6 @@
-(custom-set flycheck-global-modes '(not org-mode))
-(custom-set flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+(custom-set-variables
+ '(flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+ '(flycheck-global-modes '(not org-mode)))
 
 (global-flycheck-mode 1)
 

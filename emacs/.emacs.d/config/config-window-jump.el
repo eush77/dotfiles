@@ -1,7 +1,7 @@
 (add-to-list 'package-selected-packages 'dash)
 (package-install-selected-packages)
 
-(custom-set wj-jump-frames (not (null window-system)))
+(custom-set-variables '(wj-jump-frames (not (null window-system))))
 
 (defun my-wj-all-windows--selected-wm-desktop (windows)
   "Limit results to the selected virtual desktop of a window

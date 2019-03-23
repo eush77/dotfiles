@@ -1,4 +1,5 @@
 (guide-key-mode 1)
 
-(custom-set guide-key/guide-key-sequence t)
-(custom-set guide-key/popup-window-position 'bottom)
+(custom-set-variables
+ '(guide-key/guide-key-sequence t)
+ '(guide-key/popup-window-position 'bottom))

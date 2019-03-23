@@ -1,6 +1,6 @@
 ;;; Continuous Mode
 
-(custom-set doc-view-continuous t)
+(custom-set-variables '(doc-view-continuous t))
 
 ;;; Terminal Display
 

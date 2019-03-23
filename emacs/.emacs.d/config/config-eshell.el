@@ -3,11 +3,12 @@
 
 ;;; Basic setup
 
-(custom-set eshell-prefer-lisp-functions t)
-(custom-set eshell-ls-initial-args '("--classify"
-                                     "--color=auto"
-                                     "--group-directories-first"
-                                     "-v"))
+(custom-set-variables
+ '(eshell-ls-initial-args '("--classify"
+                            "--color=auto"
+                            "--group-directories-first"
+                            "-v"))
+ '(eshell-prefer-lisp-functions t))
 
 ;; Advice `eshell-dirs-substitute-cd' to list directory contents.
 (defun eshell-dirs-substitute-cd--ls (func &rest args)
@@ -246,9 +247,10 @@ including the sigil."
 
 ;; Set up the prompt.
 ;; It is already propertized, so turn off built-in highlighting.
-(custom-set eshell-highlight-prompt nil)
-(custom-set eshell-prompt-function #'my-eshell-prompt-function)
-(custom-set eshell-prompt-regexp "^[^#$]* [#$][[:digit:]]* ")
+(custom-set-variables
+ '(eshell-highlight-prompt nil)
+ '(eshell-prompt-function #'my-eshell-prompt-function)
+ '(eshell-prompt-regexp "^[^#$]* [#$][[:digit:]]* "))
 
 ;;; Commands
 

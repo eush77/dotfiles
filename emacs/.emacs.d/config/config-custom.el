@@ -1,1 +1,1 @@
-(custom-set custom-unlispify-remove-prefixes t)
+(custom-set-variables '(custom-unlispify-remove-prefixes t))

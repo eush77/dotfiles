@@ -5,8 +5,8 @@
 
 ;;; Agenda
 
-(custom-set org-agenda-span 'fortnight)
-(custom-set org-agenda-window-setup 'current-window)
+(custom-set-variables '(org-agenda-span 'fortnight)
+                      '(org-agenda-window-setup 'current-window))
 
 (defun my-org-agenda-get-batch-view-region ()
   "Get restriction region for the batch view.
@@ -51,28 +51,29 @@ the whole buffer otherwise."
 (advice-add 'org-search-view
             :after #'my-org-search-view--go-to-heading)
 
-(custom-set org-agenda-custom-commands
-            `(("b" "Batch view" search "{..}"
-               ((org-agenda-restrict
-                 (progn (put 'org-agenda-files 'org-restrict
-                             (list (buffer-file-name (buffer-base-buffer))))
-                        (current-buffer)))
-                (org-agenda-restrict-begin
-                 (car (my-org-agenda-get-batch-view-region)))
-                (org-agenda-restrict-end
-                 (cdr (my-org-agenda-get-batch-view-region)))
-                (my-org-agenda-goto-hd-point
-                 (unless (region-active-p)
-                   (save-excursion (org-back-to-heading) (point))))))
-              ("n" "Next actions" todo "NEXT")
-              ("p" "Planned tasks"
-               ((my-org-agenda-planned-view "Weekly.org")
-                (my-org-agenda-planned-view "Monthly.org")
-                (my-org-agenda-planned-view "Quarterly.org")
-                (my-org-agenda-planned-view "Yearly.org")
-                (my-org-agenda-planned-view "5 Years.org")
-                (my-org-agenda-planned-view "Life.org"))
-               ((org-agenda-prefix-format "  ")))))
+(custom-set-variables
+ '(org-agenda-custom-commands
+   `(("b" "Batch view" search "{..}"
+      ((org-agenda-restrict
+        (progn (put 'org-agenda-files 'org-restrict
+                    (list (buffer-file-name (buffer-base-buffer))))
+               (current-buffer)))
+       (org-agenda-restrict-begin
+        (car (my-org-agenda-get-batch-view-region)))
+       (org-agenda-restrict-end
+        (cdr (my-org-agenda-get-batch-view-region)))
+       (my-org-agenda-goto-hd-point
+        (unless (region-active-p)
+          (save-excursion (org-back-to-heading) (point))))))
+     ("n" "Next actions" todo "NEXT")
+     ("p" "Planned tasks"
+      ((my-org-agenda-planned-view "Weekly.org")
+       (my-org-agenda-planned-view "Monthly.org")
+       (my-org-agenda-planned-view "Quarterly.org")
+       (my-org-agenda-planned-view "Yearly.org")
+       (my-org-agenda-planned-view "5 Years.org")
+       (my-org-agenda-planned-view "Life.org"))
+      ((org-agenda-prefix-format "  "))))))
 
 (defun my-org-agenda-get-restriction-and-command--display-buffer-action
     (func &rest args)
@@ -221,7 +222,7 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 
 ;;; Archive
 
-(custom-set org-archive-location "archive/%s::")
+(custom-set-variables '(org-archive-location "archive/%s::"))
 
 (defun my-org-save-archive-buffer ()
   "Save the live archive buffer for the current buffer."
@@ -356,42 +357,44 @@ Archive files are those matching `org-archive-location'."
         (and (fboundp 'w3m-anchor) (w3m-anchor))
         (thing-at-point 'url))))
 
-(custom-set org-capture-templates
-            `(("n" "New item" entry
-               (file org-default-notes-file)
-               ,(concat "* NEW %?\n"
-                        ":LOGBOOK:\n"
-                        "- State \"NEW\"        from              %U\n"
-                        ":END:\n"))
-              ("r" ,(documentation 'my-org-capture-region) entry
-               (file org-default-notes-file)
-                "%(with-current-buffer (org-capture-get :original-buffer)
+(custom-set-variables
+ '(org-capture-templates
+   `(("n" "New item" entry
+      (file org-default-notes-file)
+      ,(concat "* NEW %?\n"
+               ":LOGBOOK:\n"
+               "- State \"NEW\"        from              %U\n"
+               ":END:\n"))
+     ("r" ,(documentation 'my-org-capture-region) entry
+      (file org-default-notes-file)
+      "%(with-current-buffer (org-capture-get :original-buffer)
                    (my-org-capture-region
                     \"%f\" \"%i\" \"%U\" \"%:from\" \"%:link\" \"%:subject\"))")
-              ("c" "Store link to the current buffer" entry
-               (file org-default-notes-file)
-               ,(concat "* NEW [[%(pcase
+     ("c" "Store link to the current buffer" entry
+      (file org-default-notes-file)
+      ,(concat "* NEW [[%(pcase
                             (with-current-buffer
                                 (org-capture-get :original-buffer) major-mode)
                              ((or 'w3m-mode 'gnus-article-mode) \"%:link\")
                              (_ \"file:%F\")
                            )][%f%:description]]\n"
-                        ":LOGBOOK:\n"
-                        "- State \"NEW\"        from              %U\n"
-                        ":END:\n"))
-              ("u" ,(documentation 'my-org-capture-link) entry
-               (file org-default-notes-file)
-               "%(with-current-buffer (org-capture-get :original-buffer)
-                  (my-org-capture-link \"%U\"))")))
+               ":LOGBOOK:\n"
+               "- State \"NEW\"        from              %U\n"
+               ":END:\n"))
+     ("u" ,(documentation 'my-org-capture-link) entry
+      (file org-default-notes-file)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+                  (my-org-capture-link \"%U\"))"))))
 
 (defun my-org-capture-c-context ()
   (or (memq major-mode '(w3m-mode gnus-article-mode))
       (buffer-file-name)))
 
-(custom-set org-capture-templates-contexts
-            '(("c" (my-org-capture-c-context))
-              ("r" (region-active-p))
-              ("u" (my-org-capture-link-context))))
+(custom-set-variables
+ '(org-capture-templates-contexts
+   '(("c" (my-org-capture-c-context))
+     ("r" (region-active-p))
+     ("u" (my-org-capture-link-context)))))
 
 (defun my-org-capture-select-template--display-buffer-action (func &rest args)
   "Set up `display-buffer' action."
@@ -432,9 +435,11 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Column View
 
-(custom-set org-columns-default-format
-            "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
-(custom-set org-columns-summary-types '(("!min" . my-org-timestamp-summarize-min)))
+(custom-set-variables
+ '(org-columns-default-format
+   "%32ITEM %TODO %1PRIORITY %4EFFORT{:} %4CLOCKSUM %CATEGORY %TAGS")
+ '(org-columns-summary-types
+   '(("!min" . my-org-timestamp-summarize-min))))
 
 (defun my-org-timestamp-summarize-min (timestamps &optional format)
   "Summarize TIMESTAMPS by returning the minimum."
@@ -464,13 +469,15 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Effort
 
-(custom-set org-global-properties
-            '(("EFFORT_ALL" . "0:10 0:30 1:00 2:00 3:00 4:00 6:00")))
+(custom-set-variables
+ '(org-global-properties
+   '(("EFFORT_ALL" . "0:10 0:30 1:00 2:00 3:00 4:00 6:00"))))
 
 ;;; Export
 
-(custom-set org-export-async-init-file
-            (locate-user-emacs-file "ox-async-init.el"))
+(custom-set-variables
+ '(org-export-async-init-file
+   (locate-user-emacs-file "ox-async-init.el")))
 
 ;;; ff-get-other-file
 
@@ -572,7 +579,7 @@ alphabetically."
 
 (add-hook 'org-mode-hook #'auto-fill-mode)
 
-(custom-set org-startup-indented t)
+(custom-set-variables '(org-startup-indented t))
 
 (defun my-org-align-tags ()
   "Align all tags in the visible part of the buffer.
@@ -613,18 +620,20 @@ truncated."
 
 ;;; Lists
 
-(custom-set org-list-allow-alphabetical t)
+(custom-set-variables '(org-list-allow-alphabetical t))
 
 ;;; Logbook
 
-(custom-set org-log-done 'time)
-(custom-set org-log-into-drawer t)
-(custom-set org-log-refile 'time)
+(custom-set-variables
+ '(org-log-done 'time)
+ '(org-log-into-drawer t)
+ '(org-log-refile 'time))
 
 ;;; Priority
 
-(custom-set org-default-priority ?C)
-(custom-set org-lowest-priority ?D)
+(custom-set-variables
+ '(org-default-priority ?C)
+ '(org-lowest-priority ?D))
 
 ;;; Refiling
 
@@ -643,11 +652,12 @@ value."
                    t
                    "\\`[^#]+.org\\'"))
 
-(custom-set org-refile-targets '((org-files-list :maxlevel . 2)
-                                 (my-org-cabinet-files :maxlevel . 2)))
-(custom-set org-refile-allow-creating-parent-nodes t)
-(custom-set org-refile-use-outline-path 'file)
-(custom-set org-outline-path-complete-in-steps nil)
+(custom-set-variables
+ '(org-outline-path-complete-in-steps nil)
+ '(org-refile-allow-creating-parent-nodes t)
+ '(org-refile-targets '((org-files-list :maxlevel . 2)
+                        (my-org-cabinet-files :maxlevel . 2)))
+ '(org-refile-use-outline-path 'file))
 
 (defun my-org-remove-new-keywords ()
   "Remove NEW keyword from entries after refiling.
@@ -737,15 +747,15 @@ recursively.")
 
 ;;; Todo
 
-(custom-set org-todo-keywords
-            '((type  "TODO(!)" "NEXT(!)" "WAIT(@)" "|" "DONE(!)" "DROP(@)")
-              (sequence "PLAN" "|" "PASS" "FAIL")))
-(custom-set org-todo-keyword-faces
-            '(("PLAN" . "yellow")
-              ("PASS" . "green")
-              ("FAIL" . "red")))
-(custom-set org-enforce-todo-checkbox-dependencies t)
-(custom-set org-enforce-todo-dependencies t)
+(custom-set-variables
+ '(org-enforce-todo-checkbox-dependencies t)
+ '(org-enforce-todo-dependencies t)
+ '(org-todo-keywords '((type  "TODO(!)" "NEXT(!)" "WAIT(@)"
+                              "|" "DONE(!)" "DROP(@)")
+                       (sequence "PLAN" "|" "PASS" "FAIL")))
+ '(org-todo-keyword-faces '(("PLAN" . "yellow")
+                            ("PASS" . "green")
+                            ("FAIL" . "red"))))
 
 (defun my-org-drop-headings (end)
   "Drop headings from point to END."
@@ -898,7 +908,7 @@ If NO-MARK-DONE is non-nil, don't change the entry state."
 
 ;;; Visibility
 
-(custom-set org-cycle-global-at-bob t)
+(custom-set-variables '(org-cycle-global-at-bob t))
 
 (defun my-org-cycle (arg)
   "With single prefix argument ARG, call

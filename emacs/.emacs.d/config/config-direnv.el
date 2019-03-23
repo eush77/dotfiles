@@ -1,10 +1,11 @@
 (when (executable-find "direnv")
   (direnv-mode 1))
 
-(custom-set direnv-non-file-modes '(compilation-mode
-                                    dired-mode
-                                    eshell-mode
-                                    magit-status-mode))
+(custom-set-variables
+ '(direnv-non-file-modes '(compilation-mode
+                           dired-mode
+                           eshell-mode
+                           magit-status-mode)))
 
 (with-eval-after-load "eshell"
   (defun my-eshell--direnv-path-env (&rest args)

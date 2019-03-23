@@ -3,10 +3,11 @@
 
 ;;; Basic setup
 
-(custom-set dired-dwim-target t)
-(custom-set dired-listing-switches
-            (concat "-lv --group-directories-first --human-readable"
-                    (if window-system " --all" " --almost-all")))
+(custom-set-variables
+ '(dired-dwim-target t)
+ '(dired-listing-switches
+   (concat "-lv --group-directories-first --human-readable"
+           (if window-system " --all" " --almost-all"))))
 
 (add-hook 'dired-mode-hook #'dired-filter-mode)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
@@ -66,7 +67,7 @@ the same window."
 
 ;;; `dired-filter'
 
-(custom-set dired-filter-stack nil)
+(custom-set-variables '(dired-filter-stack nil))
 
 (define-key dired-filter-map (kbd "w") #'dired-filter-pop)
 

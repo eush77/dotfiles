@@ -1,7 +1,7 @@
 (smartparens-global-strict-mode 1)
 (require 'smartparens-config)
 
-(custom-set sp-highlight-pair-overlay nil)
+(custom-set-variables '(sp-highlight-pair-overlay nil))
 
 (defun my-hippie-expand--smartparens (&rest args)
   "Fix Smartparens' integration with Hippie-Expand. See [1].

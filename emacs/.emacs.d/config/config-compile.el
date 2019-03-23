@@ -1,17 +1,11 @@
 (require 'dash)
 
-;;; Basic setup
-
-(custom-set compilation-scroll-output t)
+;;; Commands
 
 (defun my-compilation-save-buffers-predicate ()
   "Limit buffers that are saved before compiling to those derived
 from `prog-mode'."
   (derived-mode-p 'prog-mode))
-(custom-set compilation-save-buffers-predicate
-            #'my-compilation-save-buffers-predicate)
-
-;;; Commands
 
 ;;;###autoload
 (defcustom my-compilation-ignored-buffers '("*Compile-Log*"
@@ -65,6 +59,13 @@ buffer."
       (select-window compilation-window)))
   (recompile)
   (select-window (get-buffer-window compilation-last-buffer t)))
+
+;;; Custom Setup
+
+(custom-set-variables
+ '(compilation-save-buffers-predicate
+   #'my-compilation-save-buffers-predicate)
+ '(compilation-scroll-output t))
 
 ;;; Keymap
 
