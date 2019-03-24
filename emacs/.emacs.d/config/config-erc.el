@@ -2,6 +2,25 @@
 
 (custom-set-variables '(erc-prompt-for-password nil))
 
+;;;###autoload
+(defun my-erc ()
+  "Switch to ERC buffer
+
+Start ERC if there is no open IRC process, switch to the next
+active ERC buffer if there is one, or else switch to the server
+buffer.
+
+If called in an ERC buffer with an open IRC process, switch to
+the last non-ERC buffer."
+  (interactive)
+  (require 'erc)
+  (let ((server-buffer (seq-find #'erc-open-server-buffer-p
+                                 (erc-all-buffer-names))))
+    (cond ((not server-buffer) (erc))
+          ((my-erc-track-switch-buffer--no-op)
+           (erc-track-switch-buffer 1))
+          (t (switch-to-buffer server-buffer)))))
+
 ;;; erc-imenu
 
 (defun my-erc-unfill-notice--read-only ()
@@ -60,7 +79,10 @@ well."
 (defun my-erc-track-switch-buffer--no-op (&rest args)
   "Do not switch to `erc-track-last-non-erc-buffer' if already
 visiting a non-ERC buffer."
-  (or erc-modified-channels-alist (eq major-mode 'erc-mode)))
+  (or erc-modified-channels-alist
+      (derived-mode-p 'erc-mode)
+      (when (called-interactively-p 'interactive)
+        (ignore (message "No next active channel")))))
 
 (with-eval-after-load "erc-track"
   (custom-set-variables
@@ -75,6 +97,4 @@ visiting a non-ERC buffer."
               :before-while #'my-erc-track-switch-buffer--no-op)
 
   (define-key erc-track-minor-mode-map (kbd "C-c C-@") nil)
-  (define-key erc-track-minor-mode-map (kbd "C-c C-SPC") nil)
-  (define-key erc-track-minor-mode-map (kbd "C-x M-5")
-    #'erc-track-switch-buffer))
+  (define-key erc-track-minor-mode-map (kbd "C-c C-SPC") nil))
