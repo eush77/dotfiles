@@ -31,7 +31,7 @@ unless `org-pomodoro-clock-break' is t."
   (concat (number-to-string num)
           (if (= (/ (mod num 100) 10) 1)
               "th"
-            (case (mod num 10)
+            (cl-case (mod num 10)
               ((1) "st")
               ((2) "nd")
               ((3) "rd")
