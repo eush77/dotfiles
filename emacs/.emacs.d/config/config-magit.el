@@ -54,6 +54,9 @@ Otherwise hide it, and show the previous sibling section."
 
 ;;; magit-files
 
+;; Enable `global-magit-file-mode'
+(require 'magit-files)
+
 (defun my-magit-file-mode-turn-on--directories (func &rest args)
   "Add support for directories"
   (let ((buffer-file-name (magit-file-relative-name)))
