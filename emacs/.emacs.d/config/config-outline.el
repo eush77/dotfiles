@@ -136,3 +136,16 @@ direction. The meaning of COUNT is inverted."
   #'my-outline-show-next-subtree)
 (define-key outline-mode-prefix-map (kbd "M-P")
   #'my-outline-show-previous-subtree)
+
+;;; indent-for-tab-command integration
+
+(defun my-indent-for-tab-command--outline-minor (func &rest args)
+  "Cycle heading at point"
+  (let ((point-before (point)))
+    (apply func args)
+    (when (and (outline-minor-mode)
+               (= point-before (point))
+               (outline-on-heading-p))
+      (my-outline-cycle-subtree))))
+(advice-add 'indent-for-tab-command
+            :around #'my-indent-for-tab-command--outline-minor)
