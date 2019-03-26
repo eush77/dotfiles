@@ -37,6 +37,31 @@ readable."
 (advice-add 'gdb-locals-handler-custom
             :around #'my-gdb-locals-handler-custom--add-row)
 
+;;; Window Configuration
+
+(defvar my-gdb-startup-window-configurations nil
+  "Window configurations saved on entering GDB-MI.
+
+An alist (frame . wconf) of window configurations per frame.")
+
+(defun my-gdb-save-window-configuration (&rest _)
+  "Save to `my-gdb-startup-window-configurations'."
+  (setf (alist-get (selected-frame)
+                   my-gdb-startup-window-configurations)
+        (current-window-configuration)))
+(advice-add 'gdb :before #'my-gdb-save-window-configuration)
+
+(defun my-gdb-restore-window-configuration (&rest _)
+  "Restore from `my-gdb-startup-window-configurations'."
+  (when-let ((window-configuration
+              (alist-get (selected-frame)
+                         my-gdb-startup-window-configurations)))
+    (set-window-configuration window-configuration)
+    (setf (alist-get (selected-frame)
+                     my-gdb-startup-window-configurations nil t)
+          nil)))
+(advice-add 'gdb-reset :after #'my-gdb-restore-window-configuration)
+
 ;;; Windows
 
 (custom-set-variables '(gdb-many-windows t))
