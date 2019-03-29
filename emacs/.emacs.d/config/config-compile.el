@@ -38,11 +38,13 @@ from `prog-mode'."
 (defun my-compile-in-compilation-buffer ()
   "Like `compile', but command defaults to the last command."
   (interactive)
-  (let ((last-command
-         (save-excursion (goto-char (point-min))
-                         (beginning-of-line 4)
-                         (buffer-substring (point) (line-end-position)))))
-    (compile (compilation-read-command last-command))))
+  (let ((command
+         (if (region-active-p)
+             (buffer-substring-no-properties (region-beginning) (region-end))
+           (save-excursion (goto-char (point-min))
+                           (beginning-of-line 4)
+                           (buffer-substring (point) (line-end-position))))))
+    (compile (compilation-read-command command))))
 
 ;;;###autoload
 (defun my-recompile ()
