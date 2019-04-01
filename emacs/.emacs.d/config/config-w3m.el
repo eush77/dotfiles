@@ -150,6 +150,17 @@ configuration and doesn't close buffers in other windows."
       (bury-buffer (window-buffer))
       (set-window-buffer (selected-window) (other-buffer)))))
 
+;;; w3m-download
+
+(defun my-w3m-download--default-directory (func &rest args)
+  "Save to `default-directory' if called outside of `w3m-mode'."
+  (if (derived-mode-p 'w3m-mode)
+      (apply func args)
+    (let ((w3m-default-save-directory default-directory))
+      (apply func args))))
+
+(advice-add 'w3m-download :around #'my-w3m-download--default-directory)
+
 ;;; w3m-filter
 
 (defun my-w3m-filter--catch-errors (func &rest args)
