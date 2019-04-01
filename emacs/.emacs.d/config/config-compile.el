@@ -1,5 +1,16 @@
 (require 'dash)
 
+;;; ANSI Control Sequences
+
+(defun my-compilation-filter-ansi-color ()
+  (let ((string
+         (ansi-color-filter-apply (buffer-substring compilation-filter-start
+                                                    (point)))))
+    (delete-region compilation-filter-start (point))
+    (insert string)))
+
+(add-hook 'compilation-filter-hook #'my-compilation-filter-ansi-color)
+
 ;;; Commands
 
 (defun my-compilation-save-buffers-predicate ()
