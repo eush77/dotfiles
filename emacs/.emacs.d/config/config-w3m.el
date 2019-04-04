@@ -1,4 +1,5 @@
 (require 'dash)
+(require 'dash-functional)
 
 ;;; browse-web
 
@@ -134,6 +135,16 @@ point instead."
    '(w3m-make-new-session t))
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode))
+
+;;; w3m-alive-p
+
+(defun my-w3m-alive-p--latter-buffer (func &rest args)
+  "Prefer latter buffers in the order of buffer names."
+  (cl-letf* ((buffers (reverse (w3m-list-buffers)))
+             ((symbol-function 'w3m-list-buffers) (-const buffers)))
+    (apply func args)))
+
+(advice-add 'w3m-alive-p :around #'my-w3m-alive-p--latter-buffer)
 
 ;;; w3m-close-window
 
