@@ -1,3 +1,5 @@
+(require 'emms-volume-pulse)
+
 (emms-all)
 (emms-default-players)
 (emms-mode-line-disable)
