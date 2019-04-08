@@ -26,8 +26,8 @@ function decol {
 		fi
 	fi
 
-	tempx=$(tempfile --suffix=.pdf)
-	tempy=$(tempfile --suffix=.pdf)
+	tempx=$(mktemp --suffix=.pdf)
+	tempy=$(mktemp --suffix=.pdf)
 	trap "rm $tempx $tempy" EXIT
 
 	mutool poster -x2 "$input" "$tempx"
