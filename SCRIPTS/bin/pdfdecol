@@ -28,7 +28,7 @@ function decol {
 
 	tempx=$(mktemp --suffix=.pdf)
 	tempy=$(mktemp --suffix=.pdf)
-	trap "rm $tempx $tempy" EXIT
+	trap "rm \"$tempx\" \"$tempy\"" EXIT
 
 	mutool poster -x2 "$input" "$tempx"
 	mutool poster -y2 "$tempx" "$tempy"
@@ -42,7 +42,7 @@ if [[ "$1" = "--help" || "$#" -ne 2 ]]; then
 fi
 
 if [[ -d "$2" ]]; then
-	decol "$1" "$2/$(basename $1)"
+	decol "$1" "$2/$(basename "$1")"
 else
 	decol "$1" "$2"
 fi
