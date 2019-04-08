@@ -10,6 +10,10 @@
 
 (define-key emacs-lisp-mode-map "\C-c\C-j" #'counsel-outline)
 
+;;; nameless
+
+(add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+
 ;;; outline-minor-mode
 
 (add-hook 'emacs-lisp-mode-hook #'outline-minor-mode)
