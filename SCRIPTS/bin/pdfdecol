@@ -6,7 +6,7 @@ IFS=$'\n'
 
 function help {
 	cat <<-EOF
-		Usage: $0 <input.pdf> <output-file-or-directory>
+		Usage: $(basename "$0") <input.pdf> <output-file-or-directory>
 
 		Cut file horizontally, then vertically, then crop margins.
 		Make it readable on a 6" ebook reader.
