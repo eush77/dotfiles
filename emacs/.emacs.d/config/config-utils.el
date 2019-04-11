@@ -415,15 +415,16 @@ With `C-u C-u' prefix argument, just reset
 system, or nil."
   (when window-system
     (string-to-number
-     (cadr
-      (split-string
-       ;; Run `xprop' from a local directory.
-       (let ((default-directory "~"))
-         (shell-command-to-string
-          (format "xprop -id %s _NET_WM_DESKTOP"
-                  (alist-get 'outer-window-id
-                             (frame-parameters frame)))))
-       "=")))))
+     (or (cadr
+          (split-string
+           ;; Run `xprop' from a local directory.
+           (let ((default-directory "~"))
+             (shell-command-to-string
+              (format "xprop -id %s _NET_WM_DESKTOP"
+                      (alist-get 'outer-window-id
+                                 (frame-parameters frame)))))
+           "="))
+         ""))))
 
 ;;; Window sizing
 
