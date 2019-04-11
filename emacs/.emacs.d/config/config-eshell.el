@@ -254,11 +254,16 @@ including the sigil."
 
 ;;; Commands
 
-(defun my-eshell-insert-sudo ()
+(defun my-eshell-toggle-sudo ()
   "Prefix current command with prefix."
   (interactive)
-  (eshell-bol)
-  (insert "sudo "))
+  (let ((bol (save-excursion (eshell-bol) (point))))
+    (if (save-excursion (goto-char bol) (looking-at "sudo "))
+        (delete-region bol (+ bol 5))
+      (let ((point (point)))
+        (eshell-bol)
+        (insert "sudo ")
+        (goto-char (+ point 5))))))
 
 (defun eshell/gdb ()
   "Debug previous command in `gdb'."
@@ -314,5 +319,5 @@ numbered."
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)
   (define-key eshell-mode-map (kbd "C-c C-w")
     #'my-eshell-edit-indirect-output)
-  (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-insert-sudo))
+  (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-toggle-sudo))
 (add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
