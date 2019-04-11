@@ -417,6 +417,7 @@ function youtube-mw {
 #======================= System Setup ======================================
 # Show battery status if running on a TTY.
 [[ -z "$DISPLAY" ]] &&
+	[[ -e /sys/class/power_supply/BAT1/status ]] &&
 	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
 	acpi --battery
 
