@@ -55,9 +55,14 @@ the whole buffer otherwise."
  '(org-agenda-custom-commands
    `(("b" "Batch view" search "{..}"
       ((org-agenda-restrict
-        (progn (put 'org-agenda-files 'org-restrict
-                    (list (buffer-file-name (buffer-base-buffer))))
-               (current-buffer)))
+        (progn
+          (put 'org-agenda-files 'org-restrict
+               (let ((file (buffer-file-name (buffer-base-buffer))))
+                 (unless file
+                   (user-error
+                    "Cannot form batch view for non-file-visiting buffers"))
+                 (list file)))
+          (current-buffer)))
        (org-agenda-restrict-begin
         (car (my-org-agenda-get-batch-view-region)))
        (org-agenda-restrict-end
