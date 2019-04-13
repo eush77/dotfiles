@@ -38,17 +38,18 @@ Active sink is defined as the last one in the list printed by
 
 ;; Commands
 
-(defvar my-emms-toggle-mute--last-volume)
+(defvar my-emms-volume-mute--last-volume)
 
-(defun my-emms-toggle-mute ()
+;;;###autoload
+(defun my-emms-volume-mute ()
   "Toggle mute"
   (interactive)
   (let ((volume (emms-volume--pulse-get-volume)))
     (cond ((> volume 0)
-           (setq my-emms-toggle-mute--last-volume volume)
+           (setq my-emms-volume-mute--last-volume volume)
            (emms-volume-pulse-change (- volume)))
-          (my-emms-toggle-mute--last-volume
-           (emms-volume-pulse-change my-emms-toggle-mute--last-volume))
+          (my-emms-volume-mute--last-volume
+           (emms-volume-pulse-change my-emms-volume-mute--last-volume))
           (t (message "Cannot unmute")))))
 
 ;;
@@ -242,7 +243,7 @@ the playlist."
   ("n" my-hydra-emms-next "next")
   ("0" emms-volume-raise "++" :column "Volume")
   ("9" emms-volume-lower "--")
-  ("m" my-emms-toggle-mute (if (zerop (emms-volume--pulse-get-volume))
+  ("m" my-emms-volume-mute (if (zerop (emms-volume--pulse-get-volume))
                                "unmute"
                              "mute"))
   ("<" emms-seek-backward "backward" :column "Seek")
