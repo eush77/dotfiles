@@ -5,7 +5,9 @@
 (defun my-exwm-brightness-change (amount)
   "Change screen brightness by AMOUNT."
   (interactive "nChange screen brightness by [-100..100]: ")
-  (call-process "xbacklight" nil nil nil "-inc" (number-to-string amount)))
+  (call-process "xbacklight" nil nil nil "-inc" (number-to-string amount))
+  (message "Screen brightness set to %s%%"
+           (string-trim (shell-command-to-string "xbacklight -get"))))
 
 ;;;###autoload
 (defcustom my-exwm-brightness-change-amount 10
