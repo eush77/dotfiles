@@ -12,6 +12,7 @@
 (add-hook 'dired-mode-hook #'dired-filter-mode)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 (add-hook 'dired-mode-hook #'dired-hide-dotfiles-mode)
+(add-hook 'dired-mode-hook #'toggle-truncate-lines)
 
 ;;; Commands
 
