@@ -70,8 +70,11 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      ([?\C-n] . [down])
      ([?\C-p] . [up])
      ([?\C-v] . [next])
+     ([?\C-w] . [?\C-x])
+     ([?\C-y] . [?\C-v])
      ([?\M-h] . [?\C-a])
-     ([?\M-v] . [prior]))))
+     ([?\M-v] . [prior])
+     ([?\M-w] . [?\C-c]))))
 
 ;;; exwm-update-class-hook
 
