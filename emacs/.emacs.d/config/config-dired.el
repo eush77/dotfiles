@@ -74,6 +74,13 @@ the same window."
 
 (define-key dired-filter-map (kbd "w") #'dired-filter-pop)
 
+;;; dired-guess-shell-command
+
+(custom-set-variables
+ '(dired-guess-shell-alist-user
+   `((,(concat "\\." (regexp-opt '("avi" "m4v" "mkv" "mp4" "webm" "wmv")) "\\'")
+      "mplayer"))))
+
 ;;; find-file
 
 ;;;###autoload
