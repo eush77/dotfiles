@@ -138,6 +138,7 @@
 (with-eval-after-load "elisp-mode" (load "config-elisp"))
 (with-eval-after-load "erc" (load "config-erc"))
 (with-eval-after-load "eshell" (load "config-eshell"))
+(with-eval-after-load "exwm" (load "config-exwm"))
 (with-eval-after-load "ffap" (load "config-ffap"))
 (with-eval-after-load "files" (load "config-files"))
 (with-eval-after-load "gdb-mi" (load "config-gdb-mi"))
