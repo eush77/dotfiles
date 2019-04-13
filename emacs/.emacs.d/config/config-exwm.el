@@ -2,15 +2,28 @@
 
 ;;; exwm-input-global-keys
 
+(defun my-exwm-brightness-change (amount)
+  "Change screen brightness by AMOUNT."
+  (interactive "nChange screen brightness by [-100..100]: ")
+  (call-process "xbacklight" nil nil nil "-inc" (number-to-string amount)))
+
+;;;###autoload
+(defcustom my-exwm-brightness-change-amount 10
+  "The amount to use when raising or lowering screen brightness.
+
+See `my-exwm-brightness-down', `my-exwm-brightness-up'."
+  :type 'integer
+  :group 'my)
+
 (defun my-exwm-brightness-down ()
   "Decrease screen brightness."
   (interactive)
-  (call-process "xbacklight" nil nil nil "-dec" "10"))
+  (my-exwm-brightness-change (- my-exwm-brightness-change-amount)))
 
 (defun my-exwm-brightness-up ()
   "Increase screen brightness."
   (interactive)
-  (call-process "xbacklight" nil nil nil "-inc" "10"))
+  (my-exwm-brightness-change my-exwm-brightness-change-amount))
 
 (defun my-exwm-toggle-touchpad ()
   "Enable or disable touchpad."
