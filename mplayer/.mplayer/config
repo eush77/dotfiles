@@ -1,5 +1,7 @@
 af=scaletempo
 use-filedir-conf=yes
+
+[audio]
 vo=null
 
 [vo.fbdev2]
