@@ -1,2 +1,3 @@
-(unless window-system
-  (custom-set-variables '(switch-window-shortcut-appearance 'asciiart)))
+(custom-set-variables
+ '(switch-window-shortcut-appearance
+   (if (display-graphic-p) 'text 'asciiart)))
