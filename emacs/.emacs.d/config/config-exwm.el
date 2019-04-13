@@ -59,7 +59,6 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 ;;; exwm-input-simulation-keys
 
-;; Part of `exwm-config-default'
 (custom-set-variables
  '(exwm-input-simulation-keys
    '(([?\C-b] . [left])
@@ -71,7 +70,8 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      ([?\M-v] . [prior])
      ([?\C-v] . [next])
      ([?\C-d] . [delete])
-     ([?\C-k] . [S-end delete]))))
+     ([?\C-k] . [S-end delete])
+     ([?\M-h] . [?\C-a]))))
 
 ;;; exwm-update-class-hook
 
