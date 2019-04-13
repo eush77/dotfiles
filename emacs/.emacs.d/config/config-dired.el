@@ -1,7 +1,7 @@
 (require 'dash)
 (require 'dired-imenu)
 
-;;; Basic setup
+;;; Basic Setup
 
 (custom-set-variables
  '(dired-dwim-target t)
@@ -9,7 +9,6 @@
    (concat "-lv --group-directories-first --human-readable"
            (if window-system " --all" " --almost-all"))))
 
-(add-hook 'dired-mode-hook #'dired-filter-mode)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 (add-hook 'dired-mode-hook #'dired-hide-dotfiles-mode)
 (add-hook 'dired-mode-hook #'toggle-truncate-lines)
@@ -64,15 +63,18 @@ the same window."
          (message "Empty directory \"%s\" deleted"
                   (file-name-nondirectory directory))
          t)))))
+
 (advice-add 'dired-do-delete :before-until #'my-dired-do-delete--rmdir)
 
-;;; `dired-filter'
+;;; dired-filter
+
+(add-hook 'dired-mode-hook #'dired-filter-mode)
 
 (custom-set-variables '(dired-filter-stack nil))
 
 (define-key dired-filter-map (kbd "w") #'dired-filter-pop)
 
-;;; Find-file
+;;; find-file
 
 ;;;###autoload
 (defcustom my-src-directory "~/src"
@@ -130,7 +132,7 @@ alternative names."
 
 (add-hook 'dired-mode-hook #'my-dired-ff-mode-hook)
 
-;;; Keymap
+;;; dired-mode-map
 
 (define-key dired-mode-map (kbd "C-M-p") #'window-jump-up)
 (define-key dired-mode-map (kbd "C-M-n") #'window-jump-down)
