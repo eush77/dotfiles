@@ -519,3 +519,15 @@ Resize window
   (interactive)
   (select-window (or (get-mru-window t t t) (minibuffer-window)))
   (select-frame-set-input-focus (window-frame (selected-window))))
+
+;;; XDG Applications
+
+;;;###autoload
+(defun my-xdg-web-browser ()
+  "Launch default XDG web browser."
+  (interactive)
+  (require 'counsel)
+  (counsel-linux-app-action-default
+   (cons nil
+         (string-trim (shell-command-to-string
+                       "xdg-settings get default-web-browser")))))

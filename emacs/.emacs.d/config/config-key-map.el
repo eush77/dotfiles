@@ -49,6 +49,7 @@
 (global-set-key (kbd "C-x M-1") #'eshell)
 (global-set-key (kbd "C-x M-2") #'gnus)
 (global-set-key (kbd "C-x M-3") #'browse-web)
+(global-set-key (kbd "C-x C-M-3") #'my-xdg-web-browser)
 (global-set-key (kbd "C-x M-4") #'pocket-reader)
 (global-set-key (kbd "C-x M-5") #'my-erc)
 
