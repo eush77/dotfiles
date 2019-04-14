@@ -6,8 +6,7 @@
 (custom-set-variables
  '(dired-dwim-target t)
  '(dired-listing-switches
-   (concat "-lv --group-directories-first --human-readable"
-           (if window-system " --all" " --almost-all"))))
+   (concat "-lv --group-directories-first --human-readable --almost-all")))
 
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 (add-hook 'dired-mode-hook #'dired-hide-dotfiles-mode)
