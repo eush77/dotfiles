@@ -72,6 +72,8 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      ([?\C-v] . [next])
      ([?\C-w] . [?\C-x])
      ([?\C-y] . [?\C-v])
+     ([?\M-<] . [home])
+     ([?\M->] . [end])
      ([?\M-h] . [?\C-a])
      ([?\M-v] . [prior])
      ([?\M-w] . [?\C-c]))))
