@@ -285,6 +285,24 @@ Archive files are those matching `org-archive-location'."
 (advice-add 'org-files-list
             :filter-return #'my-org-files-list--remove-archive)
 
+;;; Babel
+
+(defun my-org-babel-execute-buffer--ignore-non-executable (func &rest args)
+  "Ignore non-executable source blocks."
+  (cl-letf* ((execute-src-block (symbol-function 'org-babel-execute-src-block))
+             ((symbol-function 'org-babel-execute-src-block)
+              (lambda (&rest args)
+                (condition-case err
+                    (apply execute-src-block args)
+                  (error
+                   (unless (string-match-p "\\`No org-babel-execute function"
+                                           (cadr err))
+                     (signal (car err) (cdr err))))))))
+    (apply func args)))
+
+(advice-add 'org-babel-execute-buffer
+            :around #'my-org-babel-execute-buffer--ignore-non-executable)
+
 ;;; Capture
 
 (defun my-w3m-anchor-text ()
