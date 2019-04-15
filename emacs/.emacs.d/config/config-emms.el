@@ -1,42 +1,26 @@
 (require 'emms-volume-pulse)
 
+;;; Starting Up
+
 (emms-all)
 (emms-default-players)
 (emms-mode-line-disable)
 (emms-playing-time-disable-display)
 
-(defun my-emms-playlist-mode-goto-dired-at-point--default-directory ()
-  "Visit `emms-source-file-default-directory' in Dired if there
-is no track at point."
-  (unless (emms-playlist-track-at)
-    (dired emms-source-file-default-directory)))
-(advice-add 'emms-playlist-mode-goto-dired-at-point
-            :before-until
-            #'my-emms-playlist-mode-goto-dired-at-point--default-directory)
+;;; Adding Tracks
 
-(with-eval-after-load "emms-playlist-mode"
-  (define-key emms-playlist-mode-map (kbd "0") #'emms-volume-raise)
-  (define-key emms-playlist-mode-map (kbd "9") #'emms-volume-lower)
-  (define-key emms-playlist-mode-map (kbd "SPC") #'emms-pause))
+(defun my-emms-add-tracks-dwim ()
+  "Add tracks at point or completed interactively.
 
-(with-eval-after-load "emms-volume-pulse"
-  (defun my-emms-pulse-get-sink ()
-    "Get active PulseAudio sink.
+Calls `emms-add-dired' or `emms-add-directory-tree'
+(with completion), depending on the mode of the buffer."
+  (declare (interactive-only t))
+  (interactive)
+  (if (eq major-mode 'dired-mode)
+      (emms-add-dired)
+    (call-interactively #'emms-add-directory-tree)))
 
-Active sink is defined as the last one in the list printed by
-`pactl'."
-    (with-temp-buffer
-      (call-process "pactl" nil t nil "list" "short" "sinks")
-      (cadr (split-string (buffer-substring (line-beginning-position 0)
-                                            (point-max))))))
-
-  (defun my-emms-volume-pulse-get-volume--select-sink ()
-    "Select the active `emms-volume-pulse-sink'."
-    (setq emms-volume-pulse-sink (my-emms-pulse-get-sink)))
-  (advice-add 'emms-volume--pulse-get-volume
-              :before #'my-emms-volume-pulse-get-volume--select-sink))
-
-;; Commands
+;;; Mute
 
 (defvar my-emms-volume-mute--last-volume)
 
@@ -52,9 +36,93 @@ Active sink is defined as the last one in the list printed by
            (emms-volume-pulse-change my-emms-volume-mute--last-volume))
           (t (message "Cannot unmute")))))
 
-;;
-;; EMMS Hydra
-;;
+;;; Playback Order
+
+(defun my-emms-next--random-playlist (func &rest args)
+  "`emms-next' or `emms-random' based on `emms-random-playlist'."
+  (if emms-random-playlist
+      (emms-random)
+    (apply func args)))
+
+(defun my-emms-previous--random-playlist ()
+  "Signal an error if `emms-random-playlist' is on."
+  (when emms-random-playlist
+    (user-error "Can't go back in a random playback")))
+
+(defun my-emms-toggle-looping ()
+  "Toggle between looping states.
+
+Switch between looping a single track, a playlist, or stopping at
+the end of the playlist.
+
+Resets `emms-random-playlist', modifies `emms-repeat-track'
+and/or `emms-repeat-playlist'."
+  (declare (interactive-only t))
+  (interactive)
+  (setq emms-random-playlist nil)
+  (setq emms-player-next-function #'emms-next-noerror)
+  (cond (emms-repeat-track (setq emms-repeat-track nil)
+                           (setq emms-repeat-playlist t)
+                           (message "Will repeat the playlist."))
+        (emms-repeat-playlist (setq emms-repeat-playlist nil)
+                              (message "Will stop at the end of the playlist."))
+        (t (setq emms-repeat-track t)
+           (message "Will repeat this track."))))
+
+(defun my-emms-toggle-stop-after ()
+  "Toggle between stopping after this track or continuing playing
+the playlist."
+  (declare (interactive-only t))
+  (interactive)
+  (cond ((not (eq emms-player-next-function 'emms-stop))
+         (setq emms-player-next-function #'emms-stop)
+         (message "Will stop after this track."))
+        (emms-random-playlist
+         (setq emms-player-next-function #'emms-random)
+         (message "Will play the tracks randomly."))
+        (t (setq emms-player-next-function #'emms-next-noerror)
+           (message "Will play the track sequentially."))))
+
+(advice-add 'emms-next :around #'my-emms-next--random-playlist)
+(advice-add 'emms-previous :before #'my-emms-previous--random-playlist)
+
+;;; Playlist Mode
+
+(defun my-emms-playlist-mode-goto-dired-at-point--default-directory ()
+  "Visit `emms-source-file-default-directory' in Dired if there
+is no track at point."
+  (unless (emms-playlist-track-at)
+    (dired emms-source-file-default-directory)))
+(advice-add 'emms-playlist-mode-goto-dired-at-point
+            :before-until
+            #'my-emms-playlist-mode-goto-dired-at-point--default-directory)
+
+(with-eval-after-load "emms-playlist-mode"
+  (define-key emms-playlist-mode-map (kbd "0") #'emms-volume-raise)
+  (define-key emms-playlist-mode-map (kbd "9") #'emms-volume-lower)
+  (define-key emms-playlist-mode-map (kbd "SPC") #'emms-pause))
+
+;;; PulseAudio
+
+(defun my-emms-pulse-get-sink ()
+  "Get active PulseAudio sink.
+
+Active sink is defined as the last one in the list printed by
+`pactl'."
+  (with-temp-buffer
+    (call-process "pactl" nil t nil "list" "short" "sinks")
+    (cadr (split-string (buffer-substring (line-beginning-position 0)
+                                          (point-max))))))
+
+(defun my-emms-volume-pulse-get-volume--select-sink ()
+  "Select the active `emms-volume-pulse-sink'."
+  (setq emms-volume-pulse-sink (my-emms-pulse-get-sink)))
+
+(with-eval-after-load "emms-volume-pulse"
+  (advice-add 'emms-volume--pulse-get-volume
+              :before #'my-emms-volume-pulse-get-volume--select-sink))
+
+;;; Hydra
 
 (defvar my-hydra-emms/hint-line ""
   "First line of `my-hydra-emms/hint' showing track info.")
@@ -168,69 +236,9 @@ Active sink is defined as the last one in the list printed by
   (cancel-timer my-hydra-emms/hint-update-timer)
   (setq my-hydra-emms/hint-update-timer nil))
 
-(defun my-hydra-emms-previous ()
-  "Like `emms-previous', but signal an error if
-`emms-random-playlist' is on."
-  (interactive)
-  (when emms-random-playlist
-    (user-error "Can't go back in a random playback"))
-  (emms-previous))
-
-(defun my-hydra-emms-next ()
-  "Call `emms-next' or `emms-random', depending on the value of
-`emms-random-playlist'."
-  (interactive)
-  (if emms-random-playlist
-      (emms-random)
-    (emms-next)))
-
-(defun my-hydra-emms-toggle-looping ()
-  "Toggle between looping a single track, a playlist, or stopping
-at the end of the playlist.
-
-Resets `emms-random-playlist', modifies `emms-repeat-track'
-and/or `emms-repeat-playlist', and finally updates
-`my-hydra-emms/hint'."
-  (interactive)
-  (setq emms-random-playlist nil)
-  (setq emms-player-next-function #'emms-next-noerror)
-  (cond (emms-repeat-track (setq emms-repeat-track nil)
-                           (setq emms-repeat-playlist t))
-        (emms-repeat-playlist (setq emms-repeat-playlist nil))
-        (t (setq emms-repeat-track t)))
-  (my-hydra-emms-update-hint))
-
-(defun my-hydra-emms-toggle-random ()
-  "Toggle between sequential or random order of playback.
-
-Equivalent to `emms-toggle-random-playlist', except that it also
-updates `my-hydra-emms/hint'."
-  (interactive)
-  (setq emms-player-next-function
-        (if (setq emms-random-playlist (not emms-random-playlist))
-            #'emms-random
-          #'emms-next-noerror))
-  (my-hydra-emms-update-hint))
-
-(defun my-hydra-emms-toggle-stop-after ()
-  "Toggle between stopping after this track or continuing playing
-the playlist."
-  (interactive)
-  (cond ((not (eq emms-player-next-function 'emms-stop))
-         (setq emms-player-next-function #'emms-stop))
-        (emms-random-playlist
-         (setq emms-player-next-function #'emms-random))
-        (t (setq emms-player-next-function #'emms-next-noerror)))
-  (my-hydra-emms-update-hint))
-
-(defun my-hydra-emms-add ()
-  "Add files using `emms-add-dired' or `emms-add-directory-tree'
-(with completion), depending on the mode of the buffer."
-  (interactive)
-  (message "%s" major-mode)
-  (if (eq major-mode 'dired-mode)
-      (emms-add-dired)
-    (call-interactively #'emms-add-directory-tree)))
+(advice-add 'my-emms-toggle-looping :after #'my-hydra-emms-update-hint)
+(advice-add 'emms-toggle-random-playlist :after #'my-hydra-emms-update-hint)
+(advice-add 'my-emms-toggle-stop-after :after #'my-hydra-emms-update-hint)
 
 ;;;###autoload (autoload 'my-hydra-emms/body "config-emms")
 (defhydra my-hydra-emms (:body-pre (my-hydra-emms-start-hint-update-timer)
@@ -239,8 +247,8 @@ the playlist."
 %s`my-hydra-emms/hint-line
 "
   ("SPC" emms-pause "pause" :column "Playback")
-  ("p" my-hydra-emms-previous "previous")
-  ("n" my-hydra-emms-next "next")
+  ("p" emms-previous "previous")
+  ("n" emms-next "next")
   ("0" emms-volume-raise "++" :column "Volume")
   ("9" emms-volume-lower "--")
   ("m" my-emms-volume-mute (if (zerop (emms-volume--pulse-get-volume))
@@ -248,9 +256,9 @@ the playlist."
                              "mute"))
   ("<" emms-seek-backward "backward" :column "Seek")
   (">" emms-seek-forward "forward")
-  ("l" my-hydra-emms-toggle-looping "looping" :column "Order")
-  ("r" my-hydra-emms-toggle-random "random")
-  ("s" my-hydra-emms-toggle-stop-after "stop after")
-  ("a" my-hydra-emms-add "add" :column "Playlist")
+  ("l" my-emms-toggle-looping "looping" :column "Order")
+  ("r" emms-toggle-random-playlist "random")
+  ("s" my-emms-toggle-stop-after "stop after")
+  ("a" my-emms-add-tracks-dwim "add" :column "Playlist")
   ("e" emms "playlist" :exit t)
   ("q" nil "cancel" :column ""))
