@@ -20,22 +20,6 @@ Calls `emms-add-dired' or `emms-add-directory-tree'
       (emms-add-dired)
     (call-interactively #'emms-add-directory-tree)))
 
-;;; Mute
-
-(defvar my-emms-volume-mute--last-volume)
-
-;;;###autoload
-(defun my-emms-volume-mute ()
-  "Toggle mute"
-  (interactive)
-  (let ((volume (emms-volume--pulse-get-volume)))
-    (cond ((> volume 0)
-           (setq my-emms-volume-mute--last-volume volume)
-           (emms-volume-pulse-change (- volume)))
-          (my-emms-volume-mute--last-volume
-           (emms-volume-pulse-change my-emms-volume-mute--last-volume))
-          (t (message "Cannot unmute")))))
-
 ;;; Playback Order
 
 (defun my-emms-next--random-playlist (func &rest args)
@@ -121,6 +105,35 @@ Active sink is defined as the last one in the list printed by
 (with-eval-after-load "emms-volume-pulse"
   (advice-add 'emms-volume--pulse-get-volume
               :before #'my-emms-volume-pulse-get-volume--select-sink))
+
+;;; Volume
+
+(defun my-emms-volume-fine-lower ()
+  "Like `emms-volume-lower', but with the unit decrement."
+  (interactive)
+  (let ((emms-volume-change-amount 1))
+    (emms-volume-lower)))
+
+(defun my-emms-volume-fine-raise ()
+  "Like `emms-volume-raise', but with the unit increment."
+  (interactive)
+  (let ((emms-volume-change-amount 1))
+    (emms-volume-raise)))
+
+(defvar my-emms-volume-mute--last-volume nil
+  "Last volume before muting the speaker.")
+
+;;;###autoload
+(defun my-emms-volume-mute ()
+  "Toggle mute"
+  (interactive)
+  (let ((volume (emms-volume--pulse-get-volume)))
+    (cond ((> volume 0)
+           (setq my-emms-volume-mute--last-volume volume)
+           (emms-volume-pulse-change (- volume)))
+          (my-emms-volume-mute--last-volume
+           (emms-volume-pulse-change my-emms-volume-mute--last-volume))
+          (t (message "Cannot unmute")))))
 
 ;;; Hydra
 
@@ -249,11 +262,13 @@ Active sink is defined as the last one in the list printed by
   ("SPC" emms-pause "pause" :column "Playback")
   ("p" emms-previous "previous")
   ("n" emms-next "next")
-  ("0" emms-volume-raise "++" :column "Volume")
-  ("9" emms-volume-lower "--")
+  ("9" emms-volume-lower "--" :column "Volume Down")
+  ("(" my-emms-volume-fine-lower "-")
   ("m" my-emms-volume-mute (if (zerop (emms-volume--pulse-get-volume))
                                "unmute"
                              "mute"))
+  ("0" emms-volume-raise "++" :column "Volume Up")
+  (")" my-emms-volume-fine-raise "+")
   ("<" emms-seek-backward "backward" :column "Seek")
   (">" emms-seek-forward "forward")
   ("l" my-emms-toggle-looping "looping" :column "Order")
