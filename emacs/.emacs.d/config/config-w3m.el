@@ -37,10 +37,15 @@
 
 ;;; font
 
+;;;###autoload
+(defcustom my-w3m-default-face-remapping-specs nil
+  "Face remapping specs for the default face in W3m buffers."
+  :type '(plist))
+
 (defun my-w3m-setup-font ()
   "Set up the font for `w3m-mode'."
-  (face-remap-add-relative 'default :family "Droid Serif")
-  (text-scale-increase 1))
+  (apply #'face-remap-add-relative 'default
+         my-w3m-default-face-remapping-specs))
 
 (with-eval-after-load "w3m"
   (when window-system
