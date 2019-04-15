@@ -1,0 +1,43 @@
+{
+  "defaultHandlersVersion": {
+    "en-US": 4
+  },
+  "mimeTypes": {
+    "application/pdf": {
+      "action": 2,
+      "handlers": [
+        {
+          "name": "emacsclient",
+          "path": "/bin/emacsclient"
+        }
+      ]
+    },
+    "text/plain": {
+      "action": 2,
+      "handlers": [
+        {
+          "name": "emacsclient",
+          "path": "/bin/emacsclient"
+        }
+      ]
+    }
+  },
+  "schemes": {
+    "irc": {
+      "action": 0,
+      "ask": true
+    },
+    "ircs": {
+      "action": 0,
+      "ask": true
+    },
+    "mailto": {
+      "action": 0,
+      "ask": true
+    },
+    "webcal": {
+      "action": 0,
+      "ask": true
+    }
+  }
+}
