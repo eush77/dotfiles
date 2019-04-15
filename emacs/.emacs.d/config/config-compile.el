@@ -2,14 +2,14 @@
 
 ;;; ANSI Control Sequences
 
-(defun my-compilation-filter-ansi-color ()
-  (let ((string
-         (ansi-color-filter-apply (buffer-substring compilation-filter-start
-                                                    (point)))))
-    (delete-region compilation-filter-start (point))
-    (insert string)))
+(defun my-compilation-filter-ansi-color (&rest _)
+  (save-excursion
+    (let ((inhibit-read-only t))
+      (perform-replace ansi-color-control-seq-regexp ""
+                       nil t nil nil nil (point-min) (point-max)))))
 
-(add-hook 'compilation-filter-hook #'my-compilation-filter-ansi-color)
+(advice-add 'compilation-handle-exit
+            :after #'my-compilation-filter-ansi-color)
 
 ;;; Commands
 
