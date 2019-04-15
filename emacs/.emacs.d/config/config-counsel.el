@@ -174,3 +174,12 @@ If called with a prefix argument, call `counsel-org-goto-all'."
   (push-mark))
 (advice-add 'counsel-org-goto-action
             :before #'my-counsel-org-goto-action--push-mark)
+
+;;; counsel-rg
+
+(defun my-counsel-rg--no-git-root (func &rest args)
+  "Always search in `default-directory' by default."
+  (cl-letf (((symbol-function 'counsel--git-root) #'ignore))
+    (apply func args)))
+
+(advice-add 'counsel-rg :around #'my-counsel-rg--no-git-root)
