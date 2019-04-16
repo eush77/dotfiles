@@ -39,9 +39,9 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 (custom-set-variables
  '(exwm-input-global-keys
-   `((,(kbd "<XF86AudioLowerVolume") . emms-volume-lower)
-     (,(kbd "<XF86AudioMute") . my-emms-volume-mute)
-     (,(kbd "<XF86AudioRaiseVolume") . emms-volume-raise)
+   `((,(kbd "<XF86AudioLowerVolume>") . emms-volume-lower)
+     (,(kbd "<XF86AudioMute>") . my-emms-volume-mute)
+     (,(kbd "<XF86AudioRaiseVolume>") . emms-volume-raise)
      (,(kbd "<XF86MonBrightnessDown>") . my-exwm-brightness-down)
      (,(kbd "<XF86MonBrightnessUp>") . my-exwm-brightness-up)
      (,(kbd "<XF86TouchpadToggle>") . my-exwm-toggle-touchpad)
