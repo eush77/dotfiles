@@ -42,14 +42,15 @@
   "Face remapping specs for the default face in W3m buffers."
   :type '(plist))
 
-(defun my-w3m-setup-font ()
-  "Set up the font for `w3m-mode'."
-  (apply #'face-remap-add-relative 'default
-         my-w3m-default-face-remapping-specs))
+(defun my-w3m-remap-default-face ()
+  "Apply `my-w3m-default-face-remapping-specs' to default face."
+  (when my-w3m-default-face-remapping-specs
+    (apply #'face-remap-add-relative 'default
+           my-w3m-default-face-remapping-specs)))
 
 (with-eval-after-load "w3m"
-  (when window-system
-    (add-hook 'w3m-mode-hook #'my-w3m-setup-font)))
+  (when (display-graphic-p)
+    (add-hook 'w3m-mode-hook #'my-w3m-remap-default-face)))
 
 ;;; pocket-lib
 
