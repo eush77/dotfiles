@@ -54,7 +54,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                  `(,(kbd (format "<f%d>" (+ windex 1)))
                    . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create ,windex))))
+                       (exwm-workspace-switch ,windex))))
                (number-sequence 0 7)))))
 
 ;;; exwm-input-simulation-keys
