@@ -236,7 +236,8 @@ Active sink is defined as the last one in the list printed by
 `my-hydra-emms/hint'."
   (setq my-hydra-emms/hint-line (my-hydra-emms-format-hint-line
                                  (emms-playlist-current-selected-track)))
-  (hydra-show-hint my-hydra-emms/hint 'my-hydra-emms))
+  (when my-hydra-emms/hint-update-timer
+    (hydra-show-hint my-hydra-emms/hint 'my-hydra-emms)))
 
 (defvar my-hydra-emms/hint-update-timer nil
   "Timer for `my-hydra-emms-update-hint'.")
