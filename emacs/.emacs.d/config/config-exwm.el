@@ -85,3 +85,44 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 ;; Part of `exwm-config-default'
 (add-hook 'exwm-update-class-hook #'my-exwm-update-buffer-name)
+
+;;; exwm-workspace
+
+(defun my-exwm-workspace-prompt-for-workspace--switch (func &rest args)
+  "Switch between workspaces interactively."
+  (if (not (eq this-command 'exwm-workspace-switch))
+      (apply func args)
+    (cl-letf* (((symbol-function 'next-history-element)
+                (lambda ()
+                  (interactive)
+                  (unless (= minibuffer-history-position 1)
+                    (throw 'switch-and-reprompt
+                           (- minibuffer-history-position 2)))))
+               ((symbol-function 'previous-history-element)
+                (lambda ()
+                  (interactive)
+                  (unless (= minibuffer-history-position
+                             (exwm-workspace--count))
+                    (throw 'switch-and-reprompt
+                           minibuffer-history-position))))
+               (goto-history-element-function
+                (symbol-function 'goto-history-element))
+               ((symbol-function 'goto-history-element)
+                (lambda (n)
+                  (interactive "p")
+                  (cond
+                   ((string-equal (this-command-keys) "\C-a")
+                    (throw 'switch-and-reprompt 0))
+                   ((string-equal (this-command-keys) "\C-e")
+                    (throw 'switch-and-reprompt (1- (exwm-workspace--count))))
+                   (t (funcall goto-history-element-function n))))))
+      (catch 'switch
+        (while t
+          (let ((frame (catch 'switch-and-reprompt
+                         (apply func args))))
+            (if (numberp frame)
+                (exwm-workspace-switch frame)
+              (throw 'switch frame))))))))
+
+(advice-add 'exwm-workspace--prompt-for-workspace
+            :around #'my-exwm-workspace-prompt-for-workspace--switch)
