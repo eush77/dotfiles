@@ -245,16 +245,17 @@ Active sink is defined as the last one in the list printed by
 (defun my-hydra-emms-start-hint-update-timer ()
   "Set up `my-hydra-emms/hint-update-timer' to call
 `my-hydra-emms-update-hint' every second."
-  (cl-assert (null my-hydra-emms/hint-update-timer))
+  (when my-hydra-emms/hint-update-timer
+    (my-hydra-emms-stop-hint-update-timer))
   (setq my-hydra-emms/hint-update-timer
         (run-at-time 0 1 #'my-hydra-emms-update-hint)))
 
 (defun my-hydra-emms-stop-hint-update-timer ()
   "Stop `my-hydra-emms/hint-update-timer' previously started by
 `my-hydra-emms-start-hint-update-timer'."
-  (cl-assert my-hydra-emms/hint-update-timer)
-  (cancel-timer my-hydra-emms/hint-update-timer)
-  (setq my-hydra-emms/hint-update-timer nil))
+  (when my-hydra-emms/hint-update-timer
+    (cancel-timer my-hydra-emms/hint-update-timer)
+    (setq my-hydra-emms/hint-update-timer nil)))
 
 (advice-add 'my-emms-toggle-looping :after #'my-hydra-emms-update-hint)
 (advice-add 'emms-toggle-random-playlist :after #'my-hydra-emms-update-hint)
