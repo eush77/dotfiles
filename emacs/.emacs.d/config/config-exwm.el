@@ -96,15 +96,15 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                 (lambda ()
                   (interactive)
                   (unless (= minibuffer-history-position 1)
-                    (throw 'switch-and-reprompt
-                           (- minibuffer-history-position 2)))))
+                    (throw 'reprompt
+                           (cons 'switch (- minibuffer-history-position 2))))))
                ((symbol-function 'previous-history-element)
                 (lambda ()
                   (interactive)
                   (unless (= minibuffer-history-position
                              (exwm-workspace--count))
-                    (throw 'switch-and-reprompt
-                           minibuffer-history-position))))
+                    (throw 'reprompt
+                           (cons 'switch minibuffer-history-position)))))
                (goto-history-element-function
                 (symbol-function 'goto-history-element))
                ((symbol-function 'goto-history-element)
@@ -112,17 +112,24 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                   (interactive "p")
                   (cond
                    ((string-equal (this-command-keys) "\C-a")
-                    (throw 'switch-and-reprompt 0))
+                    (throw 'reprompt (cons 'switch 0)))
                    ((string-equal (this-command-keys) "\C-e")
-                    (throw 'switch-and-reprompt (1- (exwm-workspace--count))))
-                   (t (funcall goto-history-element-function n))))))
+                    (throw 'reprompt (cons 'switch
+                                           (1- (exwm-workspace--count)))))
+                   (t (funcall goto-history-element-function n)))))
+               ((symbol-function 'exwm-workspace--prompt-delete)
+                (lambda ()
+                  (interactive)
+                  (when (< 1 (exwm-workspace--count))
+                    (throw 'reprompt 'delete)))))
       (catch 'switch
         (while t
-          (let ((frame (catch 'switch-and-reprompt
-                         (apply func args))))
-            (if (numberp frame)
-                (exwm-workspace-switch frame)
-              (throw 'switch frame))))))))
+          (pcase (catch 'reprompt (apply func args))
+            (`(switch . ,n) (exwm-workspace-switch n))
+            ('delete (let ((frame (selected-frame)))
+                       (other-frame 1)
+                       (delete-frame frame)))
+            (frame (throw 'switch frame))))))))
 
 (advice-add 'exwm-workspace--prompt-for-workspace
             :around #'my-exwm-workspace-prompt-for-workspace--switch)
