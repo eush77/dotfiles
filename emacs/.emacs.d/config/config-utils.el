@@ -527,7 +527,9 @@ Resize window
   "Launch default XDG web browser."
   (interactive)
   (require 'counsel)
-  (counsel-linux-app-action-default
-   (cons nil
-         (string-trim (shell-command-to-string
-                       "xdg-settings get default-web-browser")))))
+  ;; Run commands in the local system.
+  (let ((default-directory "~"))
+    (counsel-linux-app-action-default
+     (cons nil
+           (string-trim (shell-command-to-string
+                         "xdg-settings get default-web-browser"))))))
