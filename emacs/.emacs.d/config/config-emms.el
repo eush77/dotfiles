@@ -33,6 +33,11 @@ Calls `emms-add-dired' or `emms-add-directory-tree'
   (when emms-random-playlist
     (user-error "Can't go back in a random playback")))
 
+(defun my-emms-random--random-playlist ()
+  "Turn on `emms-random-playlist'."
+  (unless emms-random-playlist
+    (emms-toggle-random-playlist)))
+
 (defun my-emms-toggle-looping ()
   "Toggle between looping states.
 
@@ -69,6 +74,7 @@ the playlist."
 
 (advice-add 'emms-next :around #'my-emms-next--random-playlist)
 (advice-add 'emms-previous :before #'my-emms-previous--random-playlist)
+(advice-add 'emms-random :after #'my-emms-random--random-playlist)
 
 ;;; Playlist Mode
 
