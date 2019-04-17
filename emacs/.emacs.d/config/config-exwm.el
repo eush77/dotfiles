@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-;;; exwm-input-global-keys
+;;; Commands
 
 (defun my-exwm-brightness-change (amount)
   "Change screen brightness by AMOUNT."
@@ -37,6 +37,19 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
     (call-process "synclient" nil nil nil
                   (format "TouchpadOff=%d" (- 1 state)))))
 
+(defun my-exwm-workspace-next (n)
+  "Switch to the next N-th workspace."
+  (interactive "p")
+  (exwm-workspace-switch (mod (+ exwm-workspace-current-index n)
+                              (exwm-workspace--count))))
+
+(defun my-exwm-workspace-previous (n)
+  "Switch to the previous N-th workspace."
+  (interactive "p")
+  (my-exwm-workspace-next (- n)))
+
+;;; exwm-input-global-keys
+
 (custom-set-variables
  '(exwm-input-global-keys
    `((,(kbd "<XF86AudioLowerVolume>") . emms-volume-lower)
@@ -50,6 +63,11 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "C-M-n") . window-jump-down)
      (,(kbd "C-M-p") . window-jump-up)
      (,(kbd "s-r") . exwm-reset)
+     (,(kbd "s-a") . exwm-workspace-add)
+     (,(kbd "s-d") . exwm-workspace-delete)
+     (,(kbd "s-n") . my-exwm-workspace-next)
+     (,(kbd "s-p") . my-exwm-workspace-previous)
+     (,(kbd "s-w") . exwm-workspace-switch)
      ,@(mapcar (lambda (windex)
                  `(,(kbd (format "<f%d>" (+ windex 1)))
                    . (lambda ()
@@ -95,16 +113,15 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
     (cl-letf* (((symbol-function 'next-history-element)
                 (lambda ()
                   (interactive)
-                  (unless (= minibuffer-history-position 1)
-                    (throw 'reprompt
-                           (cons 'switch (- minibuffer-history-position 2))))))
+                  (throw 'reprompt
+                         (cons 'switch (mod (- minibuffer-history-position 2)
+                                            (exwm-workspace--count))))))
                ((symbol-function 'previous-history-element)
                 (lambda ()
                   (interactive)
-                  (unless (= minibuffer-history-position
-                             (exwm-workspace--count))
-                    (throw 'reprompt
-                           (cons 'switch minibuffer-history-position)))))
+                  (throw 'reprompt
+                         (cons 'switch (mod minibuffer-history-position
+                                            (exwm-workspace--count))))))
                (goto-history-element-function
                 (symbol-function 'goto-history-element))
                ((symbol-function 'goto-history-element)
@@ -121,7 +138,15 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                 (lambda ()
                   (interactive)
                   (when (< 1 (exwm-workspace--count))
-                    (throw 'reprompt 'delete)))))
+                    (throw 'reprompt 'delete))))
+               (exwm-workspace--switch-map
+                (let ((keymap-parent exwm-workspace--switch-map)
+                      (keymap (make-sparse-keymap)))
+                  (set-keymap-parent keymap keymap-parent)
+                  (define-key keymap (kbd "n") #'previous-history-element)
+                  (define-key keymap (kbd "p") #'next-history-element)
+                  (define-key keymap (kbd "s-w") #'previous-history-element)
+                  keymap)))
       (catch 'switch
         (while t
           (pcase (catch 'reprompt (apply func args))
