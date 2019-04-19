@@ -106,6 +106,10 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 ;;; exwm-workspace
 
+(custom-set-variables
+ '(exwm-layout-show-all-buffers t)
+ '(exwm-workspace-show-all-buffers t))
+
 (defun my-exwm-workspace-prompt-for-workspace--switch (func &rest args)
   "Switch between workspaces interactively."
   (if (not (eq this-command 'exwm-workspace-switch))
