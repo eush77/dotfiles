@@ -414,19 +414,17 @@ With `C-u C-u' prefix argument, just reset
   "Get virtual desktop number of a frame running in a window
 system, or nil."
   (when window-system
-    (if (fboundp 'exwm-workspace--position)
-        (exwm-workspace--position frame)
-      (string-to-number
-       (or (cadr
-            (split-string
-             ;; Run `xprop' from a local directory.
-             (let ((default-directory "~"))
-               (shell-command-to-string
-                (format "xprop -id %s _NET_WM_DESKTOP"
-                        (alist-get 'outer-window-id
-                                   (frame-parameters frame)))))
-             "="))
-           "")))))
+    (string-to-number
+     (or (cadr
+          (split-string
+           ;; Run `xprop' from a local directory.
+           (let ((default-directory "~"))
+             (shell-command-to-string
+              (format "xprop -id %s _NET_WM_DESKTOP"
+                      (alist-get 'outer-window-id
+                                 (frame-parameters frame)))))
+           "="))
+         ""))))
 
 ;;; Window sizing
 
