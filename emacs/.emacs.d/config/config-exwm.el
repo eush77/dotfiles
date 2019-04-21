@@ -48,6 +48,14 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (interactive "p")
   (my-exwm-workspace-next (- n)))
 
+(defun my-exwm-workspace-switch-or-next ()
+  "Switch workspace interactively unless there are <3 of them."
+  (interactive)
+  (cl-case (length (frame-list))
+    (1 (user-error "No other workspace"))
+    (2 (my-exwm-workspace-next 1))
+    (otherwise (call-interactively 'exwm-workspace-switch))))
+
 ;;; exwm-input-global-keys
 
 (custom-set-variables
@@ -62,7 +70,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "C-M-k") . window-jump-right)
      (,(kbd "C-M-n") . window-jump-down)
      (,(kbd "C-M-p") . window-jump-up)
-     (,(kbd "M-`") . exwm-workspace-switch)
+     (,(kbd "M-`") . my-exwm-workspace-switch-or-next)
      (,(kbd "s-a") . exwm-workspace-add)
      (,(kbd "s-d") . exwm-workspace-delete)
      (,(kbd "s-n") . my-exwm-workspace-next)
@@ -113,7 +121,8 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 (defun my-exwm-workspace-prompt-for-workspace--switch (func &rest args)
   "Switch between workspaces interactively."
-  (if (not (eq this-command 'exwm-workspace-switch))
+  (if (not (memq this-command '(exwm-workspace-switch
+                                my-exwm-workspace-switch-or-next)))
       (apply func args)
     (cl-letf* (((symbol-function 'next-history-element)
                 (lambda ()
