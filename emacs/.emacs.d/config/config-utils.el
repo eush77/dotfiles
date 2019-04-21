@@ -524,14 +524,37 @@ Resize window
 
 ;;; XDG Applications
 
+(require 'counsel)
+
+(defvar my-xdg-web-browser-app
+  (let ((default-directory "~"))
+    (string-trim (shell-command-to-string
+                  "xdg-settings get default-web-browser")))
+  "App name of the default XDG web browser.")
+
+(defvar my-xdg-web-browser-class-name
+  (let* ((desktop-file
+          (cdr (assoc my-xdg-web-browser-app
+                      (counsel-linux-apps-list-desktop-files))))
+         (props (xdg-desktop-read-file desktop-file)))
+    (or (gethash "StartupWMClass" props)
+        (gethash "Name" props)))
+  "X class name of the default XDG web browser.")
+
+(defun my-xdg-web-browser-buffer ()
+  "Get live Exwm buffer of the default XDG web browser, or nil."
+  (--find (with-current-buffer it
+            (and (derived-mode-p 'exwm-mode)
+                 (string-equal exwm-class-name
+                               my-xdg-web-browser-class-name)))
+          (buffer-list)))
+
 ;;;###autoload
 (defun my-xdg-web-browser ()
-  "Launch default XDG web browser."
+  "Launch or switch to the default XDG web browser."
   (interactive)
-  (require 'counsel)
-  ;; Run commands in the local system.
-  (let ((default-directory "~"))
-    (counsel-linux-app-action-default
-     (cons nil
-           (string-trim (shell-command-to-string
-                         "xdg-settings get default-web-browser"))))))
+  (if-let ((buffer (my-xdg-web-browser-buffer)))
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer-same-window buffer))
+    (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app))))
