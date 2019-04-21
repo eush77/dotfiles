@@ -12,3 +12,7 @@
 
 (advice-add 'set-visited-file-name
             :filter-args #'my-set-visited-file-name--unset)
+
+;;; view-read-only
+
+(custom-set-variables '(view-read-only t))

@@ -95,9 +95,6 @@ the name of the current buffer."
 ;; Ignore case when sorting lines.
 (custom-set-variables '(sort-fold-case t))
 
-;; View mode
-(custom-set-variables '(view-read-only t))
-
 ;; yes-or-no-p
 (defun yay-or-nay-p (prompt)
   "Like `yes-or-no-p', but asks for \"yay\" or \"nay\" instead."
