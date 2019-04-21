@@ -62,11 +62,12 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "C-M-k") . window-jump-right)
      (,(kbd "C-M-n") . window-jump-down)
      (,(kbd "C-M-p") . window-jump-up)
-     (,(kbd "s-r") . exwm-reset)
+     (,(kbd "M-`") . exwm-workspace-switch)
      (,(kbd "s-a") . exwm-workspace-add)
      (,(kbd "s-d") . exwm-workspace-delete)
      (,(kbd "s-n") . my-exwm-workspace-next)
      (,(kbd "s-p") . my-exwm-workspace-previous)
+     (,(kbd "s-r") . exwm-reset)
      (,(kbd "s-w") . exwm-workspace-switch)
      ,@(mapcar (lambda (windex)
                  `(,(kbd (format "<f%d>" (+ windex 1)))
@@ -143,22 +144,43 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                   (interactive)
                   (when (< 1 (exwm-workspace--count))
                     (throw 'reprompt 'delete))))
+               (rethrow-toggle-prompt
+                (lambda ()
+                  (interactive)
+                  (throw 'reprompt 'toggle-prompt)))
                (exwm-workspace--switch-map
                 (let ((keymap-parent exwm-workspace--switch-map)
                       (keymap (make-sparse-keymap)))
                   (set-keymap-parent keymap keymap-parent)
+                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
                   (define-key keymap (kbd "n") #'previous-history-element)
                   (define-key keymap (kbd "p") #'next-history-element)
                   (define-key keymap (kbd "s-w") #'previous-history-element)
+                  keymap))
+               (minibuffer-local-must-match-map
+                (let ((keymap (make-sparse-keymap)))
+                  (set-keymap-parent keymap minibuffer-local-must-match-map)
+                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
+                  keymap))
+               (ivy-minibuffer-map
+                (let ((keymap (make-sparse-keymap)))
+                  (set-keymap-parent keymap ivy-minibuffer-map)
+                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
                   keymap)))
       (catch 'switch
-        (while t
-          (pcase (catch 'reprompt (apply func args))
-            (`(switch . ,n) (exwm-workspace-switch n))
-            ('delete (let ((frame (selected-frame)))
-                       (other-frame 1)
-                       (delete-frame frame)))
-            (frame (throw 'switch frame))))))))
+        (let ((select-by-buffer-name))
+          (while t
+            (pcase (catch 'reprompt
+                     (if select-by-buffer-name
+                         (my-select-frame-by-buffer-names)
+                       (apply func args)))
+              (`(switch . ,n) (exwm-workspace-switch n))
+              ('delete (let ((frame (selected-frame)))
+                         (other-frame 1)
+                         (delete-frame frame)))
+              ('toggle-prompt (setq select-by-buffer-name
+                                    (null select-by-buffer-name)))
+              (frame (throw 'switch frame)))))))))
 
 (advice-add 'exwm-workspace--prompt-for-workspace
             :around #'my-exwm-workspace-prompt-for-workspace--switch)

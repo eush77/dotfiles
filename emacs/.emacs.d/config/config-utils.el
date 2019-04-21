@@ -262,15 +262,16 @@ File in %s(my-quote-text-string
 (require 'dash)
 
 ;;;###autoload
-(defun my-select-frame ()
-  "Interactively select a frame from names of buffers that are
-open in it, with frames ordered from the most recently used to
-the least recently used and the default selection pointing at the
-most recently used other frame.
+(defun my-select-frame-by-buffer-names (&optional switch-p)
+  "Interactively select a frame from names of its displayed buffers.
 
-If there are only 2 frames open, switch to the other frame
-immediately."
-  (interactive)
+The frames ordered from the most recently used to the least
+recently used and the most recently used one is preselected.
+
+If SWITCH-P is non-nil, the selected frame is immediately
+switched to. If there are only 2 frames total, the other frame is
+switched to without prompt."
+  (interactive (list t))
   (let* ((frame-list                     ; List of frames in MRU order
           (-distinct (--map (window-frame it)
                             (--mapcat (get-buffer-window-list it nil 'visible)
@@ -280,19 +281,22 @@ immediately."
                                   (window-list it)
                                   ", ")
                        it)
-                 frame-list)))
-    (if (<= (length frame-alist) 2)
-        (other-frame 1)
-      (select-frame-set-input-focus
-       (cdr (assoc (completing-read "Select frame: "
-                                    frame-alist
-                                    nil
-                                    t
-                                    nil
-                                    nil
-                                    ;; Select the other frame
-                                    (caadr frame-alist))
-                   frame-alist))))))
+                 frame-list))
+         (selected-frame
+          (if (<= (length frame-alist) 2)
+              (next-frame)
+            (cdr (assoc (completing-read "Select frame: "
+                                         frame-alist
+                                         nil
+                                         t
+                                         nil
+                                         nil
+                                         ;; Select the other frame
+                                         (caadr frame-alist))
+                        frame-alist)))))
+    (if switch-p
+        (select-frame-set-input-focus selected-frame)
+      selected-frame)))
 
 ;;; Lisp evaluation
 
