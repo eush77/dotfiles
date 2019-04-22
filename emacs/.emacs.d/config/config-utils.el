@@ -283,7 +283,7 @@ switched to without prompt."
                        it)
                  frame-list))
          (selected-frame
-          (if (<= (length frame-alist) 2)
+          (if (and switch-p (<= (length frame-alist) 2))
               (next-frame)
             (cdr (assoc (completing-read "Select frame: "
                                          frame-alist
