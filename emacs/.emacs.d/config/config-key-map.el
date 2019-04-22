@@ -188,6 +188,9 @@
 (global-set-key (kbd "C-M-p") #'window-jump-up)
 (global-set-key (kbd "C-M-n") #'window-jump-down)
 
+;; Window quitting
+(global-set-key (kbd "C-x C-q") #'quit-window)
+
 ;; Window sizing
 (global-set-key [remap enlarge-window]
                 #'my-hydra-window-resize/my-enlarge-window)
