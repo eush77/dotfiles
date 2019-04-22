@@ -121,6 +121,22 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
  '(exwm-layout-show-all-buffers t)
  '(exwm-workspace-show-all-buffers t))
 
+(defvar my-exwm-workspace-switch-prompt-method 'workspace
+  "Prompt method for `exwm-workspace-switch'.
+
+If symbol `workspace', use the default prompt of
+`exwm-workspace--prompt-for-workspace'. If symbol `buffer-names',
+use `my-select-frame-by-buffer-names'.")
+
+(defun my-exwm-workspace-switch-toggle-prompt-method ()
+  "Toggle `my-exwm-workspace-switch-prompt-method'."
+  (interactive)
+  (setq my-exwm-workspace-switch-prompt-method
+        (cl-case my-exwm-workspace-switch-prompt-method
+          (workspace 'buffer-names)
+          (buffer-names 'workspace)
+          (otherwise (error "Unsupported prompt method")))))
+
 (defun my-exwm-workspace-prompt-for-workspace--switch (func &rest args)
   "Switch between workspaces interactively."
   (if (not (memq this-command '(exwm-workspace-switch
@@ -179,19 +195,18 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                   (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
                   keymap)))
       (catch 'switch
-        (let ((select-by-buffer-name))
-          (while t
-            (pcase (catch 'reprompt
-                     (if select-by-buffer-name
-                         (my-select-frame-by-buffer-names)
-                       (apply func args)))
-              (`(switch . ,n) (exwm-workspace-switch n))
-              ('delete (let ((frame (selected-frame)))
-                         (other-frame 1)
-                         (delete-frame frame)))
-              ('toggle-prompt (setq select-by-buffer-name
-                                    (null select-by-buffer-name)))
-              (frame (throw 'switch frame)))))))))
+        (while t
+          (pcase (catch 'reprompt
+                   (cl-case my-exwm-workspace-switch-prompt-method
+                     (workspace (apply func args))
+                     (buffer-names (my-select-frame-by-buffer-names))
+                     (otherwise (error "Unsupported prompt method"))))
+            (`(switch . ,n) (exwm-workspace-switch n))
+            ('delete (let ((frame (selected-frame)))
+                       (other-frame 1)
+                       (delete-frame frame)))
+            ('toggle-prompt (my-exwm-workspace-switch-toggle-prompt-method))
+            (frame (throw 'switch frame))))))))
 
 (advice-add 'exwm-workspace--prompt-for-workspace
             :around #'my-exwm-workspace-prompt-for-workspace--switch)
