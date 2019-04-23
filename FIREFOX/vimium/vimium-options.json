@@ -9,7 +9,7 @@
   "filterLinkHints": true,
   "waitForEnterForFilteredHints": true,
   "hideHud": false,
-  "keyMappings": "map <a-q> removeTab\nmap b goBack\nmap B goForward\nmap g Vomnibar.activate\nmap G Vomnibar.activateInNewTab\nmap q passNextKey\nunmap x",
+  "keyMappings": "map <a-q> removeTab\nmap b goBack\nmap B goForward\nmap c copyCurrentUrl\nmap d LinkHints.activateModeToDownloadLink\nmap g Vomnibar.activate\nmap G Vomnibar.activateInNewTab\nmap q passNextKey\nmap u LinkHints.activateModeToCopyLinkUrl\nunmap x",
   "linkHintCharacters": "sadfjklewcmpgh",
   "linkHintNumbers": "0123456789",
   "newTabUrl": "about:newtab",
