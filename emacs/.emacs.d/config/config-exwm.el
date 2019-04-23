@@ -27,6 +27,12 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (interactive)
   (my-exwm-brightness-change my-exwm-brightness-change-amount))
 
+(defun my-exwm-lock-screen ()
+  "Lock screen."
+  (interactive)
+  (call-process "slock")
+  (message "Welcome back"))
+
 (defun my-exwm-toggle-touchpad ()
   "Enable or disable touchpad."
   (interactive)
@@ -74,6 +80,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "M-`") . my-exwm-workspace-switch-or-next)
      (,(kbd "s-a") . exwm-workspace-add)
      (,(kbd "s-d") . exwm-workspace-delete)
+     (,(kbd "s-l") . my-exwm-lock-screen)
      (,(kbd "s-m") . exwm-workspace-move)
      (,(kbd "s-n") . my-exwm-workspace-next)
      (,(kbd "s-p") . my-exwm-workspace-previous)
