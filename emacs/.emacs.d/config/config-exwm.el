@@ -220,3 +220,12 @@ use `my-select-frame-by-buffer-names'.")
 
 (advice-add 'exwm-workspace--prompt-for-workspace
             :around #'my-exwm-workspace-prompt-for-workspace--switch)
+
+(defun my-exwm-workspace-update-switch-history (&rest _)
+  "Update `exwm-workspace--switch-history'."
+  (exwm-workspace--update-switch-history))
+
+(advice-add 'exwm-workspace-add
+            :after #'my-exwm-workspace-update-switch-history)
+(advice-add 'exwm-workspace-delete
+            :after #'my-exwm-workspace-update-switch-history)
