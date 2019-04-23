@@ -66,6 +66,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "<XF86MonBrightnessDown>") . my-exwm-brightness-down)
      (,(kbd "<XF86MonBrightnessUp>") . my-exwm-brightness-up)
      (,(kbd "<XF86TouchpadToggle>") . my-exwm-toggle-touchpad)
+     (,(kbd "C-g") . keyboard-quit)
      (,(kbd "C-M-j") . window-jump-left)
      (,(kbd "C-M-k") . window-jump-right)
      (,(kbd "C-M-n") . window-jump-down)
