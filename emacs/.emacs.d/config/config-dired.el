@@ -142,8 +142,9 @@ alternative names."
 
 ;;; dired-mode-map
 
-(define-key dired-mode-map (kbd "C-M-p") #'window-jump-up)
 (define-key dired-mode-map (kbd "C-M-n") #'window-jump-down)
+(define-key dired-mode-map (kbd "C-M-p") #'window-jump-up)
+(define-key dired-mode-map (kbd "C-x C-q") #'wdired-change-to-wdired-mode)
 
 (define-key dired-mode-map (kbd ".") #'dired-hide-dotfiles-mode)
 (define-key dired-mode-map (kbd "?") #'counsel-rg)
