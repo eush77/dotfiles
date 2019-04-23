@@ -121,6 +121,15 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
  '(exwm-layout-show-all-buffers t)
  '(exwm-workspace-show-all-buffers t))
 
+(defun my-exwm-workspace-display-current ()
+  "Display current workspace index."
+  (interactive)
+  (let ((message-log-max))
+    (message (elt exwm-workspace--switch-history
+                  exwm-workspace-current-index))))
+
+(add-hook 'exwm-workspace-switch-hook #'my-exwm-workspace-display-current)
+
 (defvar my-exwm-workspace-switch-prompt-method 'workspace
   "Prompt method for `exwm-workspace-switch'.
 
@@ -142,7 +151,8 @@ use `my-select-frame-by-buffer-names'.")
   (if (not (memq this-command '(exwm-workspace-switch
                                 my-exwm-workspace-switch-or-next)))
       (apply func args)
-    (cl-letf* (((symbol-function 'next-history-element)
+    (cl-letf* ((inhibit-message t)      ; my-exwm-workspace-display-current
+               ((symbol-function 'next-history-element)
                 (lambda ()
                   (interactive)
                   (throw 'reprompt
