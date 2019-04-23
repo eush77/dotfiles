@@ -84,3 +84,5 @@ buffer."
 
 (define-key compilation-mode-map (kbd "c") #'my-compile-in-compilation-buffer)
 (define-key compilation-mode-map (kbd "h") #'my-compilation-other-buffer)
+(define-key compilation-shell-minor-mode-map (kbd "C-M-n") nil)
+(define-key compilation-shell-minor-mode-map (kbd "C-M-p") nil)
