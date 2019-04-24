@@ -80,6 +80,70 @@ buffer."
    #'my-compilation-save-buffers-predicate)
  '(compilation-scroll-output t))
 
+;;; History
+
+(defvar-local my-compile-history nil
+  "Buffer-local compilation history variable.")
+
+(defvar my-compile-history-counter 0
+  "Number of local compilation history variables created.")
+
+(defun my-compile-history--format-docstring ()
+  "Format documentation string for local history variable."
+  (cl-assert (eq major-mode 'compilation-mode))
+  (format "Compilation history for buffer %s." (buffer-name)))
+
+(defun my-compile-reset-history ()
+  "Reset compilation history for the current buffer."
+  (interactive)
+  (cl-assert (eq major-mode 'compilation-mode))
+  (setq my-compile-history
+        (intern (format "my-compile-history-%d" my-compile-history-counter)))
+  (setq my-compile-history-counter (+ my-compile-history-counter 1))
+  (eval `(defvar ,my-compile-history nil
+           ,(my-compile-history--format-docstring))))
+
+(defun my-compile-delete-history ()
+  "Delete compilation history variable for the current buffer."
+  (when (eq major-mode 'compilation-mode)
+    (makunbound my-compile-history)
+    (setf (documentation-property my-compile-history 'variable-documentation)
+          nil)))
+
+(defun my-compilation-mode--init-compile-history (func &rest args)
+  "Initialize compilation history for the current buffer.
+
+Preserve existing `my-compile-history' or create a new one."
+  (let ((history my-compile-history))
+    (apply func args)
+    (if history
+        (setq my-compile-history history)
+      (my-compile-reset-history))))
+
+(defun my-compilation-read-command (command)
+  "Read compilation command from the minibuffer.
+
+COMMAND is the default command."
+  (read-shell-command "Compile command: " command
+                      (if (equal (car (symbol-value my-compile-history))
+                                 command)
+                          (cons my-compile-history 1)
+                        my-compile-history)))
+
+(defun my-rename-buffer--compile-history-docstring (&rest _)
+  "Update documentation string for local history variable."
+  (when (eq major-mode 'compilation-mode)
+    (setf (documentation-property my-compile-history 'variable-documentation)
+          (my-compile-history--format-docstring))))
+
+(add-hook 'kill-buffer-hook #'my-compile-delete-history)
+(advice-add 'compilation-mode
+            :around #'my-compilation-mode--init-compile-history)
+(advice-add 'compilation-read-command
+            :override #'my-compilation-read-command)
+(advice-add 'rename-buffer
+            :after #'my-rename-buffer--compile-history-docstring)
+
 ;;; Keymap
 
 (define-key compilation-mode-map (kbd "c") #'my-compile-in-compilation-buffer)
