@@ -283,15 +283,17 @@ Returns the absolute file name of the selected trace directory."
 
   ;; Start processes.
   (gdb (concat "gdb -i=mi " (my-rr-get-trace-executable trace-dir)))
-  (when-let ((rr-replay (get-buffer-process
-                         (get-buffer-create my-rr-replay-buffer-name))))
-    (kill-process rr-replay))
-  (with-current-buffer (get-buffer-create my-rr-replay-buffer-name)
-    (erase-buffer))
-  (start-process "rr replay" (get-buffer-create my-rr-replay-buffer-name)
-                 "rr" "replay"
-                 "-s" (number-to-string my-rr-replay-port)
-                 trace-dir)
+  (let ((rr-replay-buffer (get-buffer-create my-rr-replay-buffer-name)))
+    (when-let ((rr-replay (get-buffer-process rr-replay-buffer)))
+      (kill-process rr-replay))
+    (with-current-buffer rr-replay-buffer
+      (let ((inhibit-read-only t))
+        (erase-buffer))
+      (view-mode 1))
+    (start-process "rr replay" rr-replay-buffer
+                   "rr" "replay"
+                   "-s" (number-to-string my-rr-replay-port)
+                   trace-dir))
 
   ;; Connect to the rr remote.
   (gdb-input "-gdb-set sysroot /" 'ignore)
