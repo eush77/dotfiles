@@ -20,6 +20,15 @@ Calls `emms-add-dired' or `emms-add-directory-tree'
       (emms-add-dired)
     (call-interactively #'emms-add-directory-tree)))
 
+;;; MPlayer
+
+(require 'emms-player-mplayer)
+
+(unless (member "-vo" emms-player-mplayer-parameters)
+  (custom-set-variables
+   `(emms-player-mplayer-parameters
+     '("-vo" "null" . ,emms-player-mplayer-parameters))))
+
 ;;; Playback Order
 
 (defun my-emms-next--random-playlist (func &rest args)
