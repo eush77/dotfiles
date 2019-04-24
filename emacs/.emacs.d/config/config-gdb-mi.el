@@ -128,6 +128,12 @@ current frame."
   (insert "quit")
   (comint-send-input t t))
 
+(defun my-gdb-quit-maybe ()
+  "Quit GDB with confirmation."
+  (interactive)
+  (when (yes-or-no-p "Quit GDB? ")
+    (my-gdb-quit)))
+
 (defun my-gdb-switch-to-stack-buffer ()
   "Switch to call stack buffer."
   (interactive)
@@ -157,6 +163,8 @@ current frame."
 
 ;;; Keymap
 
+(define-key gdb-breakpoints-mode-map (kbd "q") #'my-gdb-quit-maybe)
+
 (define-key gdb-frames-mode-map (kbd "c") #'gud-cont)
 (define-key gdb-frames-mode-map (kbd "C") #'my-gud-reverse-cont)
 (define-key gdb-frames-mode-map (kbd "d") #'my-gdb-frame-down)
@@ -166,9 +174,12 @@ current frame."
 (define-key gdb-frames-mode-map (kbd "n") #'gud-next)
 (define-key gdb-frames-mode-map (kbd "N") #'my-gud-reverse-next)
 (define-key gdb-frames-mode-map (kbd "p") #'my-gdb-print-in-comint-buffer)
+(define-key gdb-frames-mode-map (kbd "q") #'my-gdb-quit-maybe)
 (define-key gdb-frames-mode-map (kbd "s") #'gud-step)
 (define-key gdb-frames-mode-map (kbd "S") #'my-gud-reverse-step)
 (define-key gdb-frames-mode-map (kbd "u") #'my-gdb-frame-up)
+
+(define-key gdb-locals-mode-map (kbd "q") #'my-gdb-quit-maybe)
 
 (define-key gud-mode-map [remap gdb-delchar-or-quit] #'delete-char)
 (global-set-key (vconcat gud-key-prefix "\C-q") #'my-gdb-quit)
