@@ -115,6 +115,22 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      ([?\M-v] . [prior])
      ([?\M-w] . [?\C-c]))))
 
+;;; exwm-mode-map
+
+;; Define keys participating in key chords in `exwm-mode-map' so that they are
+;; passed through to Emacs.
+(map-keymap
+ (lambda (event-type key-chord-map)
+   (when (eq event-type 'key-chord)
+     (map-keymap
+      (lambda (key _)
+        (define-key exwm-mode-map (string key)
+          (lambda ()
+            (interactive)
+            (exwm-input--fake-key key))))
+      key-chord-map)))
+ (current-global-map))
+
 ;;; exwm-update-class-hook
 
 (defun my-exwm-update-buffer-name ()
