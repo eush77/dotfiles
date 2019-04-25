@@ -314,3 +314,13 @@ use `my-select-frame-by-buffer-names'.")
             :after #'my-exwm-workspace-update-switch-history)
 (advice-add 'exwm-workspace-delete
             :after #'my-exwm-workspace-update-switch-history)
+
+;;; exwm-xim
+
+(require 'exwm-xim)
+
+(exwm-xim-enable)
+
+(--each (where-is-internal 'toggle-input-method (current-global-map))
+  (when (= (length it) 1)
+    (add-to-list 'exwm-input-prefix-keys (elt it 0))))

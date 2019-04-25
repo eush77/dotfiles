@@ -10,5 +10,11 @@ xset r rate 200 60
 # Set default cursor
 xsetroot -cursor_name left_ptr
 
+# Setup XIM
+export CLUTTER_IM_MODULE=xim
+export GTK_IM_MODULE=xim
+export QT_IM_MODULE=xim
+export XMODIFIERS=@im=exwm-xim
+
 # Finally start Emacs
 exec emacs --load exwm --funcall exwm-enable
