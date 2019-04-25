@@ -1,6 +1,8 @@
 ;;; -*- lexical-binding: t -*-
+(require 'counsel)
+(require 'dash)
 
-;;; Commands
+;;; External Commands
 
 (defun my-exwm-brightness-change (amount)
   "Change screen brightness by AMOUNT."
@@ -43,24 +45,40 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
     (call-process "synclient" nil nil nil
                   (format "TouchpadOff=%d" (- 1 state)))))
 
-(defun my-exwm-workspace-next (n)
-  "Switch to the next N-th workspace."
-  (interactive "p")
-  (exwm-workspace-switch (mod (+ exwm-workspace-current-index n)
-                              (exwm-workspace--count))))
+;;; XDG Applications
 
-(defun my-exwm-workspace-previous (n)
-  "Switch to the previous N-th workspace."
-  (interactive "p")
-  (my-exwm-workspace-next (- n)))
+(defvar my-xdg-web-browser-app
+  (let ((default-directory "~"))
+    (string-trim (shell-command-to-string
+                  "xdg-settings get default-web-browser")))
+  "App name of the default XDG web browser.")
 
-(defun my-exwm-workspace-switch-or-next ()
-  "Switch workspace interactively unless there are <3 of them."
+(defvar my-xdg-web-browser-class-name
+  (let* ((desktop-file
+          (cdr (assoc my-xdg-web-browser-app
+                      (counsel-linux-apps-list-desktop-files))))
+         (props (xdg-desktop-read-file desktop-file)))
+    (or (gethash "StartupWMClass" props)
+        (gethash "Name" props)))
+  "X class name of the default XDG web browser.")
+
+(defun my-xdg-web-browser-buffer ()
+  "Get live Exwm buffer of the default XDG web browser, or nil."
+  (--find (with-current-buffer it
+            (and (derived-mode-p 'exwm-mode)
+                 (string-equal exwm-class-name
+                               my-xdg-web-browser-class-name)))
+          (buffer-list)))
+
+;;;###autoload
+(defun my-xdg-web-browser ()
+  "Launch or switch to the default XDG web browser."
   (interactive)
-  (cl-case (length (frame-list))
-    (1 (user-error "No other workspace"))
-    (2 (my-exwm-workspace-next 1))
-    (otherwise (call-interactively 'exwm-workspace-switch))))
+  (if-let ((buffer (my-xdg-web-browser-buffer)))
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer-same-window buffer))
+    (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app))))
 
 ;;; exwm-input-global-keys
 
@@ -140,6 +158,25 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 (add-hook 'exwm-update-class-hook #'my-exwm-update-buffer-name)
 
 ;;; exwm-workspace
+
+(defun my-exwm-workspace-next (n)
+  "Switch to the next N-th workspace."
+  (interactive "p")
+  (exwm-workspace-switch (mod (+ exwm-workspace-current-index n)
+                              (exwm-workspace--count))))
+
+(defun my-exwm-workspace-previous (n)
+  "Switch to the previous N-th workspace."
+  (interactive "p")
+  (my-exwm-workspace-next (- n)))
+
+(defun my-exwm-workspace-switch-or-next ()
+  "Switch workspace interactively unless there are <3 of them."
+  (interactive)
+  (cl-case (length (frame-list))
+    (1 (user-error "No other workspace"))
+    (2 (my-exwm-workspace-next 1))
+    (otherwise (call-interactively 'exwm-workspace-switch))))
 
 (custom-set-variables
  '(exwm-layout-show-all-buffers t)
