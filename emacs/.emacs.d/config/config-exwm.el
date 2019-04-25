@@ -214,6 +214,8 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                   exwm-workspace-current-index))))
 
 (add-hook 'exwm-workspace-switch-hook #'my-exwm-workspace-display-current)
+(advice-add 'exwm-workspace-add :after #'my-exwm-workspace-display-current)
+(advice-add 'exwm-workspace-delete :after #'my-exwm-workspace-display-current)
 
 (defvar my-exwm-workspace-switch-prompt-method 'workspace
   "Prompt method for `exwm-workspace-switch'.
