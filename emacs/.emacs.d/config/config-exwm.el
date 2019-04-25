@@ -63,6 +63,28 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                     (funcall get-buffers-function)))))
     (counsel-ibuffer)))
 
+;;; Key Chords
+
+;; Define keys participating in key chords in `exwm-mode-map' so that they are
+;; passed through to Emacs.
+(map-keymap
+ (lambda (event-type key-chord-map)
+   (when (eq event-type 'key-chord)
+     (map-keymap
+      (lambda (key _)
+        (define-key exwm-mode-map (string key)
+          (lambda ()
+            (interactive)
+            (exwm-input--fake-key key))))
+      key-chord-map)))
+ (current-global-map))
+
+(defun my-exwm-define-key-chords ()
+  "Define local key chords for Exwm buffer."
+  (key-chord-define-local "XB" #'my-counsel-ibuffer-by-exwm-class-name))
+
+(add-hook 'exwm-mode-hook #'my-exwm-define-key-chords)
+
 ;;; XDG Applications
 
 (defvar my-xdg-web-browser-app
@@ -150,28 +172,6 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      ([?\M-h] . [?\C-a])
      ([?\M-v] . [prior])
      ([?\M-w] . [?\C-c]))))
-
-;;; exwm-mode-map
-
-;; Define keys participating in key chords in `exwm-mode-map' so that they are
-;; passed through to Emacs.
-(map-keymap
- (lambda (event-type key-chord-map)
-   (when (eq event-type 'key-chord)
-     (map-keymap
-      (lambda (key _)
-        (define-key exwm-mode-map (string key)
-          (lambda ()
-            (interactive)
-            (exwm-input--fake-key key))))
-      key-chord-map)))
- (current-global-map))
-
-(defun my-exwm-define-key-chords ()
-  "Define local key chords for Exwm buffer."
-  (key-chord-define-local "XB" #'my-counsel-ibuffer-by-exwm-class-name))
-
-(add-hook 'exwm-mode-hook #'my-exwm-define-key-chords)
 
 ;;; exwm-update-class-hook
 
