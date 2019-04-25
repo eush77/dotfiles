@@ -45,6 +45,24 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
     (call-process "synclient" nil nil nil
                   (format "TouchpadOff=%d" (- 1 state)))))
 
+;;; IBuffer
+
+(defun my-counsel-ibuffer-by-exwm-class-name ()
+  "`counsel-ibuffer' limited to Exwm buffers of same X class."
+  (interactive)
+  (require 'ibuffer)
+  (cl-letf*
+      ((class-name exwm-class-name)
+       (get-buffers-function
+        (symbol-function 'counsel-ibuffer--get-buffers))
+       ((symbol-function 'counsel-ibuffer--get-buffers)
+        (lambda ()
+          (--filter (with-current-buffer (cdr it)
+                      (and (eq major-mode 'exwm-mode)
+                           (string-equal exwm-class-name class-name)))
+                    (funcall get-buffers-function)))))
+    (counsel-ibuffer)))
+
 ;;; XDG Applications
 
 (defvar my-xdg-web-browser-app
@@ -148,6 +166,12 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
             (exwm-input--fake-key key))))
       key-chord-map)))
  (current-global-map))
+
+(defun my-exwm-define-key-chords ()
+  "Define local key chords for Exwm buffer."
+  (key-chord-define-local "XB" #'my-counsel-ibuffer-by-exwm-class-name))
+
+(add-hook 'exwm-mode-hook #'my-exwm-define-key-chords)
 
 ;;; exwm-update-class-hook
 
