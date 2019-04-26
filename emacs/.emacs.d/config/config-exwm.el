@@ -136,6 +136,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
      (,(kbd "C-M-n") . window-jump-down)
      (,(kbd "C-M-p") . window-jump-up)
      (,(kbd "M-`") . my-exwm-workspace-switch-or-next)
+     (,(kbd "M-<tab>") . my-switch-window)
      (,(kbd "s-a") . exwm-workspace-add)
      (,(kbd "s-d") . exwm-workspace-delete)
      (,(kbd "s-l") . my-exwm-lock-screen)

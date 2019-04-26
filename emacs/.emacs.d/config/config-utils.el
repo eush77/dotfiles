@@ -411,25 +411,6 @@ With `C-u C-u' prefix argument, just reset
                     command)))))
   (shell-command-on-region (point-min) (point-max) command))
 
-;;; Virtual desktops
-
-;;;###autoload
-(defun my-frame-wm-desktop (frame)
-  "Get virtual desktop number of a frame running in a window
-system, or nil."
-  (when window-system
-    (string-to-number
-     (or (cadr
-          (split-string
-           ;; Run `xprop' from a local directory.
-           (let ((default-directory "~"))
-             (shell-command-to-string
-              (format "xprop -id %s _NET_WM_DESKTOP"
-                      (alist-get 'outer-window-id
-                                 (frame-parameters frame)))))
-           "="))
-         ""))))
-
 ;;; Window sizing
 
 ;;;###autoload
@@ -521,3 +502,62 @@ Resize window
   (interactive)
   (select-window (or (get-mru-window t t t) (minibuffer-window)))
   (select-frame-set-input-focus (window-frame (selected-window))))
+
+(defun my-frame-wm-desktop (&optional frame)
+  "Get _NET_WM_DESKTOP number of a FRAME or nil.
+
+If FRAME is nil, use selected frame."
+  (when window-system
+    (string-to-number
+     (or (cadr
+          (split-string
+           ;; Run `xprop' from a local directory.
+           (let ((default-directory "~"))
+             (shell-command-to-string
+              (format "xprop -id %s _NET_WM_DESKTOP"
+                      (alist-get 'outer-window-id
+                                 (frame-parameters frame)))))
+           "="))
+         ""))))
+
+(defun my-active-frames ()
+  "Get all active frames.
+
+Active frames are frames that should be used as targets for
+`window-jump', `switch-window', etc.
+
+- When using Exwm, a frame is active iff it has `exwm-active'
+  frame parameter.
+
+- When using other window managers, a frame is active iff it has
+  the same non-nil _NET_WM_DESKTOP as the selected frame.
+
+- Otherwise, a frame is active iff it is visible."
+  (cond ((boundp 'exwm-state)
+         (--filter (frame-parameter it 'exwm-active) (frame-list)))
+        (window-system
+         ;; Avoid recomputing `selected-wm-desktop' for every frame.
+         (let ((selected-wm-desktop (my-frame-wm-desktop)))
+           (--filter (= (my-frame-wm-desktop it) selected-wm-desktop)
+                     (frame-list))))
+        (t (-filter #'frame-visible-p (frame-list)))))
+
+;;;###autoload
+(defun my-active-windows ()
+  "Get all windows on all active frames.
+
+See `my-active-frames'."
+  (-mapcat #'window-list (my-active-frames)))
+
+;;;###autoload
+(defun my-switch-window ()
+  "Switch to another active window interactively."
+  (interactive)
+  (select-window
+   (pcase (--map (cons (buffer-name (window-buffer it)) it)
+                 (remq (selected-window) (my-active-windows)))
+     (`() (user-error "No other window"))
+     (`((,_ . ,other-window)) other-window)
+     (collection
+      (cdr (assoc (ivy-read "Select window: " collection :require-match t)
+                  collection))))))
