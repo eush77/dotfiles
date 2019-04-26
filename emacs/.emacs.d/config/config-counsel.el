@@ -30,6 +30,16 @@
 (advice-add 'counsel-ibuffer--get-buffers
             :filter-return #'my-counsel-ibuffer--get-buffers--exclude)
 
+(defun my-counsel-ibuffer-visit-buffer--create (name)
+  "Create buffer if it doesn't exist."
+  (when (and (stringp name) (not (get-buffer name)))
+    (when (yes-or-no-p "Buffer does not exist. Create? ")
+      (switch-to-buffer name))
+    t))
+
+(advice-add 'counsel-ibuffer-visit-buffer
+            :before-until #'my-counsel-ibuffer-visit-buffer--create)
+
 (defun my-counsel-ibuffer--small-cases (func &rest args)
   "Don't complete buffer name if there aren't any options."
   (cl-letf* ((ivy-read-function (symbol-function 'ivy-read))
