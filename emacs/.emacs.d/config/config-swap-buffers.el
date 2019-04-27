@@ -1,6 +1,8 @@
 (custom-set-variables '(swap-buffers-keep-focus t))
 
-(unless window-system
+(unless (display-graphic-p)
+  (add-to-list 'package-selected-packages 'switch-window)
+  (package-install-selected-packages)
   (require 'switch-window-asciiart)
 
   (custom-set-variables

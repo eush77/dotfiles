@@ -97,7 +97,6 @@
 (add-to-list 'package-selected-packages 'smartscan)
 (add-to-list 'package-selected-packages 'swap-buffers)
 (add-to-list 'package-selected-packages 'swiper)
-(add-to-list 'package-selected-packages 'switch-window)
 (add-to-list 'package-selected-packages 'w3m)
 (add-to-list 'package-selected-packages 'window-jump)
 
@@ -175,7 +174,6 @@
 (with-eval-after-load "simple" (load "config-simple"))
 (with-eval-after-load "smerge-mode" (load "config-smerge"))
 (with-eval-after-load "swap-buffers" (load "config-swap-buffers"))
-(with-eval-after-load "switch-window" (load "config-switch-window"))
 (with-eval-after-load "tex-mode" (load "config-tex"))
 (with-eval-after-load "view" (load "config-view"))
 (with-eval-after-load "which-func" (load "config-which-func"))
