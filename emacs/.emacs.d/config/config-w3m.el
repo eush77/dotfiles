@@ -52,6 +52,18 @@
   (when (display-graphic-p)
     (add-hook 'w3m-mode-hook #'my-w3m-remap-default-face)))
 
+;;; org-capture
+
+(defun my-w3m-org-capture-link-action (info)
+  "`w3m-lnum-universal' action for capturing url in Org."
+  (goto-char (cadr info))
+  (org-capture nil "u"))
+
+(with-eval-after-load "w3m-lnum"
+  (add-to-list 'w3m-lnum-actions-link-alist
+               '(?c my-w3m-org-capture-link-action "Capture")
+               t))
+
 ;;; pocket-lib
 
 (defun my-w3m-pocket-add-url (&optional this-url)
