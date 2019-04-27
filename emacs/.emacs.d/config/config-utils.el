@@ -552,12 +552,17 @@ See `my-active-frames'."
 ;;;###autoload
 (defun my-switch-window ()
   "Switch to another active window interactively."
+  (declare (interactive-only t))
   (interactive)
-  (select-window
-   (pcase (--map (cons (buffer-name (window-buffer it)) it)
-                 (remq (selected-window) (my-active-windows)))
-     (`() (user-error "No other window"))
-     (`((,_ . ,other-window)) other-window)
-     (collection
-      (cdr (assoc (ivy-read "Select window: " collection :require-match t)
-                  collection))))))
+  (pcase (--map (cons (buffer-name (window-buffer it)) it)
+                (seq-sort-by #'window-use-time #'>
+                             (remq (selected-window)
+                                   (my-active-windows))))
+    (`() (message "No other window"))
+    (`((,_ . ,other-window)) (select-window other-window))
+    (collection
+     (ivy-read
+      "Select window: " collection
+      :require-match t
+      :action (pcase-lambda (`(_ . ,window))
+                (select-window window))))))
