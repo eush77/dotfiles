@@ -78,7 +78,7 @@ the same window."
 (custom-set-variables
  '(dired-guess-shell-alist-user
    `((,(concat "\\." (regexp-opt '("avi" "m4v" "mkv" "mp4" "webm" "wmv")) "\\'")
-      "mplayer")
+      "mplayer;")
      (,(concat "\\." (regexp-opt '("doc" "docx" "odt" "xls" "xlsx")) "\\'")
       "libreoffice"))))
 
