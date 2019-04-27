@@ -559,12 +559,13 @@ See `my-active-windows'.")
   (setq my-switch-window-order
         (seq-sort-by #'window-use-time #'> (my-active-windows))))
 
-(defun my-switch-window-next ()
-  "Switch to next window in `my-switch-window-order'."
+(defun my-switch-window-next (n)
+  "Switch to the next Nth window in `my-switch-window-order'."
   (interactive)
   (select-window
-   (or (cadr (memq (selected-window) my-switch-window-order))
-       (car my-switch-window-order))))
+   (elt (--drop-while (not (eq it (selected-window)))
+                      (-cycle my-switch-window-order))
+        (mod n (length my-switch-window-order)))))
 
 (defun my-switch-window-nth (n)
   "Switch to N-th window in `my-switch-window-order'."
@@ -625,11 +626,11 @@ See `my-active-windows'.")
     (overlay-put overlay 'before-string
                  (propertize before-string 'face face))))
 
-(define-advice my-switch-window-next (:before nil other-overlay)
+(define-advice my-switch-window-next (:before (_) other-overlay)
   (my-switch-window-set-current-window-overlay-face
    'my-switch-window-overlay-other))
 
-(define-advice my-switch-window-next (:after nil current-overlay)
+(define-advice my-switch-window-next (:after (_) current-overlay)
   (my-switch-window-set-current-window-overlay-face
    'my-switch-window-overlay-current))
 
@@ -638,10 +639,11 @@ See `my-active-windows'.")
                                   (progn
                                     (my-switch-window-reorder)
                                     (my-switch-window-create-overlays)
-                                    (my-switch-window-next))
+                                    (my-switch-window-next 1))
                                   :before-exit
                                   (my-switch-window-delete-overlays))
-  ("M-<tab>" my-switch-window-next nil)
+  ("M-<tab>" (my-switch-window-next 1) nil)
+  ("M-<iso-lefttab>" (my-switch-window-next -1) nil)
   ("<return>" nil))
 
 (setq my-switch-window-hydra/hint
