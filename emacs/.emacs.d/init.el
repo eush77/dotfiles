@@ -34,6 +34,10 @@
     (my-rr-replay-buffer-name custom-variable)
     (my-rr-replay-port custom-variable)
     (my-rr-trace-root-directory custom-variable)
+    (my-switch-window-current custom-face)
+    (my-switch-window-other custom-face)
+    (my-switch-window-overlay-current custom-face)
+    (my-switch-window-overlay-other custom-face)
     (my-w3m-default-face-remapping-specs custom-variable)
     (my-window-size-delta custom-variable))
   "Settings for my personal configuration."

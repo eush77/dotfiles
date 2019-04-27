@@ -549,20 +549,128 @@ Active frames are frames that should be used as targets for
 See `my-active-frames'."
   (-mapcat #'window-list (my-active-frames)))
 
+(defvar my-switch-window-order nil
+  "All active windows ordered by use time.
+
+See `my-active-windows'.")
+
+(defun my-switch-window-reorder ()
+  "Compute `my-switch-window-order'."
+  (setq my-switch-window-order
+        (seq-sort-by #'window-use-time #'> (my-active-windows))))
+
+(defun my-switch-window-next ()
+  "Switch to next window in `my-switch-window-order'."
+  (interactive)
+  (select-window
+   (or (cadr (memq (selected-window) my-switch-window-order))
+       (car my-switch-window-order))))
+
+(defun my-switch-window-nth (n)
+  "Switch to N-th window in `my-switch-window-order'."
+  (select-window (elt my-switch-window-order n)))
+
+(defvar my-switch-window-overlays nil
+  "Window-number overlays for `my-switch-window-hydra/body'.")
+
+;;;###autoload
+(defface my-switch-window-current
+  '((t :foreground "deep sky blue"))
+  "Face for the current window."
+  :group 'my)
+
+;;;###autoload
+(defface my-switch-window-other
+  '((t :foreground "orange red"))
+  "Face for other windows."
+  :group 'my)
+
+;;;###autoload
+(defface my-switch-window-overlay-current
+  '((t :inherit my-switch-window-current :height 4.0))
+  "Face for the current-window overlay."
+  :group 'my)
+
+;;;###autoload
+(defface my-switch-window-overlay-other
+  '((t :inherit my-switch-window-other :height 4.0))
+  "Face for `my-switch-window-overlays'."
+  :group 'my)
+
+(defun my-switch-window-create-overlays ()
+  "Set `my-switch-window-overlays' for `my-switch-window-order'."
+  (my-switch-window-delete-overlays)
+  (setq my-switch-window-overlays
+        (--map-indexed
+         (let ((overlay (make-overlay (window-point it) (window-point it)
+                                      (window-buffer it))))
+           (overlay-put overlay 'before-string
+                        (propertize (number-to-string it-index) 'face
+                                    'my-switch-window-overlay-other))
+           (overlay-put overlay 'window it)
+           overlay)
+         my-switch-window-order)))
+
+(defun my-switch-window-delete-overlays ()
+  "Delete `my-switch-window-overlays'."
+  (-each my-switch-window-overlays #'delete-overlay)
+  (setq my-switch-window-overlays nil))
+
+(defun my-switch-window-set-current-window-overlay-face (face)
+  "Set face of the current-window overlay."
+  (when-let* ((overlay (elt my-switch-window-overlays
+                            (-elem-index (selected-window)
+                                         my-switch-window-order)))
+              (before-string (overlay-get overlay 'before-string)))
+    (overlay-put overlay 'before-string
+                 (propertize before-string 'face face))))
+
+(define-advice my-switch-window-next (:before nil other-overlay)
+  (my-switch-window-set-current-window-overlay-face
+   'my-switch-window-overlay-other))
+
+(define-advice my-switch-window-next (:after nil current-overlay)
+  (my-switch-window-set-current-window-overlay-face
+   'my-switch-window-overlay-current))
+
+(defhydra my-switch-window-hydra (:hint nil
+                                  :body-pre
+                                  (progn
+                                    (my-switch-window-reorder)
+                                    (my-switch-window-create-overlays)
+                                    (my-switch-window-next))
+                                  :before-exit
+                                  (my-switch-window-delete-overlays))
+  ("M-<tab>" my-switch-window-next nil)
+  ("<return>" nil))
+
+(setq my-switch-window-hydra/hint
+      '(let ((window-heads
+              (--map-indexed
+               `(,(number-to-string it-index)
+                 (lambda ()
+                   (interactive)
+                   (hydra-keyboard-quit)
+                   (my-switch-window-nth ,it-index))
+                 ,(propertize (buffer-name (window-buffer it)) 'face
+                              (if (eq it (selected-window))
+                                  'my-switch-window-current
+                                'my-switch-window-other))
+                 :exit t)
+               my-switch-window-order)))
+         (--each window-heads
+           (define-key my-switch-window-hydra/keymap (car it) (cadr it)))
+         (eval (hydra--format nil nil "Switch window"
+                              (append my-switch-window-hydra/heads
+                                      window-heads)))))
+
 ;;;###autoload
 (defun my-switch-window ()
   "Switch to another active window interactively."
   (declare (interactive-only t))
   (interactive)
-  (pcase (--map (cons (buffer-name (window-buffer it)) it)
-                (seq-sort-by #'window-use-time #'>
-                             (remq (selected-window)
-                                   (my-active-windows))))
-    (`() (message "No other window"))
-    (`((,_ . ,other-window)) (select-window other-window))
-    (collection
-     (ivy-read
-      "Select window: " collection
-      :require-match t
-      :action (pcase-lambda (`(_ . ,window))
-                (select-window window))))))
+  (cl-case (length (my-active-windows))
+    (1 (message "No other window"))
+    (2 (select-window (car (remq (selected-window)
+                                 (my-active-windows)))))
+    (otherwise (my-switch-window-hydra/body))))
