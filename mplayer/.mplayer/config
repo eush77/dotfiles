@@ -1,17 +1,17 @@
 af=scaletempo
+ass=yes
+subpos=80
 use-filedir-conf=yes
 
 [audio]
 vo=null
 
 [vo.fbdev2]
-ass=yes
 ffactor=10
 quiet=yes
 sub-bg-alpha=1
 subfont-blur=0
 subfont-outline=8
-subpos=80
 zoom=yes
 
 [fs]
