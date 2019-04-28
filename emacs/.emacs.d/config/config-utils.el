@@ -549,29 +549,40 @@ Active frames are frames that should be used as targets for
 See `my-active-frames'."
   (-mapcat #'window-list (my-active-frames)))
 
-(defvar my-switch-window-order nil
+(defvar my-switch-window-order []
   "All active windows ordered by use time.
 
 See `my-active-windows'.")
 
+(defvar my-switch-window-index 0
+  "Index of the current window in `my-switch-window-order'.")
+
 (defun my-switch-window-reorder ()
-  "Compute `my-switch-window-order'."
+  "Update `my-switch-window-order' and `my-switch-window-index'."
   (setq my-switch-window-order
-        (seq-sort-by #'window-use-time #'> (my-active-windows))))
+        (vconcat (seq-sort-by #'window-use-time #'>
+                              (my-active-windows))))
+  (setq my-switch-window-index
+        (seq-position my-switch-window-order (selected-window))))
 
 (defun my-switch-window-next (n)
   "Switch to the next Nth window in `my-switch-window-order'."
-  (interactive)
-  (select-window
-   (elt (--drop-while (not (eq it (selected-window)))
-                      (-cycle my-switch-window-order))
-        (mod n (length my-switch-window-order)))))
+  (interactive "p")
+  (if (zerop n)
+      (select-window
+       (elt my-switch-window-order my-switch-window-index))
+    (setq my-switch-window-index
+          (mod (+ my-switch-window-index (signum n))
+               (length my-switch-window-order)))
+    (when (elt my-switch-window-order my-switch-window-index)
+      (setq n (- n (signum n))))
+    (my-switch-window-next n)))
 
 (defun my-switch-window-nth (n)
   "Switch to N-th window in `my-switch-window-order'."
   (select-window (elt my-switch-window-order n)))
 
-(defvar my-switch-window-overlays nil
+(defvar my-switch-window-overlays []
   "Window-number overlays for `my-switch-window-hydra/body'.")
 
 ;;;###autoload
@@ -602,37 +613,53 @@ See `my-active-windows'.")
   "Set `my-switch-window-overlays' for `my-switch-window-order'."
   (my-switch-window-delete-overlays)
   (setq my-switch-window-overlays
-        (--map-indexed
-         (let ((overlay (make-overlay (window-point it) (window-point it)
-                                      (window-buffer it))))
-           (overlay-put overlay 'before-string
-                        (propertize (number-to-string it-index) 'face
-                                    'my-switch-window-overlay-other))
-           (overlay-put overlay 'window it)
-           overlay)
-         my-switch-window-order)))
+        (vconcat
+         (seq-map-indexed
+          (lambda (window index)
+            (let ((overlay (make-overlay (window-point window)
+                                         (window-point window)
+                                         (window-buffer window))))
+              (overlay-put overlay 'before-string
+                           (propertize (number-to-string index) 'face
+                                       'my-switch-window-overlay-other))
+              (overlay-put overlay 'window window)
+              overlay))
+          my-switch-window-order))))
+
+(defun my-switch-window-delete-window ()
+  "Delete selected window."
+  (interactive)
+  (let ((index my-switch-window-index)
+        (window (selected-window)))
+    (my-switch-window-next 1)
+    (if (eq (selected-window) window)
+        (message "No other window")
+      (delete-overlay (elt my-switch-window-overlays index))
+      (aset my-switch-window-order index nil)
+      (aset my-switch-window-overlays index nil)
+      (delete-window window))))
 
 (defun my-switch-window-delete-overlays ()
   "Delete `my-switch-window-overlays'."
-  (-each my-switch-window-overlays #'delete-overlay)
-  (setq my-switch-window-overlays nil))
+  (seq-each (lambda (overlay)
+              (when overlay
+                (delete-overlay overlay)))
+            my-switch-window-overlays)
+  (setq my-switch-window-overlays []))
 
-(defun my-switch-window-set-current-window-overlay-face (face)
-  "Set face of the current-window overlay."
-  (when-let* ((overlay (elt my-switch-window-overlays
-                            (-elem-index (selected-window)
-                                         my-switch-window-order)))
+(defun my-switch-window-set-overlay-face (face)
+  "Set face of the overlay in the selected window."
+  (when-let* ((overlay
+               (elt my-switch-window-overlays my-switch-window-index))
               (before-string (overlay-get overlay 'before-string)))
     (overlay-put overlay 'before-string
                  (propertize before-string 'face face))))
 
 (define-advice my-switch-window-next (:before (_) other-overlay)
-  (my-switch-window-set-current-window-overlay-face
-   'my-switch-window-overlay-other))
+  (my-switch-window-set-overlay-face 'my-switch-window-overlay-other))
 
 (define-advice my-switch-window-next (:after (_) current-overlay)
-  (my-switch-window-set-current-window-overlay-face
-   'my-switch-window-overlay-current))
+  (my-switch-window-set-overlay-face 'my-switch-window-overlay-current))
 
 (defhydra my-switch-window-hydra (:hint nil
                                   :body-pre
@@ -644,25 +671,36 @@ See `my-active-windows'.")
                                   (my-switch-window-delete-overlays))
   ("M-<tab>" (my-switch-window-next 1) nil)
   ("M-<iso-lefttab>" (my-switch-window-next -1) nil)
+  ("-" #'my-switch-window-delete-window nil)
   ("<return>" nil))
 
 (setq my-switch-window-hydra/hint
       '(let ((window-heads
-              (--map-indexed
-               `(,(number-to-string it-index)
-                 (lambda ()
-                   (interactive)
-                   (hydra-keyboard-quit)
-                   (my-switch-window-nth ,it-index))
-                 ,(propertize (buffer-name (window-buffer it)) 'face
-                              (if (eq it (selected-window))
-                                  'my-switch-window-current
-                                'my-switch-window-other))
-                 :exit t)
-               my-switch-window-order)))
-         (--each window-heads
-           (define-key my-switch-window-hydra/keymap (car it) (cadr it)))
-         (eval (hydra--format nil nil "Switch window"
+              (seq-filter
+               #'identity
+               (seq-map-indexed
+                (lambda (window index)
+                  (when window
+                    `(,(number-to-string index)
+                      (lambda ()
+                        (interactive)
+                        (hydra-keyboard-quit)
+                        (my-switch-window-nth ,index))
+                      ,(propertize
+                        (buffer-name (window-buffer window)) 'face
+                        (if (eq window (selected-window))
+                            'my-switch-window-current
+                          'my-switch-window-other))
+                      :exit t)))
+                my-switch-window-order))))
+         (dolist (index (number-sequence 0 9))
+           (define-key my-switch-window-hydra/keymap (number-to-string index)
+             (lambda ()
+               (interactive)
+               (message "No such window"))))
+         (pcase-dolist (`(,key ,cmd) window-heads)
+           (define-key my-switch-window-hydra/keymap key cmd))
+         (eval (hydra--format nil nil "Switch window [-]"
                               (append my-switch-window-hydra/heads
                                       window-heads)))))
 
