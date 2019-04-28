@@ -945,6 +945,9 @@ If NO-MARK-DONE is non-nil, don't change the entry state."
 
 (key-chord-define org-mode-map "xw" #'ff-get-other-file)
 
+(when (boundp 'exwm-state)
+  (define-key org-mode-map (kbd "M-<tab>") nil))
+
 (define-key org-mode-map (kbd "C-`") #'my-insert-tilde)
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "C-c C-/ C-p") #'my-org-convert-url-property)
