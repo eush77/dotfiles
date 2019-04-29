@@ -141,6 +141,8 @@ point instead."
   (define-key w3m-mode-map (kbd "p") #'w3m-previous-anchor)
   (define-key w3m-mode-map (kbd "P") #'my-w3m-pocket-add-url)
   (define-key w3m-mode-map (kbd "C-c M-p") #'w3m-tab-move-left)
+  (define-key w3m-mode-map (kbd "r") #'w3m-reload-this-page)
+  (define-key w3m-mode-map (kbd "R") #'w3m-redisplay-this-page)
   (define-key w3m-mode-map (kbd "q") #'my-w3m-close-window)
   (define-key w3m-mode-map (kbd "Q") #'w3m-close-window)
   (define-key w3m-mode-map (kbd "w") #'w3m-lnum-universal))
