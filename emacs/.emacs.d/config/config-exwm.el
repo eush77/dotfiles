@@ -195,13 +195,19 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (interactive "p")
   (my-exwm-workspace-next (- n)))
 
-(defun my-exwm-workspace-switch-or-next ()
-  "Switch workspace interactively unless there are <3 of them."
-  (interactive)
-  (cl-case (length (frame-list))
+(defun my-exwm-workspace-switch-or-next (&optional force-display-p)
+  "Switch to another workspace interactively.
+
+If there is only one workspace or a couple, switch immediately
+without displaying the switching interface unless FORCE-DISPLAY-P
+is non-nil."
+  (interactive "P")
+  (cl-case (and (not force-display-p) (length (frame-list)))
     (1 (user-error "No other workspace"))
     (2 (my-exwm-workspace-next 1))
-    (otherwise (call-interactively 'exwm-workspace-switch))))
+    (otherwise
+     (let ((current-prefix-arg))
+       (call-interactively 'exwm-workspace-switch)))))
 
 (custom-set-variables
  '(exwm-layout-show-all-buffers t)
