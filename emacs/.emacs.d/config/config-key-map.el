@@ -119,10 +119,10 @@
 
 ;; Rotate
 (global-set-key (kbd "C-c r r") #'rotate-window)
-(global-set-key (kbd "C-c r eh") #'rotate:even-horizontal)
-(global-set-key (kbd "C-c r ev") #'rotate:even-vertical)
-(global-set-key (kbd "C-c r h") #'rotate:main-horizontal)
-(global-set-key (kbd "C-c r v") #'rotate:main-vertical)
+(global-set-key (kbd "C-c r h") #'rotate:even-horizontal)
+(global-set-key (kbd "C-c r v") #'rotate:even-vertical)
+(global-set-key (kbd "C-c r mh") #'rotate:main-horizontal)
+(global-set-key (kbd "C-c r mv") #'rotate:main-vertical)
 (global-set-key (kbd "C-c r t") #'rotate:tiled)
 
 ;; Scroll lock
