@@ -705,11 +705,16 @@ See `my-active-windows'.")
                                       window-heads)))))
 
 ;;;###autoload
-(defun my-switch-window ()
-  "Switch to another active window interactively."
+(defun my-switch-window (&optional force-display-p)
+  "Switch to another active window interactively.
+
+If there is only one active window or a couple, switch
+immediately without displaying the switching interface unless
+FORCE-DISPLAY-P is non-nil."
   (declare (interactive-only t))
-  (interactive)
-  (cl-case (length (my-active-windows))
+  (interactive "P")
+  (cl-case (and (not force-display-p)
+                (length (my-active-windows)))
     (1 (message "No other window"))
     (2 (select-window (car (remq (selected-window)
                                  (my-active-windows)))))
