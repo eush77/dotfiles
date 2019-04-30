@@ -76,6 +76,14 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
   (when my-open-line-and-indent
     (indent-according-to-mode)))
 
+;;; Dedicated Windows
+
+(defun my-toggle-window-dedicated-p ()
+  "Toggle dedicated state of the selected window."
+  (interactive)
+  (set-window-dedicated-p (selected-window)
+                          (not (window-dedicated-p))))
+
 ;;; Defun motion
 
 ;;;###autoload
