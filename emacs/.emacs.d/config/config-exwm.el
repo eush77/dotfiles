@@ -102,13 +102,21 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
         (gethash "Name" props)))
   "X class name of the default XDG web browser.")
 
+;;;###autoload
+(defun my-xdg-web-browser-buffer-p (&optional buffer)
+  "True if BUFFER is an Exwm buffer of the default XDG web browser.
+
+BUFFER defaults to the current buffer."
+  (with-current-buffer (or buffer (current-buffer))
+    (and (derived-mode-p 'exwm-mode)
+         (string-equal exwm-class-name
+                       my-xdg-web-browser-class-name))))
+
 (defun my-xdg-web-browser-buffer ()
   "Get live Exwm buffer of the default XDG web browser, or nil."
-  (--find (with-current-buffer it
-            (and (derived-mode-p 'exwm-mode)
-                 (string-equal exwm-class-name
-                               my-xdg-web-browser-class-name)))
-          (buffer-list)))
+  (if (my-xdg-web-browser-buffer-p)
+      (current-buffer)
+    (seq-find #'my-xdg-web-browser-buffer-p (buffer-list))))
 
 ;;;###autoload
 (defun my-xdg-web-browser ()
@@ -119,6 +127,23 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
           (select-window window)
         (pop-to-buffer-same-window buffer))
     (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app))))
+
+;;;###autoload
+(defun my-xdg-web-browser-get-current-url ()
+  "Get URL visited in the default XDG web browser, or nil."
+  (when-let ((buffer (my-xdg-web-browser-buffer)))
+    (with-current-buffer buffer
+      (unless (string-equal exwm-class-name "Firefox")
+        (error "Unsupported web browser %s" exwm-class-name))
+      (with-selected-window (get-buffer-window)
+        (exwm-input--fake-key ?\C-l)    ; Focus location bar
+        (sit-for 0)
+        (exwm-input--fake-key ?\C-c)
+        (sit-for .2)
+        (let ((url (current-kill 0 t)))
+          (with-temp-buffer
+            (insert url)
+            (thing-at-point 'url)))))))
 
 ;;; exwm-input-global-keys
 

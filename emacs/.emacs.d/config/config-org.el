@@ -314,19 +314,27 @@ Archive files are those matching `org-archive-location'."
 
 (defun my-org-capture-current-link (%f %F %U %:description %:link)
   "Store current link / link to the current buffer"
-  (let ((link
-         (if (derived-mode-p 'gnus-article-mode 'w3m-mode)
-             %:link
-           (concat "file:" %F)))
-        (description (concat %f %:description)))
+  (pcase-let
+      ((`(,link . ,description)
+        (cond ((derived-mode-p 'gnus-article-mode 'w3m-mode)
+               (cons %:link %:description))
+              ((derived-mode-p 'exwm-mode)
+               (if-let ((link (my-xdg-web-browser-get-current-url)))
+                   (cons link exwm-title)
+                 (let ((message
+                        "Couldn't get current url from the web browser"))
+                   (message message)
+                   (error message))))
+              (t (cons (concat "file:" %F) %f)))))
     (concat "* NEW " (org-make-link-string link description) "\n"
             ":LOGBOOK:\n"
             "- State \"NEW\"        from              " %U "\n"
             ":END:\n")))
 
 (defun my-org-capture-current-link-context ()
-  (or (memq major-mode '(w3m-mode gnus-article-mode))
-      (buffer-file-name)))
+  (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
+      (buffer-file-name)
+      (my-xdg-web-browser-buffer-p)))
 
 (defun my-org-capture-region (%f %i %U %:from %:link %:subject)
   "Quote active region"
