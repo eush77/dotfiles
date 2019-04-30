@@ -73,3 +73,11 @@
 See `sml/generate-buffer-identification'."
   (with-selected-window window
     (sml/generate-buffer-identification)))
+
+(defun my-mode-line-toggle-window-dedicated-p (event)
+  "Like `my-toggle-window-dedicated-p', but for EVENT's window."
+  (interactive "e")
+  (my-toggle-window-dedicated-p (posn-window (event-start event))))
+
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-1] #'my-mode-line-toggle-window-dedicated-p)

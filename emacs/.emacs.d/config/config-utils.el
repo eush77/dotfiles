@@ -78,11 +78,17 @@ See URL `http://www.emacswiki.org/emacs/OpenNextLine'."
 
 ;;; Dedicated Windows
 
-(defun my-toggle-window-dedicated-p ()
-  "Toggle dedicated state of the selected window."
+(defun my-toggle-window-dedicated-p (&optional window)
+  "Toggle dedicated state of the WINDOW.
+
+If WINDOW is nil, use the selected window."
   (interactive)
-  (set-window-dedicated-p (selected-window)
-                          (not (window-dedicated-p))))
+  (let ((flag (not (window-dedicated-p window))))
+    (set-window-dedicated-p window flag)
+    (if flag
+        (message "Window is strongly dedicated to %S"
+                 (window-buffer window))
+      (message "Window is not dedicated"))))
 
 ;;; Defun motion
 
