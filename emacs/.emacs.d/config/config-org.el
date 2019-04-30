@@ -336,6 +336,28 @@ Archive files are those matching `org-archive-location'."
       (buffer-file-name)
       (my-xdg-web-browser-buffer-p)))
 
+(defvar my-org-capture-killed-link-urls nil
+  "URLs from the kill ring.")
+
+(defun my-org-capture-killed-link (%U)
+  "Store link from the kill ring"
+  (let* ((link (completing-read "Killed URL: "
+                                my-org-capture-killed-link-urls))
+         (description (read-string "Description: " link)))
+    (concat "* NEW " (org-make-link-string link description) "\n"
+            ":LOGBOOK:\n"
+            "- State \"NEW\"        from              " %U "\n"
+            ":END:\n")))
+
+(defun my-org-capture-killed-link-context ()
+  (setq my-org-capture-killed-link-urls
+        (with-temp-buffer
+          (seq-filter (lambda (kill)
+                        (erase-buffer)
+                        (insert (string-trim kill))
+                        (thing-at-point 'url))
+                      kill-ring))))
+
 (defun my-org-capture-region (%f %i %U %:from %:link %:subject)
   "Quote active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
@@ -425,13 +447,17 @@ Archive files are those matching `org-archive-location'."
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-                  (my-org-capture-link \"%U\"))"))))
+                  (my-org-capture-link \"%U\"))")
+     ("U" ,(documentation 'my-org-capture-killed-link) entry
+      (file org-default-notes-file)
+      "%(my-org-capture-killed-link \"%U\")"))))
 
 (custom-set-variables
  '(org-capture-templates-contexts
    '(("c" (my-org-capture-current-link-context))
      ("r" (region-active-p))
-     ("u" (my-org-capture-link-context)))))
+     ("u" (my-org-capture-link-context))
+     ("U" (my-org-capture-killed-link-context)))))
 
 (defun my-org-capture-select-template--display-buffer-action (func &rest args)
   "Set up `display-buffer' action."
