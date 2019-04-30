@@ -312,6 +312,22 @@ Archive files are those matching `org-archive-location'."
           (end (next-single-property-change (point) 'face)))
       (buffer-substring-no-properties begin end ))))
 
+(defun my-org-capture-current-link (%f %F %U %:description %:link)
+  "Store current link / link to the current buffer"
+  (let ((link
+         (if (derived-mode-p 'gnus-article-mode 'w3m-mode)
+             %:link
+           (concat "file:" %F)))
+        (description (concat %f %:description)))
+    (concat "* NEW " (org-make-link-string link description) "\n"
+            ":LOGBOOK:\n"
+            "- State \"NEW\"        from              " %U "\n"
+            ":END:\n")))
+
+(defun my-org-capture-current-link-context ()
+  (or (memq major-mode '(w3m-mode gnus-article-mode))
+      (buffer-file-name)))
+
 (defun my-org-capture-region (%f %i %U %:from %:link %:subject)
   "Quote active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
@@ -393,29 +409,19 @@ Archive files are those matching `org-archive-location'."
       "%(with-current-buffer (org-capture-get :original-buffer)
                    (my-org-capture-region
                     \"%f\" \"%i\" \"%U\" \"%:from\" \"%:link\" \"%:subject\"))")
-     ("c" "Store link to the current buffer" entry
+     ("c" ,(documentation 'my-org-capture-current-link) entry
       (file org-default-notes-file)
-      ,(concat "* NEW [[%(pcase
-                            (with-current-buffer
-                                (org-capture-get :original-buffer) major-mode)
-                             ((or 'w3m-mode 'gnus-article-mode) \"%:link\")
-                             (_ \"file:%F\")
-                           )][%f%:description]]\n"
-               ":LOGBOOK:\n"
-               "- State \"NEW\"        from              %U\n"
-               ":END:\n"))
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-current-link \"%f\" \"%F\" \"%U\"
+                                       \"%:description\" \"%:link\"))")
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
                   (my-org-capture-link \"%U\"))"))))
 
-(defun my-org-capture-c-context ()
-  (or (memq major-mode '(w3m-mode gnus-article-mode))
-      (buffer-file-name)))
-
 (custom-set-variables
  '(org-capture-templates-contexts
-   '(("c" (my-org-capture-c-context))
+   '(("c" (my-org-capture-current-link-context))
      ("r" (region-active-p))
      ("u" (my-org-capture-link-context)))))
 
