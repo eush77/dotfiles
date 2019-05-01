@@ -586,10 +586,10 @@ See `my-active-windows'.")
       (select-window
        (elt my-switch-window-order my-switch-window-index))
     (setq my-switch-window-index
-          (mod (+ my-switch-window-index (signum n))
+          (mod (+ my-switch-window-index (cl-signum n))
                (length my-switch-window-order)))
     (when (elt my-switch-window-order my-switch-window-index)
-      (setq n (- n (signum n))))
+      (setq n (- n (cl-signum n))))
     (my-switch-window-next n)))
 
 (defun my-switch-window-nth (n)
