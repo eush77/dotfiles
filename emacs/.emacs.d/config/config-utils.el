@@ -623,35 +623,23 @@ See `my-active-windows'.")
   "Face for `my-switch-window-overlays'."
   :group 'my)
 
+(defun my-switch-window-create-overlay (window index)
+  "Create overlay in WINDOW displaying NUMBER."
+  (let ((overlay (make-overlay (window-point window)
+                               (window-point window)
+                               (window-buffer window))))
+    (overlay-put overlay 'before-string
+                 (propertize (number-to-string index) 'face
+                             'my-switch-window-overlay-other))
+    (overlay-put overlay 'window window)
+    overlay))
+
 (defun my-switch-window-create-overlays ()
   "Set `my-switch-window-overlays' for `my-switch-window-order'."
   (my-switch-window-delete-overlays)
   (setq my-switch-window-overlays
-        (vconcat
-         (seq-map-indexed
-          (lambda (window index)
-            (let ((overlay (make-overlay (window-point window)
-                                         (window-point window)
-                                         (window-buffer window))))
-              (overlay-put overlay 'before-string
-                           (propertize (number-to-string index) 'face
-                                       'my-switch-window-overlay-other))
-              (overlay-put overlay 'window window)
-              overlay))
-          my-switch-window-order))))
-
-(defun my-switch-window-delete-window ()
-  "Delete selected window."
-  (interactive)
-  (let ((index my-switch-window-index)
-        (window (selected-window)))
-    (my-switch-window-next 1)
-    (if (eq (selected-window) window)
-        (message "No other window")
-      (delete-overlay (elt my-switch-window-overlays index))
-      (aset my-switch-window-order index nil)
-      (aset my-switch-window-overlays index nil)
-      (delete-window window))))
+        (vconcat (seq-map-indexed #'my-switch-window-create-overlay
+                                  my-switch-window-order))))
 
 (defun my-switch-window-delete-overlays ()
   "Delete `my-switch-window-overlays'."
@@ -675,6 +663,30 @@ See `my-active-windows'.")
 (define-advice my-switch-window-next (:after (_) current-overlay)
   (my-switch-window-set-overlay-face 'my-switch-window-overlay-current))
 
+(defun my-switch-window-delete-window ()
+  "Delete selected window."
+  (interactive)
+  (let ((index my-switch-window-index)
+        (window (selected-window)))
+    (my-switch-window-next 1)
+    (if (eq (selected-window) window)
+        (message "No other window")
+      (delete-overlay (elt my-switch-window-overlays index))
+      (aset my-switch-window-order index nil)
+      (aset my-switch-window-overlays index nil)
+      (delete-window window))))
+
+(defun my-switch-window-split-window ()
+  "Split selected window."
+  (interactive)
+  (let ((window (split-window))
+        (index (length my-switch-window-order)))
+    (setq my-switch-window-order
+          (vconcat my-switch-window-order (list window)))
+    (setq my-switch-window-overlays
+          (vconcat my-switch-window-overlays
+                   (list (my-switch-window-create-overlay window index))))))
+
 (defhydra my-switch-window-hydra (:hint nil
                                   :body-pre
                                   (progn
@@ -686,6 +698,7 @@ See `my-active-windows'.")
   ("M-<tab>" (my-switch-window-next 1) nil)
   ("M-<iso-lefttab>" (my-switch-window-next -1) nil)
   ("-" #'my-switch-window-delete-window nil)
+  ("+" #'my-switch-window-split-window nil)
   ("<return>" nil))
 
 (setq my-switch-window-hydra/hint
