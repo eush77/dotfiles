@@ -676,10 +676,12 @@ See `my-active-windows'.")
       (aset my-switch-window-overlays index nil)
       (delete-window window))))
 
-(defun my-switch-window-split-window ()
-  "Split selected window."
+(defun my-switch-window-split-window (&optional side)
+  "Split selected window along SIDE.
+
+See `split-window' for the valid values of SIDE."
   (interactive)
-  (let ((window (split-window))
+  (let ((window (split-window nil nil side))
         (index (length my-switch-window-order)))
     (setq my-switch-window-order
           (vconcat my-switch-window-order (list window)))
@@ -699,6 +701,7 @@ See `my-active-windows'.")
   ("M-<iso-lefttab>" (my-switch-window-next -1) nil)
   ("-" #'my-switch-window-delete-window nil)
   ("+" #'my-switch-window-split-window nil)
+  ("|" (my-switch-window-split-window t) nil)
   ("<return>" nil))
 
 (setq my-switch-window-hydra/hint
