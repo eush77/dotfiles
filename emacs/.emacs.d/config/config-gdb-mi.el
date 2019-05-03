@@ -300,7 +300,10 @@ Returns the absolute file name of the selected trace directory."
     (with-current-buffer rr-replay-buffer
       (let ((inhibit-read-only t))
         (erase-buffer))
-      (view-mode 1))
+      (view-mode 1)
+      (let ((keymap (make-sparse-keymap)))
+        (define-key keymap (kbd "q") #'my-gdb-quit-maybe)
+        (use-local-map keymap)))
     (start-process "rr replay" rr-replay-buffer
                    "rr" "replay"
                    "-s" (number-to-string my-rr-replay-port)
