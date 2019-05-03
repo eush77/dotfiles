@@ -196,6 +196,9 @@
 (global-set-key [remap shrink-window-horizontally]
                 #'my-hydra-window-resize/my-shrink-window-horizontally)
 
+;; Window switching
+(global-set-key (kbd "M-<tab>") #'my-switch-window)
+
 ;; Winner
 (global-set-key (kbd "C-c w") #'my-winner-hydra/body)
 

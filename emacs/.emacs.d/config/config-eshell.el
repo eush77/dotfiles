@@ -314,8 +314,7 @@ numbered."
 
 (defun my-eshell-mode-hook ()
   "My hook for Eshell mode."
-  (when (boundp 'exwm-state)
-    (define-key eshell-mode-map (kbd "M-<tab>") nil))
+  (define-key eshell-mode-map (kbd "M-<tab>") nil)
   (define-key eshell-mode-map (kbd "C-c C-h") #'counsel-esh-history)
   (define-key eshell-mode-map (kbd "C-c C-l") #'eshell/clear)
   (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-life-is-too-much)

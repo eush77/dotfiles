@@ -25,8 +25,7 @@ Otherwise hide it, and show the previous sibling section."
       (interactive)
       (funcall show-and-move #'magit-section-backward-sibling)))
 
-  (when (boundp 'exwm-state)
-    (define-key magit-mode-map (kbd "M-<tab>") nil))
+  (define-key magit-mode-map (kbd "M-<tab>") nil)
 
   (define-key magit-mode-map (kbd "C-c f") #'magit-find-file)
   (define-key magit-mode-map (kbd "M-N") #'my-magit-section-show-next)
