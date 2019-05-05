@@ -692,6 +692,11 @@ truncated."
  '(org-log-into-drawer t)
  '(org-log-refile 'time))
 
+;;; Mouse
+
+(when (display-mouse-p)
+  (require 'org-mouse))
+
 ;;; Priority
 
 (custom-set-variables
