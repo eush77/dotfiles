@@ -71,8 +71,11 @@
   "Update buffer identification for SML mode line.
 
 See `sml/generate-buffer-identification'."
-  (with-selected-window window
-    (sml/generate-buffer-identification)))
+  (when (listp mode-line-buffer-identification) ; Fix for transient
+    (if window
+        (with-selected-window window
+          (sml/generate-buffer-identification))
+      (sml/generate-buffer-identification))))
 
 (defun my-mode-line-toggle-window-dedicated-p (event)
   "Like `my-toggle-window-dedicated-p', but for EVENT's window."
