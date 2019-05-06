@@ -71,6 +71,12 @@ See `sml/generate-buffer-identification'."
 
 ;;; mode-line-buffer-identification-keymap
 
+(defun my-mode-line-rename-buffer (event)
+  "Rename buffer displayed in the EVENT's window."
+  (interactive "e")
+  (with-current-buffer (window-buffer (posn-window (event-start event)))
+    (call-interactively 'rename-buffer)))
+
 (defun my-mode-line-toggle-window-dedicated-p (event)
   "Like `my-toggle-window-dedicated-p', but for EVENT's window."
   (interactive "e")
@@ -78,3 +84,5 @@ See `sml/generate-buffer-identification'."
 
 (define-key mode-line-buffer-identification-keymap
   [mode-line mouse-1] #'my-mode-line-toggle-window-dedicated-p)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-3] #'my-mode-line-rename-buffer)
