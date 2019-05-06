@@ -1,6 +1,9 @@
+;;; -*- lexical-binding: t -*-
 (require 'org)
 
 (sml/setup)
+
+;;; Custom Setup
 
 (custom-set-variables
  '(mode-line-format '("%e"
@@ -40,11 +43,13 @@
  '(sml/size-indication-format "%p of %I ")
  '(sml/theme 'respectful))
 
+;;; Dedicated Window Identification
+
 (defvar-local my-sml-dedicated-window-identification-face-remap-cookie nil)
 
 (define-advice sml/generate-buffer-identification
     (:after (&rest _) my-dedicated-window)
-  "Apply face `my-sml-dedicated-window-identification'."
+  "Update face remapping in dedicated windows."
   (when my-sml-dedicated-window-identification-face-remap-cookie
     (face-remap-remove-relative
      my-sml-dedicated-window-identification-face-remap-cookie)
@@ -55,7 +60,7 @@
 
 (define-advice set-window-dedicated-p
     (:after (window _) sml/generate-buffer-identification)
-  "Update buffer identification for SML mode line.
+  "Regenerate buffer identification for SML mode line.
 
 See `sml/generate-buffer-identification'."
   (when (listp mode-line-buffer-identification) ; Fix for transient
@@ -63,6 +68,8 @@ See `sml/generate-buffer-identification'."
         (with-selected-window window
           (sml/generate-buffer-identification))
       (sml/generate-buffer-identification))))
+
+;;; mode-line-buffer-identification-keymap
 
 (defun my-mode-line-toggle-window-dedicated-p (event)
   "Like `my-toggle-window-dedicated-p', but for EVENT's window."
