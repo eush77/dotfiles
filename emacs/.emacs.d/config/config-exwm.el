@@ -145,6 +145,23 @@ BUFFER defaults to the current buffer."
             (insert url)
             (thing-at-point 'url)))))))
 
+;;; exwm-edit
+
+(defun my-exwm-edit ()
+  "Edit text in the current text field."
+  (interactive)
+  (exwm-input--fake-key ?\C-a)
+  (sit-for 0)
+  (let ((previous-kill (current-kill 0 t)))
+    (exwm-input--fake-key ?\C-c)
+    (sit-for .2)
+    (let ((current-kill (current-kill 0 t)))
+      (kill-new
+       (read-string "Input: "
+                    (unless (string-equal current-kill previous-kill)
+                      current-kill)))))
+  (exwm-input--fake-key ?\C-v))
+
 ;;; exwm-input-global-keys
 
 (custom-set-variables
@@ -155,6 +172,7 @@ BUFFER defaults to the current buffer."
      (,(kbd "<XF86MonBrightnessDown>") . my-exwm-brightness-down)
      (,(kbd "<XF86MonBrightnessUp>") . my-exwm-brightness-up)
      (,(kbd "<XF86TouchpadToggle>") . my-exwm-toggle-touchpad)
+     (,(kbd "C-<return>") . my-exwm-edit)
      (,(kbd "C-g") . keyboard-quit)
      (,(kbd "C-M-j") . window-jump-left)
      (,(kbd "C-M-k") . window-jump-right)
