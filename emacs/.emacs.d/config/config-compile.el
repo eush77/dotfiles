@@ -57,22 +57,6 @@ from `prog-mode'."
                            (buffer-substring (point) (line-end-position))))))
     (compile (compilation-read-command command))))
 
-;;;###autoload
-(defun my-recompile ()
-  "Save current buffer, recompile, then switch to the compilation
-buffer."
-  (interactive)
-  (require 'compile)
-  (when (my-compilation-save-buffers-predicate)
-    (save-buffer))
-  (when compilation-last-buffer
-    (when-let ((compilation-window
-                (get-buffer-window compilation-last-buffer t)))
-      (select-frame-set-input-focus (window-frame compilation-window))
-      (select-window compilation-window)))
-  (recompile)
-  (select-window (get-buffer-window compilation-last-buffer t)))
-
 ;;; Custom Setup
 
 (custom-set-variables
@@ -150,3 +134,28 @@ COMMAND is the default command."
 (define-key compilation-mode-map (kbd "h") #'my-compilation-other-buffer)
 (define-key compilation-shell-minor-mode-map (kbd "C-M-n") nil)
 (define-key compilation-shell-minor-mode-map (kbd "C-M-p") nil)
+
+;;; Recompile
+
+(defun my-recompile-window ()
+  "Get compilation window displayed in an active frame."
+  (--find (with-current-buffer (window-buffer it)
+            (derived-mode-p 'compilation-mode))
+          (my-active-windows)))
+
+;;;###autoload
+(defun my-recompile (&optional select-p)
+  "Recompile in an active compilation window.
+
+With prefix argument SELECT-P, select the window as well."
+  (interactive "P")
+  (let ((window (my-recompile-window)))
+    (unless window
+      (user-error "No active compilation window"))
+    (when (my-compilation-save-buffers-predicate)
+      (save-buffer))
+    (with-selected-window window
+      (with-current-buffer (window-buffer window)
+        (recompile)))
+    (when select-p
+      (select-window window))))
