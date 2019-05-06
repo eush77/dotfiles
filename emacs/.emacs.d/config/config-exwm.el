@@ -182,7 +182,8 @@ BUFFER defaults to the current buffer."
 
 (custom-set-variables
  '(exwm-input-simulation-keys
-   '(([?\C-a] . [home])
+   '(([?\C-_] . [?\C-z])
+     ([?\C-a] . [home])
      ([?\C-b] . [left])
      ([?\C-d] . [delete])
      ([?\C-e] . [end])
