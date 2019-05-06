@@ -322,12 +322,17 @@ use `my-select-frame-by-buffer-names'.")
                (rethrow-toggle-prompt
                 (lambda ()
                   (interactive)
-                  (throw 'reprompt 'toggle-prompt)))
+                  (throw 'reprompt '(toggle-prompt))))
+               (rethrow-toggle-prompt-and-advance
+                (lambda ()
+                  (interactive)
+                  (throw 'reprompt '(toggle-prompt . t))))
                (exwm-workspace--switch-map
                 (let ((keymap-parent exwm-workspace--switch-map)
                       (keymap (make-sparse-keymap)))
                   (set-keymap-parent keymap keymap-parent)
-                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "<tab>") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "M-`") #'previous-history-element)
                   (define-key keymap (kbd "n") #'previous-history-element)
                   (define-key keymap (kbd "p") #'next-history-element)
                   (define-key keymap (kbd "s-w") #'previous-history-element)
@@ -335,12 +340,16 @@ use `my-select-frame-by-buffer-names'.")
                (minibuffer-local-must-match-map
                 (let ((keymap (make-sparse-keymap)))
                   (set-keymap-parent keymap minibuffer-local-must-match-map)
-                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "<tab>") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "M-`")
+                    rethrow-toggle-prompt-and-advance)
                   keymap))
                (ivy-minibuffer-map
                 (let ((keymap (make-sparse-keymap)))
                   (set-keymap-parent keymap ivy-minibuffer-map)
-                  (define-key keymap (kbd "M-`") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "<tab>") rethrow-toggle-prompt)
+                  (define-key keymap (kbd "M-`")
+                    rethrow-toggle-prompt-and-advance)
                   keymap)))
       (catch 'switch
         (while t
@@ -353,7 +362,11 @@ use `my-select-frame-by-buffer-names'.")
             ('delete (let ((frame (selected-frame)))
                        (other-frame 1)
                        (delete-frame frame)))
-            ('toggle-prompt (my-exwm-workspace-switch-toggle-prompt-method))
+            (`(toggle-prompt . ,advance-p)
+             (my-exwm-workspace-switch-toggle-prompt-method)
+             (when advance-p
+               (exwm-workspace-switch (mod (+ exwm-workspace-current-index 1)
+                                           (exwm-workspace--count)))))
             (frame (throw 'switch frame))))))))
 
 (advice-add 'exwm-workspace--prompt-for-workspace
