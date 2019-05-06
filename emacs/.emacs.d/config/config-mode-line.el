@@ -71,6 +71,17 @@ See `sml/generate-buffer-identification'."
 
 ;;; mode-line-buffer-identification-keymap
 
+(define-advice sml/generate-buffer-identification
+    (:after (&rest _) my-help-echo)
+  "Update `help-echo' property."
+  (put-text-property
+   0 (length sml/buffer-identification)
+   'help-echo
+   (format "%s\n\nmouse-1: %s window\nmouse-3: Rename buffer"
+           (or (buffer-file-name) (buffer-name))
+           (if (window-dedicated-p) "Undedicate" "Dedicate"))
+   sml/buffer-identification))
+
 (defun my-mode-line-rename-buffer (event)
   "Rename buffer displayed in the EVENT's window."
   (interactive "e")
