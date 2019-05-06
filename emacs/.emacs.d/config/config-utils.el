@@ -537,6 +537,8 @@ If FRAME is nil, use selected frame."
 (defun my-active-frames ()
   "Get all active frames.
 
+First frame in the list is always the selected frame.
+
 Active frames are frames that should be used as targets for
 `window-jump', `switch-window', etc.
 
@@ -547,14 +549,16 @@ Active frames are frames that should be used as targets for
   the same non-nil _NET_WM_DESKTOP as the selected frame.
 
 - Otherwise, a frame is active iff it is visible."
-  (cond ((boundp 'exwm-state)
-         (--filter (frame-parameter it 'exwm-active) (frame-list)))
-        (window-system
-         ;; Avoid recomputing `selected-wm-desktop' for every frame.
-         (let ((selected-wm-desktop (my-frame-wm-desktop)))
-           (--filter (= (my-frame-wm-desktop it) selected-wm-desktop)
-                     (frame-list))))
-        (t (-filter #'frame-visible-p (frame-list)))))
+  (let ((frames
+         (cons (selected-frame) (cl-remove (selected-frame) (frame-list)))))
+    (cond ((boundp 'exwm-state)
+           (--filter (frame-parameter it 'exwm-active) frames))
+          (window-system
+           ;; Avoid recomputing `selected-wm-desktop' for every frame.
+           (let ((selected-wm-desktop (my-frame-wm-desktop)))
+             (--filter (= (my-frame-wm-desktop it) selected-wm-desktop)
+                       frames)))
+          (t (-filter #'frame-visible-p frames)))))
 
 ;;;###autoload
 (defun my-active-windows ()
