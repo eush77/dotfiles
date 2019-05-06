@@ -15,7 +15,7 @@
 (global-set-key (kbd "C-x M-u") #'upcase-region)
 
 ;; Compilation
-(global-set-key (kbd "<f7>") #'my-recompile)
+(global-set-key (kbd "M-*") #'my-recompile)
 
 ;; Counsel overloads
 (global-unset-key (kbd "C-x C-u"))
