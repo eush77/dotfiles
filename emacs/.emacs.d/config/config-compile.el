@@ -13,11 +13,6 @@
 
 ;;; Commands
 
-(defun my-compilation-save-buffers-predicate ()
-  "Limit buffers that are saved before compiling to those derived
-from `prog-mode'."
-  (derived-mode-p 'prog-mode))
-
 ;;;###autoload
 (defcustom my-compilation-ignored-buffers '("*Compile-Log*"
                                             "*Org-Babel Error Output*"
@@ -58,6 +53,10 @@ from `prog-mode'."
     (compile (compilation-read-command command))))
 
 ;;; Custom Setup
+
+(defun my-compilation-save-buffers-predicate ()
+  "Non-nil if the current buffer is saved before compiling."
+  (derived-mode-p 'org-mode 'prog-mode))
 
 (custom-set-variables
  '(compilation-save-buffers-predicate
