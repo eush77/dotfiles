@@ -79,16 +79,25 @@ Otherwise hide it, and show the previous sibling section."
   :type 'regexp
   :group 'my)
 
+;;;###autoload
+(defcustom my-magit-log-excluded-refs nil
+  "List of refs to exclude from `magit-log-all',
+`magit-log-branches', and `magit-log-all-branches'."
+  :type '(repeat string)
+  :group 'my)
+
 (defun my-magit-log--exclude-refs (func &optional args files)
   "Exclude refs matching `my-magit-log-exclude-refs-regexp'."
-  (let ((excluded-refs
-         (when my-magit-log-exclude-refs-regexp
-           (seq-map (lambda (ref) (concat "^" ref))
-                    (seq-filter (lambda (ref)
-                                  (string-match-p
-                                   my-magit-log-exclude-refs-regexp
-                                   ref))
-                                (magit-list-refnames))))))
+  (let* ((exclude-refs-regexp
+          (concat (if my-magit-log-exclude-refs-regexp
+                      (concat my-magit-log-exclude-refs-regexp "\\|")
+                    "")
+                  (regexp-opt my-magit-log-excluded-refs)))
+         (excluded-refs
+          (seq-map (lambda (ref) (concat "^" ref))
+                   (seq-filter (lambda (ref)
+                                 (string-match-p exclude-refs-regexp ref))
+                               (magit-list-refnames)))))
     (funcall func (append excluded-refs args) files)))
 
 (with-eval-after-load "magit-log"
