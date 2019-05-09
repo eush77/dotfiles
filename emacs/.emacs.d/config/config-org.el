@@ -1027,7 +1027,7 @@ See `ws-start'."
       (with-current-buffer
           (let ((revert-without-query
                  (if revert-buffer-p
-                     (regexp-quote org-file)
+                     (cons (regexp-quote org-file) revert-without-query)
                    revert-without-query)))
             (find-file-noselect org-file))
         (with-current-buffer
