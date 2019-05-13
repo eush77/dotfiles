@@ -876,6 +876,35 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; URLs
 
+(defvar my-org-convert-url-property-patterns
+  '(("amazon\\.com/" . "AMAZON")
+    ("goodreads\\.com" . "GOODREADS")
+    ("imdb\\.com/" . "IMDB")
+    ("myanimelist\\.net" . "MYANIMELIST"))
+  "Alist of URL regexp patterns and default url property names.
+
+Used by `my-org-convert-url-property' when converting a link in
+the heading to a property.")
+
+(defun my-org-convert-url-get-title ()
+  (save-excursion
+   (org-back-to-heading)
+   (let ((case-fold-search))
+     (looking-at org-todo-line-regexp)
+     (goto-char (match-beginning 3))
+     (org-element-context))))
+
+(defun my-org-convert-url-get-link ()
+  (let ((title (my-org-convert-url-get-title)))
+    (and (eq (org-element-type title) 'link)
+         (org-element-property :raw-link title))))
+
+(defun my-org-convert-url-get-link-property (link)
+  (or (seq-some (pcase-lambda (`(,regexp . ,property))
+                  (and (string-match-p regexp link) property))
+                my-org-convert-url-property-patterns)
+      "URL"))
+
 (defun my-org-convert-url-property (type &optional property)
   "Move URL from a headling property to a link in the title and back.
 
@@ -887,39 +916,41 @@ If TYPE is symbol `toggle', convert between a property and a
 link.
 
 Optional argument PROPERTY specifies the name of property,
-defaults to \"URL\"."
+defaults to one given by `my-org-convert-url-property-patterns'
+if converting to a property and one of the patterns matches, or
+\"URL\" otherwise."
   (interactive
-   (list 'toggle
-         (let ((url-property
-                (car (seq-find
-                      (lambda (prop)
-                        (url-type (url-generic-parse-url (cdr prop))))
-                      (org-entry-properties)))))
-           (read-string "Property: " (or url-property "URL")))))
-  (unless property
-    (setq property "URL"))
-  (save-excursion
-    (org-back-to-heading)
-    (let* ((element (org-element-at-point))
-           (title (org-element-property :title element))
-           (url-prop (org-element-property (intern (concat ":" property))
-                                           element))
-           (title-context (let ((case-fold-search))
-                            (looking-at org-todo-line-regexp)
-                            (goto-char (match-beginning 3))
-                            (org-element-context)))
-           (link (and (eq (org-element-type title-context) 'link)
-                      (org-element-property :raw-link title-context)))
-           (link-contents
-            (and (eq (org-element-type title-context) 'link)
-                 (buffer-substring
-                  (org-element-property :contents-begin title-context)
-                  (org-element-property :contents-end title-context)))))
+   `(toggle ,(read-string
+              "Property: "
+              (if-let ((link (my-org-convert-url-get-link)))
+                  (my-org-convert-url-get-link-property link)
+                (or (seq-some
+                     (pcase-lambda (`(,property . ,value))
+                       (and (url-type (url-generic-parse-url value))
+                            property))
+                     (org-entry-properties))
+                    "URL")))))
+  (let* ((element (save-excursion
+                    (org-back-to-heading)
+                    (org-element-at-point)))
+         (title (my-org-convert-url-get-title))
+         (link (my-org-convert-url-get-link)))
+    (setq property
+          (or property
+              (and link (my-org-convert-url-get-link-property link))
+              "URL"))
+    (let ((url-prop
+           (org-element-property (intern (concat ":" property)) element)))
       (cond ((and url-prop (not link) (memq type '(link toggle)))
-             (org-edit-headline (org-make-link-string url-prop title))
+             (org-edit-headline
+              (org-make-link-string url-prop
+                                    (org-element-property :title element)))
              (org-delete-property property))
             ((and (not url-prop) link (memq type '(property toggle)))
-             (org-edit-headline link-contents)
+             (org-edit-headline
+              (buffer-substring
+               (org-element-property :contents-begin title)
+               (org-element-property :contents-end title)))
              (org-set-property property link))))))
 
 (defun my-org-convert-url-quote ()
