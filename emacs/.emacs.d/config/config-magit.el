@@ -94,10 +94,12 @@ Otherwise hide it, and show the previous sibling section."
                     "")
                   (regexp-opt my-magit-log-excluded-refs)))
          (excluded-refs
-          (seq-map (lambda (ref) (concat "^" ref))
-                   (seq-filter (lambda (ref)
-                                 (string-match-p exclude-refs-regexp ref))
-                               (magit-list-refnames)))))
+          (seq-mapcat
+           (lambda (ref)
+             (when (and (not (string-empty-p exclude-refs-regexp))
+                        (string-match-p exclude-refs-regexp ref))
+               (list (concat "^" ref))))
+           (magit-list-refnames))))
     (funcall func (append excluded-refs args) files)))
 
 (with-eval-after-load "magit-log"
