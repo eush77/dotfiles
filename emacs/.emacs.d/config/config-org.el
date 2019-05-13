@@ -363,6 +363,15 @@ Archive files are those matching `org-archive-location'."
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
                         (save-excursion (goto-char (point-min))
                                         (thing-at-point 'word))))
+         (body (concat
+                (string-trim
+                 (if (derived-mode-p 'exwm-mode)
+                     (with-selected-window (get-buffer-window)
+                       (exwm-input--fake-key ?\C-c)
+                       (sit-for .2)
+                       (current-kill 0 t))
+                   %i))
+                "\n"))
          (from (pcase major-mode
                  ('w3m-mode %:link)
                  ('gnus-article-mode
@@ -383,8 +392,11 @@ Archive files are those matching `org-archive-location'."
               (fill-region (point-min) (point-max))
               (buffer-string))
             "#+BEGIN_QUOTE\n"
-            (string-trim %i) "\n"
+            body
             "#+END_QUOTE\n")))
+
+(defun my-org-capture-region-context ()
+  (or (region-active-p) (derived-mode-p 'exwm-mode)))
 
 (defun my-org-capture-link (%U)
   "Store link at point / in the active region"
@@ -455,7 +467,7 @@ Archive files are those matching `org-archive-location'."
 (custom-set-variables
  '(org-capture-templates-contexts
    '(("c" (my-org-capture-current-link-context))
-     ("r" (region-active-p))
+     ("r" (my-org-capture-region-context))
      ("u" (my-org-capture-link-context))
      ("U" (my-org-capture-killed-link-context)))))
 
