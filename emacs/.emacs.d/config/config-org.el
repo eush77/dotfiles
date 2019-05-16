@@ -305,13 +305,6 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Capture
 
-(defun my-w3m-anchor-text ()
-  "Get anchor anchor at point."
-  (when (w3m-anchor)
-    (let ((begin (previous-single-property-change (+ (point) 1) 'face))
-          (end (next-single-property-change (point) 'face)))
-      (buffer-substring-no-properties begin end ))))
-
 (defun my-org-capture-current-link (%f %F %U %:description %:link)
   "Store current link / link to the current buffer"
   (pcase-let
@@ -358,46 +351,6 @@ Archive files are those matching `org-archive-location'."
                         (thing-at-point 'url))
                       kill-ring))))
 
-(defun my-org-capture-region (%f %i %U %:from %:link %:subject)
-  "Quote active region"
-  (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
-                        (save-excursion (goto-char (point-min))
-                                        (thing-at-point 'word))))
-         (body (concat
-                (string-trim
-                 (if (derived-mode-p 'exwm-mode)
-                     (with-selected-window (get-buffer-window)
-                       (exwm-input--fake-key ?\C-c)
-                       (sit-for .2)
-                       (current-kill 0 t))
-                   %i))
-                "\n"))
-         (from (pcase major-mode
-                 ('w3m-mode %:link)
-                 ('gnus-article-mode
-                  (format "\"%s\" (by %s)" %:subject %:from))
-                 ('magit-revision-mode
-                  (magit-rev-format "\"%s\" (%h by %an)" magit-id))
-                 (_ (if (string-empty-p %f) (buffer-name) %f))))
-         (subject (pcase major-mode
-                    ('w3m-mode w3m-current-title)
-                    ('gnus-article-mode %:subject)
-                    ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
-    (concat "* NEW %?" subject "\n"
-            ":LOGBOOK:\n"
-            "- State \"NEW\"        from              " %U "\n"
-            ":END:\n"
-            (with-temp-buffer
-              (insert "Captured from " from ":\n")
-              (fill-region (point-min) (point-max))
-              (buffer-string))
-            "#+BEGIN_QUOTE\n"
-            body
-            "#+END_QUOTE\n")))
-
-(defun my-org-capture-region-context ()
-  (or (region-active-p) (derived-mode-p 'exwm-mode)))
-
 (defun my-org-capture-link (%U)
   "Store link at point / in the active region"
   (if (region-active-p)
@@ -438,6 +391,46 @@ Archive files are those matching `org-archive-location'."
         (and (fboundp 'w3m-anchor) (w3m-anchor))
         (thing-at-point 'url))))
 
+(defun my-org-capture-region (%f %i %U %:from %:link %:subject)
+  "Quote active region"
+  (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
+                        (save-excursion (goto-char (point-min))
+                                        (thing-at-point 'word))))
+         (body (concat
+                (string-trim
+                 (if (derived-mode-p 'exwm-mode)
+                     (with-selected-window (get-buffer-window)
+                       (exwm-input--fake-key ?\C-c)
+                       (sit-for .2)
+                       (current-kill 0 t))
+                   %i))
+                "\n"))
+         (from (pcase major-mode
+                 ('w3m-mode %:link)
+                 ('gnus-article-mode
+                  (format "\"%s\" (by %s)" %:subject %:from))
+                 ('magit-revision-mode
+                  (magit-rev-format "\"%s\" (%h by %an)" magit-id))
+                 (_ (if (string-empty-p %f) (buffer-name) %f))))
+         (subject (pcase major-mode
+                    ('w3m-mode w3m-current-title)
+                    ('gnus-article-mode %:subject)
+                    ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
+    (concat "* NEW %?" subject "\n"
+            ":LOGBOOK:\n"
+            "- State \"NEW\"        from              " %U "\n"
+            ":END:\n"
+            (with-temp-buffer
+              (insert "Captured from " from ":\n")
+              (fill-region (point-min) (point-max))
+              (buffer-string))
+            "#+BEGIN_QUOTE\n"
+            body
+            "#+END_QUOTE\n")))
+
+(defun my-org-capture-region-context ()
+  (or (region-active-p) (derived-mode-p 'exwm-mode)))
+
 (custom-set-variables
  '(org-capture-templates
    `(("n" "New item" entry
@@ -456,44 +449,39 @@ Archive files are those matching `org-archive-location'."
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-current-link \"%f\" \"%F\" \"%U\"
                                        \"%:description\" \"%:link\"))")
+     ("k" ,(documentation 'my-org-capture-killed-link) entry
+      (file org-default-notes-file)
+      "%(my-org-capture-killed-link \"%U\")")
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-                  (my-org-capture-link \"%U\"))")
-     ("U" ,(documentation 'my-org-capture-killed-link) entry
-      (file org-default-notes-file)
-      "%(my-org-capture-killed-link \"%U\")"))))
-
-(custom-set-variables
+                  (my-org-capture-link \"%U\"))")))
  '(org-capture-templates-contexts
-   '(("c" (my-org-capture-current-link-context))
-     ("r" (my-org-capture-region-context))
-     ("u" (my-org-capture-link-context))
-     ("U" (my-org-capture-killed-link-context)))))
+   '(("r" (my-org-capture-region-context))
+     ("c" (my-org-capture-current-link-context))
+     ("k" (my-org-capture-killed-link-context))
+     ("u" (my-org-capture-link-context)))))
 
-(defun my-org-capture-select-template--display-buffer-action (func &rest args)
-  "Set up `display-buffer' action."
-  (let ((display-buffer-overriding-action '(display-buffer-at-bottom
-                                            . ((window-height . 0.15)))))
-    (apply func args)))
-(advice-add 'org-capture-select-template
-            :around #'my-org-capture-select-template--display-buffer-action)
-
-(defun my-org-capture-refile--save-target-buffer (func &rest args)
-  "Save target buffer after refiling an item from it."
-  (let ((base (or (buffer-base-buffer) (current-buffer))))
-    (apply func args)
-    (with-current-buffer base (save-buffer))))
-(advice-add 'org-capture-refile
-            :around #'my-org-capture-refile--save-target-buffer)
-
-(defun my-org-capture-refile--jump-to-refiled (&rest args)
+(define-advice org-capture-refile
+    (:after (&rest args) my-jump-to-refiled)
   "Jump to refiled items."
   (unless (eq (marker-buffer org-capture-last-stored-marker)
               (current-buffer))
     (org-goto-marker-or-bmk org-capture-last-stored-marker)))
-(advice-add 'org-capture-refile
-            :after #'my-org-capture-refile--jump-to-refiled)
+
+(define-advice org-capture-refile
+    (:around (func &rest args) my-save-target-buffer)
+  "Save target buffer after refiling an item from it."
+  (let ((base (or (buffer-base-buffer) (current-buffer))))
+    (apply func args)
+    (with-current-buffer base (save-buffer))))
+
+(define-advice org-capture-select-template
+    (:around (func &rest args) my-display-buffer-action)
+  "Set up `display-buffer' action."
+  (let ((display-buffer-overriding-action
+         '(display-buffer-at-bottom . ((window-height . 0.15)))))
+    (apply func args)))
 
 ;;; Clocking
 

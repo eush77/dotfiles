@@ -86,6 +86,16 @@ point instead."
                `(?P ,#'my-w3m-lnum-pocket-link-action "Add to Pocket")
                t))
 
+;;; my-w3m-anchor-text
+
+;;;###autoload
+(defun my-w3m-anchor-text ()
+  "Get anchor anchor at point."
+  (when (w3m-anchor)
+    (let ((begin (previous-single-property-change (+ (point) 1) 'face))
+          (end (next-single-property-change (point) 'face)))
+      (buffer-substring-no-properties begin end ))))
+
 ;;; w3m-bookmark-file
 
 (defun w3m-bookmark-file-modtime--chase-links (func &rest args)
