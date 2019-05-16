@@ -225,6 +225,14 @@ If FILE-NAME is not absolute, it is interpreted as relative to
             (org-agenda-finalize-entries entries)
             "\n\n")))
 
+(custom-set-variables
+ '(org-agenda-bulk-custom-functions
+   '((?y (lambda ()
+           (let ((org-inhibit-blocking t)
+                 (org-inhibit-logging 'note))
+             (org-agenda-todo-yesterday
+              (car org-done-keywords-for-agenda))))))))
+
 ;;; Archive
 
 (custom-set-variables '(org-archive-location "archive/%s::"))
