@@ -340,6 +340,19 @@ Archive files are those matching `org-archive-location'."
       (buffer-file-name)
       (my-xdg-web-browser-buffer-p)))
 
+(defun my-org-capture-extract-current-link (%U %:link)
+  "Extract info under the current link"
+  (with-temp-buffer
+    (funcall (my-org-extractor-insert-fn %:link) %:link)
+    (goto-char (point-max))
+    (insert (concat ":LOGBOOK:\n"
+                    "- State \"NEW\"        from              " %U "\n"
+                    ":END:\n"))
+    (buffer-string)))
+
+(defun my-org-capture-extract-current-link-context ()
+  (my-org-extractor w3m-current-url))
+
 (defvar my-org-capture-killed-link-urls nil
   "URLs from the kill ring.")
 
@@ -460,6 +473,10 @@ Archive files are those matching `org-archive-location'."
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-current-link \"%f\" \"%F\" \"%U\"
                                        \"%:description\" \"%:link\"))")
+     ("C" ,(documentation 'my-org-capture-extract-current-link) entry
+      (file org-default-notes-file)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-extract-current-link \"%U\" \"%:link\"))")
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
       "%(my-org-capture-killed-link \"%U\")")
@@ -470,6 +487,7 @@ Archive files are those matching `org-archive-location'."
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
+     ("C" (my-org-capture-extract-current-link-context))
      ("k" (my-org-capture-killed-link-context))
      ("u" (my-org-capture-link-context)))))
 
