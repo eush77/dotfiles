@@ -1,4 +1,8 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
+(add-to-list 'package-selected-packages 'enlive)
+(package-install-selected-packages)
+
+(require 'enlive)
 (require 'org-depend)
 (require 'subr-x)
 
@@ -551,9 +555,38 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Extract
 
+(defvar my-org-audible-properties
+  '(("By: " . "AUTHOR")
+    ("Narrated by: " . "NARRATOR")
+    ("Length: " . "DURATION"))
+  "Mapping from property lines on the Audible website to Org properties.
+
+Each element is a cons cell (PREFIX . PROPERTY).")
+
+(defun my-org-audible-insert (url)
+  "Insert headline for an Audible URL."
+  (interactive "sURL: ")
+  (when-let ((hero-content (enlive-query (enlive-fetch url) [.hero-content])))
+    (org-insert-heading)
+    (insert (enlive-text (enlive-query hero-content [h1])))
+    (org-set-tags ":audible:")
+    (org-set-property "AUDIBLE" url)
+    (dolist (span (enlive-query-all hero-content [.bc-row > .bc-text]))
+      (pcase-let*
+          ((text (string-trim (replace-regexp-in-string
+                               "[[:space:]\n]+" " "
+                               (enlive-text span))))
+           (`(,property . ,value)
+            (seq-some (pcase-lambda (`(,prefix . ,property))
+                        (when (string-prefix-p prefix text)
+                          (cons property (string-remove-prefix prefix text))))
+                      my-org-audible-properties)))
+        (when property
+          (org-set-property property value))))))
+
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
-    ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" ignore)
+    ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
     ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/" ignore)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
     ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore))
