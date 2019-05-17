@@ -566,23 +566,32 @@ Each element is a cons cell (PREFIX . PROPERTY).")
 (defun my-org-audible-insert (url)
   "Insert headline for an Audible URL."
   (interactive "sURL: ")
-  (when-let ((hero-content (enlive-query (enlive-fetch url) [.hero-content])))
-    (org-insert-heading)
-    (insert (enlive-text (enlive-query hero-content [h1])))
-    (org-set-tags ":audible:")
-    (org-set-property "AUDIBLE" url)
-    (dolist (span (enlive-query-all hero-content [.bc-row > .bc-text]))
-      (pcase-let*
-          ((text (string-trim (replace-regexp-in-string
-                               "[[:space:]\n]+" " "
-                               (enlive-text span))))
-           (`(,property . ,value)
-            (seq-some (pcase-lambda (`(,prefix . ,property))
-                        (when (string-prefix-p prefix text)
-                          (cons property (string-remove-prefix prefix text))))
-                      my-org-audible-properties)))
-        (when property
-          (org-set-property property value))))))
+  (let ((retry-count 0))
+    (cl-loop
+     (when (= retry-count 3)
+       (error "Could not scrape %s" url))
+     (let* ((hero-content (enlive-query (enlive-fetch url) [.hero-content]))
+            (title (enlive-text (enlive-query hero-content [h1]))))
+       (if (string-empty-p title)
+           (progn (sleep-for .1)
+                  (cl-incf retry-count))
+         (org-insert-heading)
+         (insert title)
+         (org-set-tags ":audible:")
+         (org-set-property "AUDIBLE" url)
+         (dolist (span (enlive-query-all hero-content [.bc-row > .bc-text]))
+           (pcase-let*
+               ((text (string-trim (replace-regexp-in-string
+                                    "[[:space:]\n]+" " "
+                                    (enlive-text span))))
+                (`(,property . ,value)
+                 (seq-some (pcase-lambda (`(,prefix . ,property))
+                             (when (string-prefix-p prefix text)
+                               (cons property (string-remove-prefix prefix text))))
+                           my-org-audible-properties)))
+             (when property
+               (org-set-property property value))))
+         (cl-return))))))
 
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
