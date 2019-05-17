@@ -351,10 +351,32 @@ Archive files are those matching `org-archive-location'."
     (buffer-string)))
 
 (defun my-org-capture-extract-current-link-context ()
-  (my-org-extractor w3m-current-url))
+  (and (derived-mode-p 'w3m-mode)
+       (my-org-extractor w3m-current-url)))
 
 (defvar my-org-capture-killed-link-urls nil
-  "URLs from the kill ring.")
+  "Urls from the kill ring.")
+
+(defvar my-org-capture-extract-killed-link-urls nil
+  "Extractable urls from the kill ring.")
+
+(define-advice org-contextualize-keys
+    (:before (&rest _) my-org-capture-killed-link-urls)
+  "Find urls in the kill ring.
+
+This computes `my-org-capture-killed-link-urls' and
+`my-org-capture-extract-killed-link-urls'."
+  (setq my-org-capture-killed-link-urls
+        (with-temp-buffer
+          (seq-mapcat (lambda (kill)
+                        (erase-buffer)
+                        (insert (string-trim kill))
+                        (when-let ((url (thing-at-point 'url)))
+                          (list url)))
+                      kill-ring)))
+  (setq my-org-capture-extract-killed-link-urls
+        (seq-filter #'my-org-extractor
+                    my-org-capture-killed-link-urls)))
 
 (defun my-org-capture-killed-link (%U)
   "Store link from the kill ring"
@@ -367,13 +389,24 @@ Archive files are those matching `org-archive-location'."
             ":END:\n")))
 
 (defun my-org-capture-killed-link-context ()
-  (setq my-org-capture-killed-link-urls
-        (with-temp-buffer
-          (seq-filter (lambda (kill)
-                        (erase-buffer)
-                        (insert (string-trim kill))
-                        (thing-at-point 'url))
-                      kill-ring))))
+  my-org-capture-killed-link-urls)
+
+(defun my-org-capture-extract-killed-link (%U)
+  "Extract info from a killed link"
+  (let ((url
+         (completing-read "Killed URL: "
+                          my-org-capture-extract-killed-link-urls)))
+    (with-temp-buffer
+      (funcall (my-org-extractor-insert-fn url) url)
+      (goto-char (point-max))
+      (insert (concat
+               ":LOGBOOK:\n"
+               "- State \"NEW\"        from              " %U "\n"
+               ":END:\n"))
+      (buffer-string))))
+
+(defun my-org-capture-extract-killed-link-context ()
+  my-org-capture-extract-killed-link-urls)
 
 (defun my-org-capture-link (%U)
   "Store link at point / in the active region"
@@ -480,6 +513,9 @@ Archive files are those matching `org-archive-location'."
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
       "%(my-org-capture-killed-link \"%U\")")
+     ("K" ,(documentation 'my-org-capture-extract-killed-link) entry
+      (file org-default-notes-file)
+      "%(my-org-capture-extract-killed-link \"%U\")")
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
@@ -489,6 +525,7 @@ Archive files are those matching `org-archive-location'."
      ("c" (my-org-capture-current-link-context))
      ("C" (my-org-capture-extract-current-link-context))
      ("k" (my-org-capture-killed-link-context))
+     ("K" (my-org-capture-extract-killed-link-context))
      ("u" (my-org-capture-link-context)))))
 
 (define-advice org-capture-refile
