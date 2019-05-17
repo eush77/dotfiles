@@ -549,6 +549,39 @@ Archive files are those matching `org-archive-location'."
  '(org-export-async-init-file
    (locate-user-emacs-file "ox-async-init.el")))
 
+;;; Extract
+
+(defcustom my-org-extractors
+  '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
+    ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" ignore)
+    ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/" ignore)
+    ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
+    ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore))
+  "List of extractors configured for URLs.
+
+Each extractor is a triple (NAME URL-REGEXP INSERT-FN), where
+URL-REGEXP specifies urls the extractor can operate on, and
+INSERT-FN is a function that inserts the title and info from the
+url into the current buffer as a headline with properties."
+  :group 'my
+  :type '(repeat (list (string :tag "Name")
+                       (string :tag "URL Regexp")
+                       (function :tag "Insert Function"))))
+
+(defun my-org-extractor (url)
+  "Get the extractor matching URL."
+  (seq-some (pcase-lambda ((and extractor `(_ ,url-regexp _)))
+              (and (string-match-p url-regexp url) extractor))
+            my-org-extractors))
+
+(defun my-org-extractor-name (url)
+  "Get the name of the extractor matching URL."
+  (first (my-org-extractor url)))
+
+(defun my-org-extractor-insert-fn (url)
+  "Get the insert function of the extractor matching URL."
+  (third (my-org-extractor url)))
+
 ;;; ff-get-other-file
 
 (defun my-locate-org-file (file)
@@ -848,16 +881,6 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; URLs
 
-(defvar my-org-convert-url-property-patterns
-  '(("amazon\\.com/" . "AMAZON")
-    ("goodreads\\.com" . "GOODREADS")
-    ("imdb\\.com/" . "IMDB")
-    ("myanimelist\\.net" . "MYANIMELIST"))
-  "Alist of URL regexp patterns and default url property names.
-
-Used by `my-org-convert-url-property' when converting a link in
-the heading to a property.")
-
 (defun my-org-convert-url-get-title ()
   (save-excursion
    (org-back-to-heading)
@@ -870,12 +893,6 @@ the heading to a property.")
   (let ((title (my-org-convert-url-get-title)))
     (and (eq (org-element-type title) 'link)
          (org-element-property :raw-link title))))
-
-(defun my-org-convert-url-get-link-property (link)
-  (or (seq-some (pcase-lambda (`(,regexp . ,property))
-                  (and (string-match-p regexp link) property))
-                my-org-convert-url-property-patterns)
-      "URL"))
 
 (defun my-org-convert-url-property (type &optional property)
   "Move URL from a headling property to a link in the title and back.
@@ -894,14 +911,14 @@ if converting to a property and one of the patterns matches, or
   (interactive
    `(toggle ,(read-string
               "Property: "
-              (if-let ((link (my-org-convert-url-get-link)))
-                  (my-org-convert-url-get-link-property link)
-                (or (seq-some
+              (or (if-let ((link (my-org-convert-url-get-link)))
+                      (my-org-extractor-name link)
+                    (seq-some
                      (pcase-lambda (`(,property . ,value))
                        (and (url-type (url-generic-parse-url value))
                             property))
-                     (org-entry-properties))
-                    "URL")))))
+                     (org-entry-properties)))
+                  "URL"))))
   (let* ((element (save-excursion
                     (org-back-to-heading)
                     (org-element-at-point)))
@@ -909,7 +926,7 @@ if converting to a property and one of the patterns matches, or
          (link (my-org-convert-url-get-link)))
     (setq property
           (or property
-              (and link (my-org-convert-url-get-link-property link))
+              (and link (my-org-extractor-name link))
               "URL"))
     (let ((url-prop
            (org-element-property (intern (concat ":" property)) element)))

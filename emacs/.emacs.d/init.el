@@ -29,6 +29,7 @@
     (my-org-agenda-context-filter custom-variable)
     (my-org-agenda-todo-keyword-filter custom-variable)
     (my-org-cabinet-directory custom-variable)
+    (my-org-extractors custom-variable)
     (my-org-notes-directory custom-variable)
     (my-org-plan-directory custom-variable)
     (my-rr-replay-buffer-name custom-variable)
