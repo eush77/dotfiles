@@ -334,19 +334,22 @@ Archive files are those matching `org-archive-location'."
     (buffer-string)))
 
 (defun my-org-capture-extract-tree (url)
-  "Generate Org capture tree extracted from URL."
-  (with-temp-buffer
-    (my-org-extractor-insert url)
-    (let ((case-fold-search))
-      (org-back-to-heading)
-      (looking-at org-heading-regexp)
-      (goto-char (match-beginning 2))
-      (insert "%?"))
-    (my-org-capture-set-todo-keyword)
-    (buffer-string)))
+  "Generate Org capture tree extracted from URL.
+
+Returns nil if there is no extractor for URL."
+  (when-let ((insert-fn (my-org-extractor-insert-fn url)))
+    (with-temp-buffer
+      (funcall insert-fn url)
+      (let ((case-fold-search))
+        (org-back-to-heading)
+        (looking-at org-heading-regexp)
+        (goto-char (match-beginning 2))
+        (insert "%?"))
+      (my-org-capture-set-todo-keyword)
+      (buffer-string))))
 
 (defun my-org-capture-current-link (%f %F %:description %:link)
-  "Store current link / link to the current buffer"
+  "Current link"
   (pcase-let
       ((`(,link . ,description)
         (cond ((derived-mode-p 'gnus-article-mode 'w3m-mode)
@@ -359,33 +362,26 @@ Archive files are those matching `org-archive-location'."
                    (message message)
                    (error message))))
               (t (cons (concat "file:" %F) %f)))))
-    (my-org-capture-tree (org-make-link-string link description))))
+    (or (my-org-capture-extract-tree link)
+        (my-org-capture-tree (org-make-link-string link description)))))
 
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
       (buffer-file-name)
       (my-xdg-web-browser-buffer-p)))
 
-(defun my-org-capture-extract-current-link (%:link)
-  "Extract info under the current link"
-  (my-org-capture-extract-tree %:link))
-
-(defun my-org-capture-extract-current-link-context ()
-  (and (derived-mode-p 'w3m-mode)
-       (my-org-extractor w3m-current-url)))
-
 (defvar my-org-capture-killed-link-urls nil
   "Urls from the kill ring.")
 
-(defvar my-org-capture-extract-killed-link-urls nil
-  "Extractable urls from the kill ring.")
+(defun my-org-capture-killed-link ()
+  "Link from the kill ring"
+  (let ((link (completing-read "Killed URL: "
+                               my-org-capture-killed-link-urls)))
+    (or (my-org-capture-extract-tree link)
+        (let ((description (read-string "Description: " link)))
+          (my-org-capture-tree (org-make-link-string link description))))))
 
-(define-advice org-contextualize-keys
-    (:before (&rest _) my-org-capture-killed-link-urls)
-  "Find urls in the kill ring.
-
-This computes `my-org-capture-killed-link-urls' and
-`my-org-capture-extract-killed-link-urls'."
+(defun my-org-capture-killed-link-context ()
   (setq my-org-capture-killed-link-urls
         (with-temp-buffer
           (seq-mapcat (lambda (kill)
@@ -393,29 +389,7 @@ This computes `my-org-capture-killed-link-urls' and
                         (insert (string-trim kill))
                         (when-let ((url (thing-at-point 'url)))
                           (list url)))
-                      kill-ring)))
-  (setq my-org-capture-extract-killed-link-urls
-        (seq-filter #'my-org-extractor
-                    my-org-capture-killed-link-urls)))
-
-(defun my-org-capture-killed-link ()
-  "Store link from the kill ring"
-  (let* ((link (completing-read "Killed URL: "
-                                my-org-capture-killed-link-urls))
-         (description (read-string "Description: " link)))
-    (my-org-capture-tree (org-make-link-string link description))))
-
-(defun my-org-capture-killed-link-context ()
-  my-org-capture-killed-link-urls)
-
-(defun my-org-capture-extract-killed-link ()
-  "Extract info from a killed link"
-  (my-org-capture-extract-tree
-   (completing-read "Killed URL: "
-                    my-org-capture-extract-killed-link-urls)))
-
-(defun my-org-capture-extract-killed-link-context ()
-  my-org-capture-extract-killed-link-urls)
+                      kill-ring))))
 
 (defun my-org-capture-link ()
   "Store link at point / in the active region"
@@ -510,16 +484,9 @@ This computes `my-org-capture-killed-link-urls' and
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-current-link \"%f\" \"%F\"
                                        \"%:description\" \"%:link\"))")
-     ("C" ,(documentation 'my-org-capture-extract-current-link) entry
-      (file org-default-notes-file)
-      "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-extract-current-link \"%:link\"))")
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
       "%(my-org-capture-killed-link)")
-     ("K" ,(documentation 'my-org-capture-extract-killed-link) entry
-      (file org-default-notes-file)
-      "%(my-org-capture-extract-killed-link)")
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
@@ -527,9 +494,7 @@ This computes `my-org-capture-killed-link-urls' and
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
-     ("C" (my-org-capture-extract-current-link-context))
      ("k" (my-org-capture-killed-link-context))
-     ("K" (my-org-capture-extract-killed-link-context))
      ("u" (my-org-capture-link-context)))))
 
 (define-advice org-capture-refile
@@ -682,10 +647,6 @@ url into the current buffer as a headline with properties."
 (defun my-org-extractor-insert-fn (url)
   "Get the insert function of the extractor matching URL."
   (third (my-org-extractor url)))
-
-(defun my-org-extractor-insert (url)
-  "Extract info from an URL and insert it as a headline."
-  (funcall (my-org-extractor-insert-fn url) url))
 
 ;;; ff-get-other-file
 
