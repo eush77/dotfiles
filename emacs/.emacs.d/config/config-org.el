@@ -325,11 +325,16 @@ Archive files are those matching `org-archive-location'."
     (org-todo "NEW")
     (org-add-log-note)))
 
+(defvar my-org-capture-position-cursor t
+  "Non-nil if capture templates include cursor positioning %?.")
+
 (defun my-org-capture-tree (title)
   "Generate Org capture tree with TITLE."
   (with-temp-buffer
     (org-insert-heading)
-    (insert (concat "%?" title))
+    (insert (if my-org-capture-position-cursor
+                (concat "%?" title)
+              title))
     (my-org-capture-set-todo-keyword)
     (buffer-string)))
 
@@ -340,11 +345,12 @@ Returns nil if there is no extractor for URL."
   (when-let ((insert-fn (my-org-extractor-insert-fn url)))
     (with-temp-buffer
       (funcall insert-fn url)
-      (let ((case-fold-search))
-        (org-back-to-heading)
-        (looking-at org-heading-regexp)
-        (goto-char (match-beginning 2))
-        (insert "%?"))
+      (when my-org-capture-position-cursor
+        (let ((case-fold-search))
+          (org-back-to-heading)
+          (looking-at org-heading-regexp)
+          (goto-char (match-beginning 2))
+          (insert "%?")))
       (my-org-capture-set-todo-keyword)
       (buffer-string))))
 
@@ -413,21 +419,23 @@ Returns nil if there is no extractor for URL."
 
 (defun my-org-capture-links ()
   "Links in the active region"
-  (let ((headings))
+  (let ((my-org-capture-position-cursor)
+        (trees))
     (save-excursion
-      (deactivate-mark)
       (save-restriction
-        (narrow-to-region (mark) (point))
+        (narrow-to-region (region-beginning) (region-end))
         (goto-char (point-min))
         (when (w3m-anchor)
           (save-restriction
             (widen)
-            (push (my-org-capture-link) headings)))
+            (push (my-org-capture-link) trees)))
         (while (w3m-goto-next-anchor)
-          (save-restriction
-            (widen)
-            (push (my-org-capture-link) headings)))))
-    (mapconcat #'identity (reverse headings) "")))
+          (when (w3m-anchor)            ; Skip forms
+            (save-excursion
+              (save-restriction
+                (widen)
+                (push (my-org-capture-link) trees)))))))
+    (mapconcat #'identity (reverse trees) "")))
 
 (defun my-org-capture-links-context ()
   (and (region-active-p) (eq major-mode 'w3m-mode)))
