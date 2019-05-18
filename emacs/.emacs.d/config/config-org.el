@@ -392,48 +392,52 @@ Returns nil if there is no extractor for URL."
                       kill-ring))))
 
 (defun my-org-capture-link ()
-  "Store link at point / in the active region"
-  (if (region-active-p)
-      (let ((headings))
-        (save-excursion
-          (deactivate-mark)
-          (save-restriction
-            (narrow-to-region (mark) (point))
-            (goto-char (point-min))
-            (when (w3m-anchor)
-              (save-restriction
-                (widen)
-                (push (my-org-capture-link) headings)))
-            (while (w3m-goto-next-anchor)
-              (save-restriction
-                (widen)
-                (push (my-org-capture-link) headings)))))
-        (mapconcat #'identity (reverse headings) ""))
-    (let ((link (or (w3m-anchor)
-                    (thing-at-point 'url)
-                    (buffer-local-value
-                     'w3m-current-url
-                     (w3m-select-buffer-current-buffer))))
-          (description (or (my-w3m-anchor-text)
-                           (thing-at-point 'url)
-                           (w3m-buffer-title
-                            (w3m-select-buffer-current-buffer)))))
-      (my-org-capture-tree (org-make-link-string link description)))))
+  "Link at point"
+  (let ((link
+         (or (w3m-anchor)
+             (thing-at-point 'url)
+             (buffer-local-value 'w3m-current-url
+                                 (w3m-select-buffer-current-buffer)))))
+    (or (my-org-capture-extract-tree link)
+        (my-org-capture-tree
+         (org-make-link-string
+          link
+          (or (my-w3m-anchor-text)
+              (thing-at-point 'url)
+              (w3m-buffer-title (w3m-select-buffer-current-buffer))))))))
 
 (defun my-org-capture-link-context ()
-  "Context for `my-org-capture-link' template."
-  (if (region-active-p)
-      (eq major-mode 'w3m-mode)
-    (or (eq major-mode 'w3m-select-buffer-mode)
-        (and (fboundp 'w3m-anchor) (w3m-anchor))
-        (thing-at-point 'url))))
+  (or (eq major-mode 'w3m-select-buffer-mode)
+      (and (fboundp 'w3m-anchor) (w3m-anchor))
+      (thing-at-point 'url)))
+
+(defun my-org-capture-links ()
+  "Links in the active region"
+  (let ((headings))
+    (save-excursion
+      (deactivate-mark)
+      (save-restriction
+        (narrow-to-region (mark) (point))
+        (goto-char (point-min))
+        (when (w3m-anchor)
+          (save-restriction
+            (widen)
+            (push (my-org-capture-link) headings)))
+        (while (w3m-goto-next-anchor)
+          (save-restriction
+            (widen)
+            (push (my-org-capture-link) headings)))))
+    (mapconcat #'identity (reverse headings) "")))
+
+(defun my-org-capture-links-context ()
+  (and (region-active-p) (eq major-mode 'w3m-mode)))
 
 (defun my-org-capture-new ()
   "New item"
   (my-org-capture-tree ""))
 
 (defun my-org-capture-region (%f %i %:from %:link %:subject)
-  "Quote active region"
+  "Active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
                         (save-excursion (goto-char (point-min))
                                         (thing-at-point 'word))))
@@ -490,12 +494,17 @@ Returns nil if there is no extractor for URL."
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-link))")))
+          (my-org-capture-link))")
+     ("U" ,(documentation 'my-org-capture-links) entry
+      (file org-default-notes-file)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-links))")))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
      ("k" (my-org-capture-killed-link-context))
-     ("u" (my-org-capture-link-context)))))
+     ("u" (my-org-capture-link-context))
+     ("U" (my-org-capture-links-context)))))
 
 (define-advice org-capture-refile
     (:after (&rest args) my-jump-to-refiled)
