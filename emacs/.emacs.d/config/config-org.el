@@ -316,7 +316,36 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Capture
 
-(defun my-org-capture-current-link (%f %F %U %:description %:link)
+(defun my-org-capture-set-todo-keyword ()
+  "Set todo keyword on the current headline."
+  (let ((org-inhibit-blocking t)
+        (org-inhibit-logging 'note)
+        (org-todo-keywords '((sequence "NEW(!)" "|" "DONE"))))
+    (org-mode)
+    (org-todo "NEW")
+    (org-add-log-note)))
+
+(defun my-org-capture-tree (title)
+  "Generate Org capture tree with TITLE."
+  (with-temp-buffer
+    (org-insert-heading)
+    (insert (concat "%?" title))
+    (my-org-capture-set-todo-keyword)
+    (buffer-string)))
+
+(defun my-org-capture-extract-tree (url)
+  "Generate Org capture tree extracted from URL."
+  (with-temp-buffer
+    (my-org-extractor-insert url)
+    (let ((case-fold-search))
+      (org-back-to-heading)
+      (looking-at org-heading-regexp)
+      (goto-char (match-beginning 2))
+      (insert "%?"))
+    (my-org-capture-set-todo-keyword)
+    (buffer-string)))
+
+(defun my-org-capture-current-link (%f %F %:description %:link)
   "Store current link / link to the current buffer"
   (pcase-let
       ((`(,link . ,description)
@@ -330,25 +359,16 @@ Archive files are those matching `org-archive-location'."
                    (message message)
                    (error message))))
               (t (cons (concat "file:" %F) %f)))))
-    (concat "* NEW " (org-make-link-string link description) "\n"
-            ":LOGBOOK:\n"
-            "- State \"NEW\"        from              " %U "\n"
-            ":END:\n")))
+    (my-org-capture-tree (org-make-link-string link description))))
 
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
       (buffer-file-name)
       (my-xdg-web-browser-buffer-p)))
 
-(defun my-org-capture-extract-current-link (%U %:link)
+(defun my-org-capture-extract-current-link (%:link)
   "Extract info under the current link"
-  (with-temp-buffer
-    (funcall (my-org-extractor-insert-fn %:link) %:link)
-    (goto-char (point-max))
-    (insert (concat ":LOGBOOK:\n"
-                    "- State \"NEW\"        from              " %U "\n"
-                    ":END:\n"))
-    (buffer-string)))
+  (my-org-capture-extract-tree %:link))
 
 (defun my-org-capture-extract-current-link-context ()
   (and (derived-mode-p 'w3m-mode)
@@ -378,37 +398,26 @@ This computes `my-org-capture-killed-link-urls' and
         (seq-filter #'my-org-extractor
                     my-org-capture-killed-link-urls)))
 
-(defun my-org-capture-killed-link (%U)
+(defun my-org-capture-killed-link ()
   "Store link from the kill ring"
   (let* ((link (completing-read "Killed URL: "
                                 my-org-capture-killed-link-urls))
          (description (read-string "Description: " link)))
-    (concat "* NEW " (org-make-link-string link description) "\n"
-            ":LOGBOOK:\n"
-            "- State \"NEW\"        from              " %U "\n"
-            ":END:\n")))
+    (my-org-capture-tree (org-make-link-string link description))))
 
 (defun my-org-capture-killed-link-context ()
   my-org-capture-killed-link-urls)
 
-(defun my-org-capture-extract-killed-link (%U)
+(defun my-org-capture-extract-killed-link ()
   "Extract info from a killed link"
-  (let ((url
-         (completing-read "Killed URL: "
-                          my-org-capture-extract-killed-link-urls)))
-    (with-temp-buffer
-      (funcall (my-org-extractor-insert-fn url) url)
-      (goto-char (point-max))
-      (insert (concat
-               ":LOGBOOK:\n"
-               "- State \"NEW\"        from              " %U "\n"
-               ":END:\n"))
-      (buffer-string))))
+  (my-org-capture-extract-tree
+   (completing-read "Killed URL: "
+                    my-org-capture-extract-killed-link-urls)))
 
 (defun my-org-capture-extract-killed-link-context ()
   my-org-capture-extract-killed-link-urls)
 
-(defun my-org-capture-link (%U)
+(defun my-org-capture-link ()
   "Store link at point / in the active region"
   (if (region-active-p)
       (let ((headings))
@@ -420,11 +429,11 @@ This computes `my-org-capture-killed-link-urls' and
             (when (w3m-anchor)
               (save-restriction
                 (widen)
-                (push (my-org-capture-link %U) headings)))
+                (push (my-org-capture-link) headings)))
             (while (w3m-goto-next-anchor)
               (save-restriction
                 (widen)
-                (push (my-org-capture-link %U) headings)))))
+                (push (my-org-capture-link) headings)))))
         (mapconcat #'identity (reverse headings) ""))
     (let ((link (or (w3m-anchor)
                     (thing-at-point 'url)
@@ -435,10 +444,7 @@ This computes `my-org-capture-killed-link-urls' and
                            (thing-at-point 'url)
                            (w3m-buffer-title
                             (w3m-select-buffer-current-buffer)))))
-      (concat "* NEW " (org-make-link-string link description) "\n"
-              ":LOGBOOK:\n"
-              "- State \"NEW\"        from              " %U "\n"
-              ":END:\n"))))
+      (my-org-capture-tree (org-make-link-string link description)))))
 
 (defun my-org-capture-link-context ()
   "Context for `my-org-capture-link' template."
@@ -448,7 +454,11 @@ This computes `my-org-capture-killed-link-urls' and
         (and (fboundp 'w3m-anchor) (w3m-anchor))
         (thing-at-point 'url))))
 
-(defun my-org-capture-region (%f %i %U %:from %:link %:subject)
+(defun my-org-capture-new ()
+  "New item"
+  (my-org-capture-tree ""))
+
+(defun my-org-capture-region (%f %i %:from %:link %:subject)
   "Quote active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
                         (save-excursion (goto-char (point-min))
@@ -473,10 +483,7 @@ This computes `my-org-capture-killed-link-urls' and
                     ('w3m-mode w3m-current-title)
                     ('gnus-article-mode %:subject)
                     ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
-    (concat "* NEW %?" subject "\n"
-            ":LOGBOOK:\n"
-            "- State \"NEW\"        from              " %U "\n"
-            ":END:\n"
+    (concat (my-org-capture-tree subject)
             (with-temp-buffer
               (insert "Captured from " from ":\n")
               (fill-region (point-min) (point-max))
@@ -490,36 +497,33 @@ This computes `my-org-capture-killed-link-urls' and
 
 (custom-set-variables
  '(org-capture-templates
-   `(("n" "New item" entry
+   `(("n" ,(documentation 'my-org-capture-new) entry
       (file org-default-notes-file)
-      ,(concat "* NEW %?\n"
-               ":LOGBOOK:\n"
-               "- State \"NEW\"        from              %U\n"
-               ":END:\n"))
+      "%(my-org-capture-new)")
      ("r" ,(documentation 'my-org-capture-region) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-                   (my-org-capture-region
-                    \"%f\" \"%i\" \"%U\" \"%:from\" \"%:link\" \"%:subject\"))")
+          (my-org-capture-region \"%f\" \"%i\"
+                                 \"%:from\" \"%:link\" \"%:subject\"))")
      ("c" ,(documentation 'my-org-capture-current-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-current-link \"%f\" \"%F\" \"%U\"
+          (my-org-capture-current-link \"%f\" \"%F\"
                                        \"%:description\" \"%:link\"))")
      ("C" ,(documentation 'my-org-capture-extract-current-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-extract-current-link \"%U\" \"%:link\"))")
+          (my-org-capture-extract-current-link \"%:link\"))")
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
-      "%(my-org-capture-killed-link \"%U\")")
+      "%(my-org-capture-killed-link)")
      ("K" ,(documentation 'my-org-capture-extract-killed-link) entry
       (file org-default-notes-file)
-      "%(my-org-capture-extract-killed-link \"%U\")")
+      "%(my-org-capture-extract-killed-link)")
      ("u" ,(documentation 'my-org-capture-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-                  (my-org-capture-link \"%U\"))")))
+          (my-org-capture-link))")))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
@@ -678,6 +682,10 @@ url into the current buffer as a headline with properties."
 (defun my-org-extractor-insert-fn (url)
   "Get the insert function of the extractor matching URL."
   (third (my-org-extractor url)))
+
+(defun my-org-extractor-insert (url)
+  "Extract info from an URL and insert it as a headline."
+  (funcall (my-org-extractor-insert-fn url) url))
 
 ;;; ff-get-other-file
 
