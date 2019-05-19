@@ -634,10 +634,45 @@ Each element is a cons cell (PREFIX . PROPERTY).")
                (org-set-property property value))))
          (cl-return))))))
 
+(defvar my-org-goodreads-properties
+  '(("author" . "AUTHOR")
+    ("numberOfPages" . "PAGES")
+    ("isbn" . "ISBN")
+    ("inLanguage" . "LANGUAGE"))
+  "Mapping from itemprop html properties on the Goodreads website to Org properties.
+
+Each element is a cons cell (ITEMPROP . PROPERTY).")
+
+(defun my-org-goodreads-insert (url)
+  "Insert headline for a Goodreads URL."
+  (interactive "sURL: ")
+  (let ((metacol (enlive-get-element-by-id (enlive-fetch url) "metacol")))
+    (org-insert-heading)
+    (insert (string-trim
+             (enlive-text (enlive-get-element-by-id metacol "bookTitle"))))
+    (org-set-tags ":book:")
+    (org-set-property "GOODREADS" url)
+    (let ((series
+           (string-trim (enlive-text
+                         (enlive-get-element-by-id metacol "bookSeries")))))
+      (unless (string-empty-p series)
+        (org-set-property
+         "SERIES"
+         (replace-regexp-in-string "\\`(\\(.*\\))\\'" "\\1" series))))
+    (dolist (el (enlive-filter metacol
+                               (lambda (el) (enlive-attr el 'itemprop))))
+      (when-let ((property (cdr (assoc (enlive-attr el'itemprop)
+                                       my-org-goodreads-properties))))
+        (org-set-property
+         property
+         (string-trim (replace-regexp-in-string "[[:space:]\n]+" " "
+                                                (enlive-text el))))))))
+
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
     ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
-    ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/" ignore)
+    ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/"
+     my-org-goodreads-insert)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
     ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore))
   "List of extractors configured for URLs.
