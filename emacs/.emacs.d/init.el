@@ -179,6 +179,7 @@
 (with-eval-after-load "swap-buffers" (load "config-swap-buffers"))
 (with-eval-after-load "tex-mode" (load "config-tex"))
 (with-eval-after-load "view" (load "config-view"))
+(with-eval-after-load "web-server" (load "config-web-server"))
 (with-eval-after-load "which-func" (load "config-which-func"))
 (with-eval-after-load "window-jump" (load "config-window-jump"))
 (with-eval-after-load "xref" (load "config-xref"))
