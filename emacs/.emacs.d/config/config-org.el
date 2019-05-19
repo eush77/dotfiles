@@ -1126,53 +1126,42 @@ If NO-MARK-DONE is non-nil, don't change the entry state."
 
 ;;; Web Server
 
-(defun my-org-web-server-agenda-handler
-    (agenda-command &optional revert-buffers-p &rest agenda-args)
-  "Create request handler for Org agenda command.
+(defun my-ws-send-org-agenda
+    (process agenda-command &optional revert-buffers-p &rest agenda-args)
+  "Render agenda buffer as html and send to PROCESS.
 
 AGENDA-COMMAND is the agenda function to call. AGENDA-ARGS are
 the arguments to this function.
 
-If REVERT-BUFFER-P is non-nil, revert Org buffers without asking.
+If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
+  (when revert-buffers-p
+    (cl-letf (((symbol-function 'yes-or-no-p) (lambda (_) t)))
+      (org-revert-all-org-buffers)))
+  (with-current-buffer
+      (save-window-excursion
+        (apply agenda-command agenda-args)
+        (org-agenda-redo t)
+        (htmlize-buffer))
+    (ws-response-header process 200 '("Content-Type" . "text/html"))
+    (process-send-region process (point-min) (point-max))))
 
-See `ws-start'."
-  (lambda (request)
-    (with-slots (process) request
-      (when revert-buffers-p
-        (cl-letf (((symbol-function 'yes-or-no-p) (lambda (_) t)))
-          (org-revert-all-org-buffers)))
-      (with-current-buffer
-          (save-window-excursion
-            (apply agenda-command agenda-args)
-            (org-agenda-redo t)
-            (htmlize-buffer))
-        (ws-response-header process 200 '("Content-Type" . "text/html"))
-        (process-send-region process (point-min) (point-max))))))
+(defun my-ws-send-org-html
+    (process org-file &optional revert-buffer-p)
+  "Export ORG-FILE as html and send to PROCESS.
 
-(defun my-org-web-server-html-export-handler
-    (org-file &optional revert-buffer-p)
-  "Create request handler for exporting ORG-FILE as html.
-
-ORG-FILE is the name of the file to export, relative to the
-`org-directory'.
-
-If REVERT-BUFFER-P is non-nil, revert Org buffer without asking.
-
-See `ws-start'."
+If REVERT-BUFFER-P is non-nil, revert Org buffer without asking."
   (setq org-file (expand-file-name org-file org-directory))
-  (lambda (request)
-    (with-slots (process) request
-      (with-current-buffer
-          (let ((revert-without-query
-                 (if revert-buffer-p
-                     (cons (regexp-quote org-file) revert-without-query)
-                   revert-without-query)))
-            (find-file-noselect org-file))
-        (with-current-buffer
-            (let ((org-export-show-temporary-export-buffer))
-              (org-html-export-as-html))
-          (ws-response-header process 200 '("Content-Type" . "text/html"))
-          (process-send-region process (point-min) (point-max)))))))
+  (with-current-buffer
+      (let ((revert-without-query
+             (if revert-buffer-p
+                 (cons (regexp-quote org-file) revert-without-query)
+               revert-without-query)))
+        (find-file-noselect org-file))
+    (with-current-buffer
+        (let ((org-export-show-temporary-export-buffer))
+          (org-html-export-as-html))
+      (ws-response-header process 200 '("Content-Type" . "text/html"))
+      (process-send-region process (point-min) (point-max)))))
 
 ;;; Keymap
 
