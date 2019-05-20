@@ -1154,7 +1154,8 @@ If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
         (org-agenda-redo t)
         (htmlize-buffer))
     (ws-response-header process 200 '("Content-Type" . "text/html"))
-    (process-send-region process (point-min) (point-max))))
+    (process-send-region process (point-min) (point-max))
+    (kill-buffer)))
 
 (defun my-ws-send-org-html
     (process org-file &optional revert-buffer-p)
