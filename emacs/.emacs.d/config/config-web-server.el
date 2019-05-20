@@ -13,3 +13,15 @@
                        (concat value "; charset=utf-8")
                      value)))
            headers)))))
+
+(defun my-ws-send-directory-list (process directory)
+  "Send a listing of files in DIRECTORY to PROCESS.
+
+Like `ws-send-directory-list', but render a Dired buffer
+instead."
+  (with-current-buffer
+      (save-window-excursion
+        (htmlize-buffer (dired directory)))
+    (ws-response-header process 200 '("Content-Type" . "text/html"))
+    (process-send-region process (point-min) (point-max))
+    (kill-buffer)))
