@@ -141,6 +141,29 @@ alternative names."
 
 (add-hook 'dired-mode-hook #'my-dired-ff-mode-hook)
 
+;;; htmlize
+
+(define-advice dired-insert-set-properties
+    (:after (begin end) my-htmlize-link)
+  "Add `htmlize-link' text properties.
+
+This is used by `htmlize' to insert html links to files."
+  (save-excursion
+    (goto-char begin)
+    (while (< (point) end)
+      (when-let ((filename-begin (dired-move-to-filename)))
+        (let* ((filename-end (dired-move-to-end-of-filename))
+               (filename (buffer-substring filename-begin filename-end))
+               (directory-p (file-directory-p
+                             (expand-file-name filename
+                                               (if (consp dired-directory)
+                                                   (car dired-directory)
+                                                 dired-directory)))))
+          (put-text-property filename-begin filename-end 'htmlize-link
+                             (url-encode-url
+                              (concat filename (and directory-p "/"))))))
+      (forward-line 1))))
+
 ;;; dired-mode-map
 
 (define-key dired-mode-map (kbd "C-M-n") #'window-jump-down)
