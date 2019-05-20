@@ -634,6 +634,9 @@ Each element is a cons cell (PREFIX . PROPERTY).")
                (org-set-property property value))))
          (cl-return))))))
 
+(defvar my-org-goodreads-genre-limit 3
+  "Maximum number of genres inserted into GENRES property.")
+
 (defvar my-org-goodreads-properties
   '(("author" . "AUTHOR")
     ("numberOfPages" . "PAGES")
@@ -646,7 +649,8 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 (defun my-org-goodreads-insert (url)
   "Insert headline for a Goodreads URL."
   (interactive "sURL: ")
-  (let ((metacol (enlive-get-element-by-id (enlive-fetch url) "metacol")))
+  (let* ((page (enlive-fetch url))
+         (metacol (enlive-get-element-by-id page "metacol")))
     (org-insert-heading)
     (insert (string-trim
              (enlive-text (enlive-get-element-by-id metacol "bookTitle"))))
@@ -659,6 +663,13 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
         (org-set-property
          "SERIES"
          (replace-regexp-in-string "\\`(\\(.*\\))\\'" "\\1" series))))
+    (org-set-property
+     "GENRES"
+     (mapconcat #'enlive-text
+                (seq-take (enlive-query-all page
+                                            [.left > .bookPageGenreLink])
+                          my-org-goodreads-genre-limit)
+                ", "))
     (dolist (el (enlive-filter metacol
                                (lambda (el) (enlive-attr el 'itemprop))))
       (when-let ((property (cdr (assoc (enlive-attr el'itemprop)
