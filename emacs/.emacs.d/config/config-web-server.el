@@ -21,7 +21,9 @@ Like `ws-send-directory-list', but render a Dired buffer
 instead."
   (with-current-buffer
       (save-window-excursion
-        (htmlize-buffer (dired directory)))
+        (dired directory)
+        (dired-revert)
+        (htmlize-buffer))
     (ws-response-header process 200 '("Content-Type" . "text/html"))
     (process-send-region process (point-min) (point-max))
     (kill-buffer)))
