@@ -471,7 +471,8 @@ Returns nil if there is no extractor for URL."
          (subject (pcase major-mode
                     ('w3m-mode w3m-current-title)
                     ('gnus-article-mode %:subject)
-                    ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
+                    ('magit-revision-mode (magit-rev-format "%s" magit-id))
+                    (_ ""))))
     (concat (my-org-capture-tree subject)
             (when from
               (with-temp-buffer
