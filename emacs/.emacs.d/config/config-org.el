@@ -354,22 +354,25 @@ Returns nil if there is no extractor for URL."
       (my-org-capture-set-todo-keyword)
       (buffer-string))))
 
-(defun my-org-capture-current-link (%f %F %:description %:link)
+(defun my-org-capture-current-link (%:link &optional %:description %f %F)
   "Current link"
   (pcase-let
       ((`(,link . ,description)
-        (cond ((derived-mode-p 'gnus-article-mode 'w3m-mode)
-               (cons %:link %:description))
-              ((derived-mode-p 'exwm-mode)
+        (cond ((derived-mode-p 'exwm-mode)
                (if-let ((link (my-xdg-web-browser-get-current-url)))
                    (cons link exwm-title)
                  (let ((message
                         "Couldn't get current url from the web browser"))
                    (message message)
                    (error message))))
+              ((or (derived-mode-p 'gnus-article-mode 'w3m-mode) (not %F))
+               (cons %:link %:description))
               (t (cons (concat "file:" %F) %f)))))
     (or (my-org-capture-extract-tree link)
-        (my-org-capture-tree (org-make-link-string link description)))))
+        (my-org-capture-tree
+         (if description
+             (org-make-link-string link description)
+           link)))))
 
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
@@ -444,7 +447,7 @@ Returns nil if there is no extractor for URL."
   "New item"
   (my-org-capture-tree ""))
 
-(defun my-org-capture-region (%f %i %:from %:link %:subject)
+(defun my-org-capture-region (%i &optional %f %:from %:link %:subject)
   "Active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
                         (save-excursion (goto-char (point-min))
@@ -470,10 +473,11 @@ Returns nil if there is no extractor for URL."
                     ('gnus-article-mode %:subject)
                     ('magit-revision-mode (magit-rev-format "%s" magit-id)))))
     (concat (my-org-capture-tree subject)
-            (with-temp-buffer
-              (insert "Captured from " from ":\n")
-              (fill-region (point-min) (point-max))
-              (buffer-string))
+            (when from
+              (with-temp-buffer
+                (insert "Captured from " from ":\n")
+                (fill-region (point-min) (point-max))
+                (buffer-string)))
             "#+BEGIN_QUOTE\n"
             body
             "#+END_QUOTE\n")))
@@ -489,13 +493,13 @@ Returns nil if there is no extractor for URL."
      ("r" ,(documentation 'my-org-capture-region) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-region \"%f\" \"%i\"
+          (my-org-capture-region \"%i\" \"%f\"
                                  \"%:from\" \"%:link\" \"%:subject\"))")
      ("c" ,(documentation 'my-org-capture-current-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-current-link \"%f\" \"%F\"
-                                       \"%:description\" \"%:link\"))")
+          (my-org-capture-current-link \"%:link\" \"%:description\"
+                                       \"%f\" \"%F\"))")
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
       "%(my-org-capture-killed-link)")
