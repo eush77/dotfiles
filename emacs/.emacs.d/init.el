@@ -165,6 +165,7 @@
 (with-eval-after-load "nameless" (load "config-nameless"))
 (with-eval-after-load "narrow-reindent" (load "config-narrow-reindent"))
 (with-eval-after-load "net-utils" (load "config-net-utils"))
+(with-eval-after-load "nxml-mode" (load "config-nxml"))
 (with-eval-after-load "org" (load "config-org"))
 (with-eval-after-load "org-pomodoro" (load "config-org-pomodoro"))
 (with-eval-after-load "outline" (load "config-outline"))
