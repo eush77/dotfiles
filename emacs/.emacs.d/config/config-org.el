@@ -1191,6 +1191,7 @@ If REVERT-BUFFER-P is non-nil, revert Org buffer without asking."
 (define-key org-mode-map (kbd "C-c C-/ C-p") #'my-org-convert-url-property)
 (define-key org-mode-map (kbd "C-c C-/ C-q") #'my-org-convert-url-quote)
 (define-key org-mode-map (kbd "C-c C-x C-p") #'org-pomodoro)
+(define-key org-mode-map (kbd "C-c C-y") #'org-todo-yesterday)
 (define-key org-mode-map (kbd "C-c j") #'org-shiftmetaleft)
 (define-key org-mode-map (kbd "C-c k") #'org-shiftmetaright)
 (define-key org-mode-map (kbd "C-c n") #'org-metadown)
