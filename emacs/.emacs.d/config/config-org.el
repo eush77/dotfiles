@@ -1013,6 +1013,20 @@ If the new state is `DROP', drop the whole subtree."
     (funcall func arg)))
 (advice-add 'org-todo :around #'my-org-todo--skip-wait)
 
+(define-advice org-store-log-note (:after () my-hide-log-drawer)
+  "Hide the log drawer if the previous log drawer is hidden."
+  (when (org-with-wide-buffer
+         (org-back-to-heading)
+         (and (re-search-backward
+               (concat "^[[:space:]]*:"
+                       (regexp-quote (org-log-into-drawer))
+                       ":[[:space:]]*$")
+               nil t)
+              (invisible-p (point))))
+    (outline-hide-entry)))
+
+(remove-hook 'org-after-todo-state-change-hook #'my-org-todo-hide-log-drawer)
+
 ;;; URLs
 
 (defun my-org-convert-url-get-title ()
