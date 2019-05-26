@@ -370,9 +370,11 @@ Returns nil if there is no extractor for URL."
               (t (cons (concat "file:" %F) %f)))))
     (or (my-org-capture-extract-tree link)
         (my-org-capture-tree
-         (if description
-             (org-make-link-string link description)
-           link)))))
+         ;; If DESCRIPTION is t, insert it as an empty string but in brackets.
+         (if (eq description t)
+             (cl-letf (((symbol-function 'org-string-nw-p) (lambda (_) t)))
+               (org-make-link-string link ""))
+           (org-make-link-string link description))))))
 
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
