@@ -241,14 +241,15 @@ If FILE-NAME is not absolute, it is interpreted as relative to
 (custom-set-variables '(org-archive-location "archive/%s::"))
 
 (defun my-org-save-archive-buffer ()
-  "Save the live archive buffer for the current buffer."
+  "Save and kill the live archive buffer for the current buffer."
   (interactive)
   (require 'org-archive)
   (dolist (buffer (seq-remove
                    #'null
                    (seq-map #'get-file-buffer (org-all-archive-files))))
     (with-current-buffer buffer
-      (save-buffer))))
+      (save-buffer)
+      (kill-buffer))))
 
 (defun my-org-add-save-archive-buffer-hook ()
   (add-hook 'after-save-hook #'my-org-save-archive-buffer nil t))
