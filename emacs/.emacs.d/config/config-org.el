@@ -460,7 +460,7 @@ Returns nil if there is no extractor for URL."
                  (if (derived-mode-p 'exwm-mode)
                      (with-selected-window (get-buffer-window)
                        (exwm-input--fake-key ?\C-c)
-                       (sit-for .2)
+                       (sleep-for .2)
                        (current-kill 0 t))
                    %i))
                 "\n"))
@@ -470,6 +470,11 @@ Returns nil if there is no extractor for URL."
                   (format "\"%s\" (by %s)" %:subject %:from))
                  ('magit-revision-mode
                   (magit-rev-format "\"%s\" (%h by %an)" magit-id))
+                 ('exwm-mode
+                  (let ((description (format "\"%s\"" exwm-title)))
+                    (if-let ((link (my-xdg-web-browser-get-current-url)))
+                        (org-make-link-string link description)
+                      description)))
                  (_ (if (string-empty-p %f) (buffer-name) %f))))
          (subject (pcase major-mode
                     ('w3m-mode w3m-current-title)
