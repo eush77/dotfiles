@@ -131,15 +131,13 @@ BUFFER defaults to the current buffer."
 ;;;###autoload
 (defun my-xdg-web-browser-get-current-url ()
   "Get URL visited in the default XDG web browser, or nil."
-  (when-let ((buffer (my-xdg-web-browser-buffer)))
-    (with-current-buffer buffer
-      (unless (string-match-p "^Firefox" exwm-class-name)
-        (error "Unsupported web browser %s" exwm-class-name))
+  (when (eq (current-buffer) (my-xdg-web-browser-buffer))
+    (when (string-match-p "^Firefox" exwm-class-name)
       (with-selected-window (get-buffer-window)
         (exwm-input--fake-key ?\C-l)    ; Focus location bar
         (sit-for 0)
         (exwm-input--fake-key ?\C-c)
-        (sit-for .2)
+        (sleep-for .2)
         (let ((url (current-kill 0 t)))
           (with-temp-buffer
             (insert url)
