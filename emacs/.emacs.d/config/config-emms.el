@@ -29,6 +29,11 @@ Calls `emms-add-dired' or `emms-add-directory-tree'
    `(emms-player-mplayer-parameters
      '("-vo" "null" . ,emms-player-mplayer-parameters))))
 
+(emms-player-set emms-player-mplayer 'regex
+                 (apply #'emms-player-simple-regexp
+                        "opus"
+                        emms-player-base-format-list))
+
 ;;; Playback Order
 
 (defun my-emms-next--random-playlist (func &rest args)
