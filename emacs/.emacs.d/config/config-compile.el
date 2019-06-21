@@ -153,8 +153,9 @@ With prefix argument SELECT-P, select the window as well."
       (user-error "No active compilation window"))
     (when (my-compilation-save-buffers-predicate)
       (save-buffer))
-    (with-selected-window window
-      (with-current-buffer (window-buffer window)
-        (recompile)))
+    (with-selected-frame (window-frame window)
+      (with-selected-window window
+        (with-current-buffer (window-buffer window)
+          (recompile))))
     (when select-p
       (select-window window))))
