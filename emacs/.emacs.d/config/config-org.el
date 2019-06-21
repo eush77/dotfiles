@@ -721,7 +721,9 @@ url into the current buffer as a headline with properties."
 
 (defun my-org-extractor-insert-fn (url)
   "Get the insert function of the extractor matching URL."
-  (third (my-org-extractor url)))
+  (when-let ((insert-fn (third (my-org-extractor url))))
+    (unless (eq insert-fn 'ignore)
+      insert-fn)))
 
 ;;; ff-get-other-file
 
