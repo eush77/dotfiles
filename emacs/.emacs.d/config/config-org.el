@@ -8,8 +8,7 @@
 
 ;;; Agenda
 
-(custom-set-variables '(org-agenda-span 'fortnight)
-                      '(org-agenda-window-setup 'current-window))
+(custom-set-variables '(org-agenda-window-setup 'current-window))
 
 (defun my-org-agenda-get-batch-view-region ()
   "Get restriction region for the batch view.
