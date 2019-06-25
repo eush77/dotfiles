@@ -493,6 +493,16 @@ Returns nil if there is no extractor for URL."
 (defun my-org-capture-region-context ()
   (or (region-active-p) (derived-mode-p 'exwm-mode)))
 
+(defun my-org-capture-scratch ()
+  "Scratch text"
+  (if (region-active-p)
+      (buffer-substring (region-beginning) (region-end))
+    ""))
+
+(defun my-org-capture-scratch-target ()
+  (set-buffer "*scratch*")
+  (goto-char (point-max)))
+
 (custom-set-variables
  '(org-capture-templates
    `(("n" ,(documentation 'my-org-capture-new) entry
@@ -518,7 +528,12 @@ Returns nil if there is no extractor for URL."
      ("U" ,(documentation 'my-org-capture-links) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-links))")))
+          (my-org-capture-links))")
+     ("s" ,(documentation 'my-org-capture-scratch) plain
+      (function my-org-capture-scratch-target)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-scratch))"
+      :empty-lines 1 :jump-to-captured t :no-save t)))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
@@ -546,6 +561,14 @@ Returns nil if there is no extractor for URL."
   (let ((display-buffer-overriding-action
          '(display-buffer-at-bottom . ((window-height . 0.15)))))
     (apply func args)))
+
+(define-advice org-capture-store-last-position
+    (:around (func) my-non-visiting-buffer)
+  "Don't bookmark captured position in non-visiting target buffers."
+  (if (buffer-file-name (buffer-base-buffer (current-buffer)))
+      (funcall func)
+    (let ((org-capture-bookmark))
+      (funcall func))))
 
 ;;; Clocking
 
