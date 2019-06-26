@@ -533,7 +533,7 @@ Returns nil if there is no extractor for URL."
       (function my-org-capture-scratch-target)
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-scratch))"
-      :empty-lines 1 :jump-to-captured t :no-save t)))
+      :empty-lines 1 :immediate-finish t :jump-to-captured t :no-save t)))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
