@@ -24,3 +24,6 @@ TAGS
 # Git
 /.archive/
 /=*/
+
+# Mypy
+.mypy_cache/
