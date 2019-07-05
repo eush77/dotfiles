@@ -25,6 +25,9 @@
 #
 # Per-tool configuration.
 #
+[big-picture]
+	format = dot
+	viewer = xdot
 [grep]
 	patternType = perl
 	lineNumber = true
