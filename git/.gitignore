@@ -1,24 +1,26 @@
-# Git worktrees.
-/.archive/
-/=*/
+# Autotools
+autom4te.cache/
 
-# Developer tools.
-*.swp
-*~
-.dir-locals.el
-\#*
+# Build Directories
+/Bootstrap*/
+/Build*/
+/Debug*/
+/Release*/
+
+# Cscope
 cscope.files
 cscope.out
+
+# Direnv
+.envrc
+
+# Emacs
+*~
+.dir-locals-2.el
+.dir-locals.el
+\#*
 TAGS
 
-# VPATH builds.
-/build-*/
-/build/
-/debug/
-/release/
-
-# Autotools.
-/autom4te.cache/
-
-# Environment files (direnv).
-.envrc
+# Git
+/.archive/
+/=*/
