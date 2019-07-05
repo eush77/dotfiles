@@ -52,7 +52,7 @@
 		git apply --check \"$2\" &&\
 		git apply \"$2\" &&\
 		git add . &&\
-		git commit -am \"apply $(basename \"$2\")\" --author=\"$1\" &&\
+		git commit -am \"Apply $(basename \"$2\")\" --author=\"$1\" &&\
 		true
 	br = branch --sort -committerdate
 	brieflog = ! GIT_PAGER=cat git log --oneline
