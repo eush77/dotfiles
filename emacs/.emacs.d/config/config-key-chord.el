@@ -12,6 +12,7 @@
 (key-chord-define-global "x2" #'my-balanced-split-window-vertically)
 (key-chord-define-global "x3" #'my-balanced-split-window-horizontally)
 (key-chord-define-global "xq" #'quit-window)
+(key-chord-define-global "XQ" #'my-quit-buffers-by-mode)
 
 ;; Finding files
 (key-chord-define-global "xf" #'find-file)

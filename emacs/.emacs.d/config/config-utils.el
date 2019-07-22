@@ -1,3 +1,21 @@
+;;; Buffers
+
+(defun my-quit-buffers-by-mode (mode)
+  "Bury buffers by major MODE and quit their windows."
+  (interactive
+   (list (if current-prefix-arg
+             (intern (completing-read
+                      "Major mode: "
+                      (cl-remove-duplicates
+                       (seq-map (apply-partially #'buffer-local-value
+                                                 'major-mode)
+                                (buffer-list)))))
+           major-mode)))
+  (dolist (buffer (--filter (eq (buffer-local-value 'major-mode it) mode)
+                            (buffer-list)))
+    (quit-windows-on buffer)
+    (bury-buffer buffer)))
+
 ;;; Editing
 
 (autoload 'copy-from-above-command "misc" nil t)
