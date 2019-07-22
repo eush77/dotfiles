@@ -31,7 +31,7 @@ Calls `emms-add-dired' or `emms-add-directory-tree'
 
 (emms-player-set emms-player-mplayer 'regex
                  (apply #'emms-player-simple-regexp
-                        "opus"
+                        "cue" "flac" "opus"
                         emms-player-base-format-list))
 
 ;;; Playback Order
