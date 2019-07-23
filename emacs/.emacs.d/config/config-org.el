@@ -354,7 +354,7 @@ Returns nil if there is no extractor for URL."
       (my-org-capture-set-todo-keyword)
       (buffer-string))))
 
-(defun my-org-capture-current-link (%:link &optional %:description %f %F)
+(defun my-org-capture-current-link (type %:link &optional %:description %f %F)
   "Current link"
   (pcase-let
       ((`(,link . ,description)
@@ -368,13 +368,19 @@ Returns nil if there is no extractor for URL."
               ((or (derived-mode-p 'gnus-article-mode 'w3m-mode) (not %F))
                (cons %:link %:description))
               (t (cons (concat "file:" %F) %f)))))
-    (or (my-org-capture-extract-tree link)
-        (my-org-capture-tree
-         ;; If DESCRIPTION is t, insert it as an empty string but in brackets.
-         (if (eq description t)
-             (cl-letf (((symbol-function 'org-string-nw-p) (lambda (_) t)))
-               (org-make-link-string link ""))
-           (org-make-link-string link description))))))
+    (cl-case type
+      ('entry
+       (or (my-org-capture-extract-tree link)
+           (my-org-capture-tree
+            ;; If DESCRIPTION is t, insert it as an empty string but in
+            ;; brackets.
+            (if (eq description t)
+                (cl-letf (((symbol-function 'org-string-nw-p)
+                           (lambda (_) t)))
+                  (org-make-link-string link ""))
+              (org-make-link-string link description)))))
+      ('item (concat "- " (org-make-link-string link description)))
+      (otherwise (user-error "Unsupported entry type")))))
 
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
@@ -444,6 +450,17 @@ Returns nil if there is no extractor for URL."
 
 (defun my-org-capture-links-context ()
   (and (region-active-p) (eq major-mode 'w3m-mode)))
+
+(defun my-org-capture-list-item-target ()
+  (if-let ((marker
+            (seq-find (lambda (marker)
+                        (with-current-buffer (marker-buffer marker)
+                          (derived-mode-p 'org-mode)))
+                      global-mark-ring)))
+      (progn (message "Marker found in `global-mark-ring'")
+             (set-buffer (marker-buffer marker))
+             (goto-char marker))
+    (user-error "No Org buffer found in `global-mark-ring'")))
 
 (defun my-org-capture-new ()
   "New item"
@@ -516,7 +533,7 @@ Returns nil if there is no extractor for URL."
      ("c" ,(documentation 'my-org-capture-current-link) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-current-link \"%:link\" \"%:description\"
+          (my-org-capture-current-link 'entry \"%:link\" \"%:description\"
                                        \"%f\" \"%F\"))")
      ("k" ,(documentation 'my-org-capture-killed-link) entry
       (file org-default-notes-file)
@@ -533,13 +550,20 @@ Returns nil if there is no extractor for URL."
       (function my-org-capture-scratch-target)
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-scratch))"
-      :empty-lines 1 :immediate-finish t :jump-to-captured t :no-save t)))
+      :empty-lines 1 :immediate-finish t :jump-to-captured t :no-save t)
+     ("l" "List item")
+     ("lc" ,(documentation 'my-org-capture-current-link) item
+      (function my-org-capture-list-item-target)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-current-link 'item \"%:link\" \"%:description\"
+                                       \"%f\" \"%F\"))")))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
      ("k" (my-org-capture-killed-link-context))
      ("u" (my-org-capture-link-context))
-     ("U" (my-org-capture-links-context)))))
+     ("U" (my-org-capture-links-context))
+     ("lc" (my-org-capture-current-link-context)))))
 
 (define-advice org-capture-refile
     (:after (&rest args) my-jump-to-refiled)
