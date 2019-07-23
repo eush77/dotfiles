@@ -316,6 +316,30 @@ Archive files are those matching `org-archive-location'."
 
 ;;; Capture
 
+(defvar my-org-capture-position-cursor t
+  "Non-nil if capture templates include cursor positioning %?.")
+
+(defvar my-org-capture-time-stamp nil
+  "Date string inserted as an active time stamp in capture trees.
+
+The string is parsed by `org-read-date' and inserted as an active
+time stamp with optional end time in the entry heading.")
+
+(defun my-org-capture-position-cursor ()
+  "Insert cursor-positioning sequence."
+  (when my-org-capture-position-cursor
+    (insert "%?")))
+
+(defvar org-end-time-was-given)
+
+(defun my-org-capture-insert-time-stamp ()
+  "Insert `my-org-capture-time-stamp' as an active time stamp."
+  (when my-org-capture-time-stamp
+    (let ((org-end-time-was-given))
+      (org-insert-time-stamp (org-read-date nil t my-org-capture-time-stamp)
+                             t nil nil nil (list org-end-time-was-given))
+      (insert " "))))
+
 (defun my-org-capture-set-todo-keyword ()
   "Set todo keyword on the current headline."
   (let ((org-inhibit-blocking t)
@@ -325,16 +349,13 @@ Archive files are those matching `org-archive-location'."
     (org-todo "NEW")
     (org-add-log-note)))
 
-(defvar my-org-capture-position-cursor t
-  "Non-nil if capture templates include cursor positioning %?.")
-
 (defun my-org-capture-tree (title)
   "Generate Org capture tree with TITLE."
   (with-temp-buffer
     (org-insert-heading)
-    (insert (if my-org-capture-position-cursor
-                (concat "%?" title)
-              title))
+    (my-org-capture-insert-time-stamp)
+    (my-org-capture-position-cursor)
+    (insert title)
     (my-org-capture-set-todo-keyword)
     (buffer-string)))
 
@@ -345,12 +366,12 @@ Returns nil if there is no extractor for URL."
   (when-let ((insert-fn (my-org-extractor-insert-fn url)))
     (with-temp-buffer
       (funcall insert-fn url)
-      (when my-org-capture-position-cursor
-        (let ((case-fold-search))
-          (org-back-to-heading)
-          (looking-at org-heading-regexp)
-          (goto-char (match-beginning 2))
-          (insert "%?")))
+      (let ((case-fold-search))
+        (org-back-to-heading)
+        (looking-at org-heading-regexp)
+        (goto-char (match-beginning 2))
+        (my-org-capture-insert-time-stamp)
+        (my-org-capture-position-cursor))
       (my-org-capture-set-todo-keyword)
       (buffer-string))))
 
