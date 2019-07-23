@@ -929,8 +929,7 @@ value."
 (custom-set-variables
  '(org-outline-path-complete-in-steps nil)
  '(org-refile-allow-creating-parent-nodes t)
- '(org-refile-targets '((org-files-list :maxlevel . 2)
-                        (my-org-cabinet-files :maxlevel . 2)))
+ '(org-refile-targets '((org-files-list :maxlevel . 2)))
  '(org-refile-use-outline-path 'file))
 
 (defun my-org-remove-new-keywords ()
