@@ -56,7 +56,7 @@
 
 (defun my-compilation-save-buffers-predicate ()
   "Non-nil if the current buffer is saved before compiling."
-  (derived-mode-p 'prog-mode 'text-mode))
+  (derived-mode-p 'bibtex-mode 'prog-mode 'text-mode))
 
 (custom-set-variables
  '(compilation-save-buffers-predicate
