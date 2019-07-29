@@ -111,23 +111,24 @@ point instead."
 
 ;;; w3m-canonicalize-url
 
-(defun my-w3m-canonicalize-url--domain-name (args)
+(define-advice w3m-canonicalize-url (:filter-args (args) my-domain-name)
   "Auto-prepend \"http://\" to domain-looking names."
-  (if (string-match-p "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+\\(?:/.*\\)?$" (car args))
-      (cons (concat "http://" (car args)) (cdr args))
+  (pcase-let ((`(,url ,feeling-searchy) args))
+    (if (string-match-p "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+\\(?:/.*\\)?$" url)
+        (cons (concat "http://" url) feeling-searchy)
+      args)))
+
+(define-advice w3m-canonicalize-url (:filter-args (args) my-feeling-searchy)
+  "Return search url for uncanonicalized query to `w3m-goto-url'."
+  (if (eq (nth 1 (backtrace-frame 7)) 'w3m-goto-url)
+      (list (car args) t)
     args))
 
-(defun my-w3m-string-match-url-components (args)
+(define-advice w3m-string-match-url-components (:filter-args (args) my-spaces)
   "Don't match strings with spaces as URLs."
   (if (string-match-p " " (car args))
       '("")
     args))
-
-(with-eval-after-load "w3m"
-  (advice-add 'w3m-canonicalize-url
-              :filter-args #'my-w3m-canonicalize-url--domain-name)
-  (advice-add 'w3m-string-match-url-components
-              :filter-args #'my-w3m-string-match-url-components))
 
 ;;; w3m-mode-map
 
