@@ -165,7 +165,8 @@ point instead."
    '(w3m-default-display-inline-images t)
    '(w3m-fill-column 78)
    '(w3m-home-page "about:")
-   '(w3m-make-new-session t))
+   '(w3m-make-new-session t)
+   '(w3m-pop-up-windows nil))
 
   (add-hook 'w3m-mode-hook #'w3m-lnum-mode))
 
