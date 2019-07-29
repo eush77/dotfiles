@@ -443,6 +443,57 @@ With `C-u C-u' prefix argument, just reset
                     command)))))
   (shell-command-on-region (point-min) (point-max) command))
 
+;;; Typography
+
+(defcustom my-nbsp-words
+  '((ru
+     "а" "без" "безо" "в" "во" "для" "до" "за" "и" "из" "из-за" "из-под" "изо"
+     "к" "ко" "на" "над" "не" "о" "об" "от" "ото" "по" "под" "подо" "при" "про"
+     "ради" "с" "со" "у")
+    (en
+     "a" "an" "as" "at" "by" "for" "from" "in" "of" "on" "the" "to" "with"))
+  "Alist of words that are followed by a non-breaking space.
+
+Each entry is a pair (LANGID . WORDS) where LANGID is an ISO
+639-1 language code and WORDS is a list of words.")
+
+(defvar-local my-nbsp-sequence nil
+  "Non-breaking space sequence to use in the current buffer.")
+
+(defun my-nbsp-get-sequence ()
+  "Get nbsp sequence to use in the current buffer."
+  (declare (interactive-only t))
+  (interactive)
+  (cond
+   (my-nbsp-sequence my-nbsp-sequence)
+   ((derived-mode-p 'html-mode) "&nbsp;")
+   ((derived-mode-p 'tex-mode) "~")
+   ((save-excursion (goto-char (point-min))
+                    (re-search-forward " " nil t))
+    " ")
+   (t (read-string "Non-breaking space sequence: " " "))))
+
+(defun my-nbsp-fix (langid nbsp)
+  "Fix non-breaking spacing in the current buffer.
+
+LANGID is an ISO 639-1 language code.
+NBSP is a string to insert for non-breaking space.
+
+If called with a prefix argument, query for LANGID interactively,
+otherwise guess one from the contents of the buffer."
+  (interactive
+   (progn (require 'guess-language)
+          (list (if current-prefix-arg
+                    (intern (completing-read "Language: "
+                                             guess-language-languages))
+                  (guess-language-buffer))
+                (call-interactively #'my-nbsp-get-sequence))))
+  (query-replace-regexp
+   (concat "\\b"
+           (regexp-opt (alist-get langid my-nbsp-words) t)
+           "\\s-+")
+   (concat "\\1" nbsp)))
+
 ;;; Window sizing
 
 ;;;###autoload
