@@ -445,17 +445,68 @@ With `C-u C-u' prefix argument, just reset
 
 ;;; Typography
 
-(defcustom my-nbsp-words
+(defcustom my-nbsp-patterns
   '((ru
-     "а" "без" "безо" "в" "во" "для" "до" "за" "и" "из" "из-за" "из-под" "изо"
-     "к" "ко" "на" "над" "не" "о" "об" "от" "ото" "по" "под" "подо" "при" "про"
-     "ради" "с" "со" "у")
+     ("\\bа")
+     ("\\bбез")
+     ("\\bбезо")
+     ("\\bв")
+     ("\\bво")
+     ("\\bдля")
+     ("\\bдо")
+     ("\\bза")
+     ("\\bтак" . "и\\b")                ; Before (1)
+     ("\\s-и")                          ; (1)
+     ("\\bиз")
+     ("\\bиз-за")
+     ("\\bиз-под")
+     ("\\bизо")
+     ("\\bк")
+     ("\\bко")
+     ("\\bна")
+     ("\\bнад")
+     ("\\bне")
+     ("\\bо")
+     ("\\bоб")
+     ("\\bот")
+     ("\\bото")
+     ("\\bпо")
+     ("\\bпод")
+     ("\\bподо")
+     ("\\bпри")
+     ("\\bпро")
+     ("\\bради")
+     ("\\bс")
+     ("\\bсо")
+     ("\\bу")
+     ("\\bт\\." . "[епд]\\.")
+     ("[[:digit:]]" . "[[:digit:]]")
+     ("" . "—")
+     ("" . "бы\\b")
+     ("" . "же\\b")
+     ("" . "ли\\b"))
     (en
-     "a" "an" "as" "at" "by" "for" "from" "in" "of" "on" "the" "to" "with"))
-  "Alist of words that are followed by a non-breaking space.
+     ("\\ba")
+     ("\\ban")
+     ("\\bas")
+     ("\\bat")
+     ("\\bby")
+     ("\\bfor")
+     ("\\bfrom")
+     ("\\bin")
+     ("\\bof")
+     ("\\bon")
+     ("\\bthe")
+     ("\\bto")
+     ("\\bwith")))
+  "Patterns governing the use of non-breaking spaces.
 
-Each entry is a pair (LANGID . WORDS) where LANGID is an ISO
-639-1 language code and WORDS is a list of words.")
+A list of pairs (LANGID . REGEXPS) where LANGID is an ISO 639-1
+language code and REGEXPS is a list of (START . END) pairs of
+regular expressions. END defaults to the empty string if nil.
+Whenever START and END match around a sequence of whitespace-only
+characters, these characters are to be replaced with a single
+non-breaking space.")
 
 (defvar-local my-nbsp-sequence nil
   "Non-breaking space sequence to use in the current buffer.")
@@ -489,10 +540,11 @@ otherwise guess one from the contents of the buffer."
                   (guess-language-buffer))
                 (call-interactively #'my-nbsp-get-sequence))))
   (query-replace-regexp
-   (concat "\\b"
-           (regexp-opt (alist-get langid my-nbsp-words) t)
-           "\\s-+")
-   (concat "\\1" nbsp)))
+   (mapconcat (pcase-lambda (`(,start . ,end))
+                (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)" start (or end "")))
+              (alist-get 'ru my-nbsp-patterns)
+              "\\|")
+   (concat "\\1" nbsp "\\2")))
 
 ;;; Window sizing
 
