@@ -539,12 +539,16 @@ otherwise guess one from the contents of the buffer."
                                              guess-language-languages))
                   (guess-language-buffer))
                 (call-interactively #'my-nbsp-get-sequence))))
-  (query-replace-regexp
-   (mapconcat (pcase-lambda (`(,start . ,end))
-                (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)" start (or end "")))
-              (alist-get 'ru my-nbsp-patterns)
-              "\\|")
-   (concat "\\1" nbsp "\\2")))
+  (apply #'query-replace-regexp
+         (mapconcat (pcase-lambda (`(,start . ,end))
+                      (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)" start (or end "")))
+                    (alist-get 'ru my-nbsp-patterns)
+                    "\\|")
+         (concat "\\1" nbsp "\\2")
+         nil
+         (if (region-active-p)
+             (list (region-beginning) (region-end))
+           nil)))
 
 ;;; Window sizing
 
