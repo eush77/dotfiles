@@ -81,7 +81,7 @@ buffer otherwise."
 ;;; Finding files
 
 (custom-set-variables
- '(counsel-file-jump-args "* -not -path '*\/.git*'")
+ '(counsel-file-jump-args '("." "-not" "-path" "'*\/.git*'"))
  '(counsel-find-file-at-point t)
  '(counsel-find-file-ignore-regexp "\\`\\.")
  '(counsel-preselect-current-file t))
