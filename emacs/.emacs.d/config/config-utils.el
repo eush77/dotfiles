@@ -525,7 +525,7 @@ non-breaking space.")
    (t (read-string "Non-breaking space sequence: " " "))))
 
 (defun my-nbsp-fix (langid nbsp)
-  "Fix non-breaking spacing in the current buffer.
+  "Fix non-breaking spacing in the current buffer or the active region.
 
 LANGID is an ISO 639-1 language code.
 NBSP is a string to insert for non-breaking space.
@@ -533,16 +533,20 @@ NBSP is a string to insert for non-breaking space.
 If called with a prefix argument, query for LANGID interactively,
 otherwise guess one from the contents of the buffer."
   (interactive
-   (progn (require 'guess-language)
-          (list (if current-prefix-arg
-                    (intern (completing-read "Language: "
-                                             guess-language-languages))
-                  (guess-language-buffer))
-                (call-interactively #'my-nbsp-get-sequence))))
+   (progn
+     (require 'guess-language)
+     (list
+      (cond (current-prefix-arg
+             (intern (completing-read "Language: "
+                                      guess-language-languages)))
+            ((region-active-p)
+             (guess-language-region (region-beginning) (region-end)))
+            (t (guess-language-buffer)))
+      (call-interactively #'my-nbsp-get-sequence))))
   (apply #'query-replace-regexp
          (mapconcat (pcase-lambda (`(,start . ,end))
                       (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)" start (or end "")))
-                    (alist-get 'ru my-nbsp-patterns)
+                    (alist-get langid my-nbsp-patterns)
                     "\\|")
          (concat "\\1" nbsp "\\2")
          nil
