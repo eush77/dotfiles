@@ -850,6 +850,63 @@ Returns either a one-element list or an empty list."
               '(("\\.org\\'" my-org-ff-other-file))))
 (add-hook 'org-mode-hook #'my-org-ff-other-file-setup)
 
+;;; Filling
+
+(defun my-org-nbsp-fix-element (langid nbsp &optional start end query-p)
+  "Fix non-breaking spaces in the element at point.
+
+LANGID is an ISO 639-1 language code. When called interactively,
+it is guessed from the contents of the element.
+
+NBSP is a string to insert for non-breaking space. When called
+interactively, it is guessed from the contents of the element.
+
+If START and END are non-nil, fix spaces in all elements in the
+region.
+
+QUERY-P specifies whether to query the user for each match or
+replace silently. `t' when called with a prefix argument."
+  (interactive
+   (progn (require 'guess-language)
+          (list (guess-language-region
+                 (org-element-property :contents-begin
+                                       (save-excursion
+                                         (goto-char (region-beginning))
+                                         (org-element-at-point)))
+                 (org-element-property :contents-end
+                                       (save-excursion
+                                         (goto-char (region-beginning))
+                                         (org-element-at-point))))
+                (call-interactively #'my-nbsp-get-sequence)
+                (and (region-active-p) (region-beginning))
+                (and (region-active-p) (region-end))
+                current-prefix-arg)))
+  (my-nbsp-fix langid
+               nbsp
+               (org-element-property :contents-begin
+                                     (save-excursion
+                                       (goto-char start)
+                                       (org-element-at-point)))
+               (org-element-property :contents-end
+                                     (save-excursion
+                                       (goto-char end)
+                                       (org-element-at-point)))
+               query-p))
+
+(define-advice org-fill-paragraph (:before (&rest _ignored) my-nbsp-fix)
+  "Fix non-breaking spaces.
+
+Both the language and the nbsp sequence are guessed from the
+current buffer. If there is no guess for the nbsp sequence no
+operation is performed. Otherwise all matches are replaced
+silently."
+  (when-let ((nbsp (my-nbsp-get-sequence)))
+    (let* ((element (org-element-at-point))
+           (begin (org-element-property :contents-begin element))
+           (end (org-element-property :contents-end element)))
+      (require 'guess-language)
+      (my-nbsp-fix (guess-language-region begin end) nbsp begin end))))
+
 ;;; Finding Files
 
 ;;;###autoload
@@ -1293,6 +1350,7 @@ If REVERT-BUFFER-P is non-nil, revert Org buffer without asking."
 (define-key org-mode-map (kbd "C-M-f") #'org-next-link)
 (define-key org-mode-map (kbd "C-x 8 e") #'counsel-org-entity)
 (define-key org-mode-map (kbd "M-N") #'my-outline-show-next-subtree)
+(define-key org-mode-map (kbd "M-Q") #'my-org-nbsp-fix-element)
 (define-key org-mode-map (kbd "M-P") #'my-outline-show-previous-subtree)
 (define-key org-mode-map (kbd "<tab>") #'my-org-cycle)
 (define-key org-mode-map [remap org-goto] #'my-counsel-org-goto)

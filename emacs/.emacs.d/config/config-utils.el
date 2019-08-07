@@ -511,18 +511,25 @@ non-breaking space.")
 (defvar-local my-nbsp-sequence nil
   "Non-breaking space sequence to use in the current buffer.")
 
-(defun my-nbsp-get-sequence ()
-  "Get nbsp sequence to use in the current buffer."
-  (interactive)
+(defun my-nbsp-get-sequence (&optional default)
+  "Get nbsp sequence to use in the current buffer.
+
+If DEFAULT is nil, return nil by default.
+If DEFAULT is t, return the unicode string for nbsp.
+If DEFAULT is the symbol `ask', read the string from minibuffer. "
+  (interactive '(ask))
   (cond
    (my-nbsp-sequence my-nbsp-sequence)
    ((derived-mode-p 'html-mode) "&nbsp;")
    ((derived-mode-p 'tex-mode) "~")
-   ((or (not (called-interactively-p 'interactive))
-        (save-excursion (goto-char (point-min))
-                     (re-search-forward " " nil t)))
+   ((save-excursion (goto-char (point-min))
+                    (re-search-forward " " nil t))
     " ")
-   (t (read-string "Non-breaking space sequence: " " "))))
+   (t (cl-case default
+        ((nil) nil)
+        ((t) " ")
+        (ask (read-string "Non-breaking space sequence: " " "))
+        (otherwise (error "Unsupported value for DEFAULT"))))))
 
 (defun my-nbsp-fix (langid nbsp &optional start end query-p)
   "Fix non-breaking spacing in the region of the current buffer.
@@ -553,23 +560,24 @@ replace silently. `t' when called interactively."
                (guess-language-region start end)))
       (call-interactively #'my-nbsp-get-sequence)
       t)))
-  (perform-replace (mapconcat (pcase-lambda (`(,start . ,end))
-                                (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
-                                        start
-                                        (or end "")))
-                              (alist-get langid my-nbsp-patterns)
-                              "\\|")
-                   (concat "\\1" nbsp "\\2")
-                   query-p
-                   t
-                   nil
-                   nil
-                   nil
-                   start
-                   end))
+  (save-excursion
+    (perform-replace (mapconcat (pcase-lambda (`(,start . ,end))
+                                  (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
+                                          start
+                                          (or end "")))
+                                (alist-get langid my-nbsp-patterns)
+                                "\\|")
+                     (concat "\\1" nbsp "\\2")
+                     query-p
+                     t
+                     nil
+                     nil
+                     nil
+                     start
+                     end)))
 
-(defun my-nbsp-fix-paragraph-and-fill (langid nbsp &optional query-p)
-  "Fix non-breaking spaces in the current paragraph and fill it.
+(defun my-nbsp-fix-paragraph (langid nbsp &optional query-p)
+  "Fix non-breaking spaces in the current paragraph.
 
 LANGID is an ISO 639-1 language code. When called interactively,
 it is guessed from the current paragraph.
@@ -589,8 +597,7 @@ replace silently. `t' when called with a prefix argument."
     (let ((end (point)))
       (backward-paragraph)
       (let ((start (point)))
-        (my-nbsp-fix langid nbsp start end query-p))))
-  (fill-paragraph))
+        (my-nbsp-fix langid nbsp start end query-p)))))
 
 ;;; Window sizing
 

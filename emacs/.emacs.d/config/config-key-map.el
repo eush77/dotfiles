@@ -106,7 +106,7 @@
 (global-set-key (kbd "C-c t") #'my-multitran-region)
 
 ;; Non-breaking Spaces
-(global-set-key (kbd "M-Q") #'my-nbsp-fix-paragraph-and-fill)
+(global-set-key (kbd "M-Q") #'my-nbsp-fix-paragraph)
 
 ;; Org
 (global-set-key (kbd "C-c a") #'org-agenda)
