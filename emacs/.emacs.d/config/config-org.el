@@ -1106,6 +1106,9 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; Typography
 
+(setf (alist-get 'org-mode my-nbsp-patterns)
+      '(("" . "---")))
+
 (defun my-org-region-snap-to-elements (begin end)
   "Extend region bounds to nearest element boundaries.
 

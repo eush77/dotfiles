@@ -501,12 +501,12 @@ With `C-u C-u' prefix argument, just reset
      ("\\bwith")))
   "Patterns governing the use of non-breaking spaces.
 
-A list of pairs (LANGID . REGEXPS) where LANGID is an ISO 639-1
-language code and REGEXPS is a list of (START . END) pairs of
-regular expressions. END defaults to the empty string if nil.
-Whenever START and END match around a sequence of whitespace-only
-characters, these characters are to be replaced with a single
-non-breaking space.")
+A list of pairs (SYMBOL . REGEXPS) where SYMBOL is either an ISO
+639-1 language code or a major mode symbol, and REGEXPS is a list
+of (START . END) pairs of regular expressions. END defaults to
+the empty string if nil. Whenever START and END match around a
+sequence of whitespace-only characters, these characters are to
+be replaced with a single non-breaking space.")
 
 (defvar-local my-nbsp-sequence nil
   "Non-breaking space sequence to use in the current buffer.")
@@ -565,7 +565,8 @@ replace silently. `t' when called interactively."
                                   (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
                                           start
                                           (or end "")))
-                                (alist-get langid my-nbsp-patterns)
+                                (append (alist-get langid my-nbsp-patterns)
+                                        (alist-get major-mode my-nbsp-patterns))
                                 "\\|")
                      (concat "\\1" nbsp "\\2")
                      query-p
