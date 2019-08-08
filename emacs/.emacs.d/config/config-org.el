@@ -1142,10 +1142,9 @@ replace silently. `t' when called with a prefix argument."
   (interactive
    (pcase-let ((`(,begin . ,end)
                 (apply #'my-org-region-snap-to-elements
-                       (-cons-to-list
-                        (if (region-active-p)
-                            (car (region-bounds))
-                          (list (cons (point) (+ (point) 1))))))))
+                       (if (region-active-p)
+                           (-cons-to-list (car (region-bounds)))
+                         (list (point) (+ (point) 1))))))
      (require 'guess-language)
      (list (guess-language-region begin end)
            (call-interactively #'my-nbsp-get-sequence)
