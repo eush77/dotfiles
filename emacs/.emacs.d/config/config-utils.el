@@ -559,6 +559,8 @@ replace silently. `t' when called interactively."
             (t (require 'guess-language)
                (guess-language-region start end)))
       (call-interactively #'my-nbsp-get-sequence)
+      start
+      end
       t)))
   (save-excursion
     (perform-replace (mapconcat (pcase-lambda (`(,start . ,end))
