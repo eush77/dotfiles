@@ -850,73 +850,6 @@ Returns either a one-element list or an empty list."
               '(("\\.org\\'" my-org-ff-other-file))))
 (add-hook 'org-mode-hook #'my-org-ff-other-file-setup)
 
-;;; Filling
-
-(defun my-org-region-snap-to-elements (begin end)
-  "Extend region bounds to nearest element boundaries.
-
-Returns a cons pair of new bounds."
-  (cons (save-excursion
-          (goto-char begin)
-          (org-element-property :begin (org-element-at-point)))
-        (save-excursion
-          (goto-char (- end 1))
-          (let ((element (org-element-at-point)))
-            (org-element-property (if (eq (org-element-type element)
-                                          'headline)
-                                      :contents-begin
-                                    :end)
-                                  element)))))
-
-(defun my-org-nbsp-fix-element (langid nbsp &optional begin end query-p)
-  "Fix non-breaking spaces in the element at point.
-
-LANGID is an ISO 639-1 language code. When called interactively,
-it is guessed from the contents of the element.
-
-NBSP is a string to insert for non-breaking space. When called
-interactively, it is guessed from the contents of the element.
-
-If BEGIN and END are non-nil, fix spaces in all elements in the
-region.
-
-QUERY-P specifies whether to query the user for each match or
-replace silently. `t' when called with a prefix argument."
-  (interactive
-   (pcase-let ((`(,begin . ,end)
-                (apply #'my-org-region-snap-to-elements
-                       (-cons-to-list
-                        (if (region-active-p)
-                            (car (region-bounds))
-                          (list (cons (point) (+ (point) 1))))))))
-     (require 'guess-language)
-     (list (guess-language-region begin end)
-           (call-interactively #'my-nbsp-get-sequence)
-           begin
-           end
-           current-prefix-arg)))
-  (pcase-let ((`(,begin . ,end)
-               (my-org-region-snap-to-elements (or begin (point))
-                                               (or end (+ (point) 1)))))
-    (my-nbsp-fix langid nbsp begin end query-p)))
-
-(define-advice org-fill-paragraph (:before (&rest _ignored) my-nbsp-fix)
-  "Fix non-breaking spaces.
-
-Both the language and the nbsp sequence are guessed from the
-current buffer. If there is no guess for the nbsp sequence no
-operation is performed. Otherwise all matches are replaced
-silently."
-  (when-let ((nbsp (my-nbsp-get-sequence)))
-    (let* ((element (org-element-at-point))
-           (begin (org-element-property :begin element))
-           (end (org-element-property :end element)))
-      (require 'guess-language)
-      (my-org-nbsp-fix-element
-       (apply #'guess-language-region
-              (-cons-to-list (my-org-region-snap-to-elements begin end)))
-       nbsp))))
-
 ;;; Finding Files
 
 ;;;###autoload
@@ -1170,6 +1103,73 @@ If the new state is `DROP', drop the whole subtree."
                    nil t)
                   (invisible-p (point))))
         (outline-hide-entry)))))
+
+;;; Typography
+
+(defun my-org-region-snap-to-elements (begin end)
+  "Extend region bounds to nearest element boundaries.
+
+Returns a cons pair of new bounds."
+  (cons (save-excursion
+          (goto-char begin)
+          (org-element-property :begin (org-element-at-point)))
+        (save-excursion
+          (goto-char (- end 1))
+          (let ((element (org-element-at-point)))
+            (org-element-property (if (eq (org-element-type element)
+                                          'headline)
+                                      :contents-begin
+                                    :end)
+                                  element)))))
+
+(defun my-org-nbsp-fix-element (langid nbsp &optional begin end query-p)
+  "Fix non-breaking spaces in the element at point.
+
+LANGID is an ISO 639-1 language code. When called interactively,
+it is guessed from the contents of the element.
+
+NBSP is a string to insert for non-breaking space. When called
+interactively, it is guessed from the contents of the element.
+
+If BEGIN and END are non-nil, fix spaces in all elements in the
+region.
+
+QUERY-P specifies whether to query the user for each match or
+replace silently. `t' when called with a prefix argument."
+  (interactive
+   (pcase-let ((`(,begin . ,end)
+                (apply #'my-org-region-snap-to-elements
+                       (-cons-to-list
+                        (if (region-active-p)
+                            (car (region-bounds))
+                          (list (cons (point) (+ (point) 1))))))))
+     (require 'guess-language)
+     (list (guess-language-region begin end)
+           (call-interactively #'my-nbsp-get-sequence)
+           begin
+           end
+           current-prefix-arg)))
+  (pcase-let ((`(,begin . ,end)
+               (my-org-region-snap-to-elements (or begin (point))
+                                               (or end (+ (point) 1)))))
+    (my-nbsp-fix langid nbsp begin end query-p)))
+
+(define-advice org-fill-paragraph (:before (&rest _ignored) my-nbsp-fix)
+  "Fix non-breaking spaces.
+
+Both the language and the nbsp sequence are guessed from the
+current buffer. If there is no guess for the nbsp sequence no
+operation is performed. Otherwise all matches are replaced
+silently."
+  (when-let ((nbsp (my-nbsp-get-sequence)))
+    (let* ((element (org-element-at-point))
+           (begin (org-element-property :begin element))
+           (end (org-element-property :end element)))
+      (require 'guess-language)
+      (my-org-nbsp-fix-element
+       (apply #'guess-language-region
+              (-cons-to-list (my-org-region-snap-to-elements begin end)))
+       nbsp))))
 
 ;;; URLs
 
