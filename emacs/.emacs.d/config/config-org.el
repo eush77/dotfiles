@@ -1115,15 +1115,20 @@ If the new state is `DROP', drop the whole subtree."
 Returns a cons pair of new bounds."
   (cons (save-excursion
           (goto-char begin)
-          (org-element-property :begin (org-element-at-point)))
+          (let ((element (org-element-at-point)))
+            (if (eq (org-element-type element) 'src-block)
+                ;; Don't snap past source blocks.
+                begin
+              (org-element-property :begin element))))
         (save-excursion
           (goto-char (- end 1))
           (let ((element (org-element-at-point)))
-            (org-element-property (if (eq (org-element-type element)
-                                          'headline)
-                                      :contents-begin
-                                    :end)
-                                  element)))))
+            (cl-case (org-element-type element)
+              ;; Don't snap past entire sections.'
+              (headline (org-element-property :contents-begin element))
+              ;; Don't snap past source blocks.
+              (src-block end)
+              (t (org-element-property :end element)))))))
 
 (defun my-org-nbsp-fix-element (langid nbsp &optional begin end query-p)
   "Fix non-breaking spaces in the element at point.
