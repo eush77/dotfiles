@@ -25,6 +25,7 @@
     (my-hydra-emms-hint-line-time custom-face)
     (my-hydra-emms-hint-line-title custom-face)
     (my-magit-log-exclude-refs-regexp custom-variable)
+    (my-nbsp-patterns custom-variable)
     (my-open-line-and-indent custom-variable)
     (my-org-agenda-context-filter custom-variable)
     (my-org-agenda-todo-keyword-filter custom-variable)

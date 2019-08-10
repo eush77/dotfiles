@@ -445,6 +445,7 @@ With `C-u C-u' prefix argument, just reset
 
 ;;; Typography
 
+;;;###autoload
 (defcustom my-nbsp-patterns
   '((ru
      ("\\bа")
