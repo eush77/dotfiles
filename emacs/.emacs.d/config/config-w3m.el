@@ -120,7 +120,10 @@ point instead."
 
 (define-advice w3m-canonicalize-url (:filter-args (args) my-feeling-searchy)
   "Return search url for uncanonicalized query to `w3m-goto-url'."
-  (if (eq (cadadr (backtrace-frames 'w3m-canonicalize-url)) 'w3m-goto-url)
+  (if (eq (cadar (--drop-while
+                  (null (car it))
+                  (cdr (backtrace-frames 'w3m-canonicalize-url))))
+          'w3m-goto-url)
       (list (car args) t)
     args))
 
