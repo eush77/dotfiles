@@ -14,6 +14,22 @@ Returns the location of an Org file the FILE is exported from."
 (add-hook 'latex-mode-hook #'my-tex-ff-other-file-setup)
 (add-hook 'plain-tex-mode-hook #'my-tex-ff-other-file-setup)
 
+;;; Typography
+
+(define-advice LaTeX-fill-paragraph (:before (&rest _ignored) my-nbsp-fix)
+  "Fix non-breaking spaces."
+  (when-let ((nbsp (my-nbsp-get-sequence)))
+    (save-excursion
+      (LaTeX-forward-paragraph)
+      (let ((end (point)))
+        (LaTeX-backward-paragraph)
+        (let ((begin (point)))
+          (require 'guess-language)
+          (my-nbsp-fix (guess-language-region begin end)
+                       nbsp
+                       begin
+                       end))))))
+
 ;;; Keymap
 
 (define-key latex-mode-map "\C-c\C-j" #'counsel-outline)
