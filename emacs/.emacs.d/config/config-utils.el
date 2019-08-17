@@ -447,7 +447,10 @@ With `C-u C-u' prefix argument, just reset
 
 ;;;###autoload
 (defcustom my-nbsp-patterns
-  '((ru
+  '((nil
+     ("[[:digit:]]" . "[[:digit:]]")
+     ("" . "—"))
+    (ru
      ("\\bа")
      ("\\bбез")
      ("\\bбезо")
@@ -484,8 +487,6 @@ With `C-u C-u' prefix argument, just reset
      ("\\bу")
      ("\\bсм\\.")
      ("\\bт\\." . "[а-я]\\.")
-     ("[[:digit:]]" . "[[:digit:]]")
-     ("" . "—")
      ("" . "бы\\b")
      ("" . "же\\b")
      ("" . "ли\\b"))
@@ -506,11 +507,14 @@ With `C-u C-u' prefix argument, just reset
   "Patterns governing the use of non-breaking spaces.
 
 A list of pairs (SYMBOL . REGEXPS) where SYMBOL is either an ISO
-639-1 language code or a major mode symbol, and REGEXPS is a list
-of (START . END) pairs of regular expressions. END defaults to
-the empty string if nil. Whenever START and END match around a
-sequence of whitespace-only characters, these characters are to
-be replaced with a single non-breaking space.")
+639-1 language code or nil (matching every language), and REGEXPS
+is a list of (START . END) pairs of regular expressions. END
+defaults to the empty string if nil. Whenever START and END match
+around a sequence of whitespace-only characters, these characters
+are to be replaced with a single non-breaking space.")
+
+(defvar-local my-nbsp-local-patterns nil
+  "Same as `my-nbsp-patterns', but buffer-local.")
 
 (defvar-local my-nbsp-sequence nil
   "Non-breaking space sequence to use in the current buffer.")
@@ -571,8 +575,8 @@ replace silently. `t' when called interactively."
                                   (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
                                           start
                                           (or end "")))
-                                (append (alist-get langid my-nbsp-patterns)
-                                        (alist-get major-mode my-nbsp-patterns))
+                                (append (alist-get major-mode my-nbsp-patterns)
+                                        (alist-get langid my-nbsp-patterns))
                                 "\\|")
                      (concat "\\1" nbsp "\\2")
                      query-p

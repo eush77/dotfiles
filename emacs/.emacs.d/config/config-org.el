@@ -1106,8 +1106,13 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; Typography
 
-(setf (alist-get 'org-mode my-nbsp-patterns)
-      '(("[^/$]" . "---")))
+(defun my-org-setup-nbsp-local-patterns ()
+  "Set up `my-nbsp-local-patterns' for `org-mode'."
+  (setq my-nbsp-patterns '((nil ("[^/$]" . "---"))
+                           (ru
+                            ("\\bна" . "\\b\\|\\[")))))
+
+(add-hook 'org-mode-hook #'my-org-setup-nbsp-local-patterns)
 
 (defun my-org-region-snap-to-elements (begin end)
   "Extend region bounds to nearest element boundaries.
