@@ -115,7 +115,7 @@ point instead."
   "Auto-prepend \"http://\" to domain-looking names."
   (pcase-let ((`(,url ,feeling-searchy) args))
     (if (string-match-p "^[a-zA-Z0-9.-]+\\.[a-zA-Z0-9.-]+\\(?:/.*\\)?$" url)
-        (cons (concat "http://" url) feeling-searchy)
+        (list (concat "http://" url) feeling-searchy)
       args)))
 
 (define-advice w3m-canonicalize-url (:filter-args (args) my-feeling-searchy)
