@@ -1,7 +1,8 @@
 (pdf-tools-install)
 
 (with-eval-after-load "pdf-tools"
-  (add-hook 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode)
+  (add-to-list 'pdf-tools-enabled-modes
+               'pdf-view-midnight-minor-mode)
 
   ;; `pdf-isearch-minor-mode' integrates `pdf-tools' with `isearch'.
   (define-key pdf-view-mode-map (kbd "C-r") #'isearch-backward)
