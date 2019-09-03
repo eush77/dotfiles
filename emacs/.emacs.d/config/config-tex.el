@@ -4,7 +4,7 @@
   "`ff-other-file-alist' function for TeX files.
 
 Returns the location of an Org file the FILE is exported from."
-  (list (concat (file-name-sans-extension file) ".org")))
+  (list (concat (file-name-base file) ".org")))
 
 (defun my-tex-ff-other-file-setup ()
   "Setup for `ff-get-other-file'."

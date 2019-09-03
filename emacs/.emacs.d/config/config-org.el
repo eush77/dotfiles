@@ -832,8 +832,7 @@ Returns either a one-element list or an empty list."
 
 (defun my-org-ff-other-file/export (file)
   "Return the list of locations of files exported from FILE."
-  (mapcar (lambda (ext)
-            (concat (file-name-sans-extension file) ext))
+  (mapcar (lambda (ext) (concat (file-name-base file) ext))
           ;; The order of extensions matters for files exported to multiple
           ;; formats
           '(".tex" ".html" ".man" ".md" ".txt")))
