@@ -406,7 +406,7 @@ Returns nil if there is no extractor for URL."
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
       (buffer-file-name)
-      (my-xdg-web-browser-buffer-p)))
+      (and (boundp 'exwm-state) (my-xdg-web-browser-buffer-p))))
 
 (defvar my-org-capture-killed-link-urls nil
   "Urls from the kill ring.")
