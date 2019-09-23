@@ -113,6 +113,13 @@ COMMAND is the default command."
                           (cons my-compile-history 1)
                         my-compile-history)))
 
+(define-advice compile (:around (func command &rest rest) my-add-to-history)
+  "Add COMMAND to compilation history."
+  (with-current-buffer (apply func command rest)
+    (cl-assert (eq major-mode 'compilation-mode))
+    (unless (equal (car (symbol-value my-compile-history)) command)
+      (push command (symbol-value my-compile-history)))))
+
 (defun my-rename-buffer--compile-history-docstring (&rest _)
   "Update documentation string for local history variable."
   (when (eq major-mode 'compilation-mode)
