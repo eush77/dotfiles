@@ -48,6 +48,21 @@ the same window."
   (message "Dired DWIM target %s"
            (if dired-dwim-target "enabled" "disabled")))
 
+(defun my-dired-tmpdir ()
+  "Create a temporary directory buffer.
+
+The new directory will be deleted when the buffer is killed."
+  (interactive)
+  (with-current-buffer (dired (make-temp-file "" t))
+    (add-hook 'kill-buffer-hook
+              (lambda ()
+                (unless (file-in-directory-p dired-directory
+                                             temporary-file-directory)
+                  (error "Not removing a directory not in %s"
+                         temporary-file-directory))
+                (delete-directory dired-directory t t))
+              nil t)))
+
 ;;; dired-do-delete
 
 (defun my-dired-do-delete--rmdir (&optional arg)
@@ -181,6 +196,7 @@ This is used by `htmlize' to insert html links to files."
 (define-key dired-mode-map (kbd "c") #'dired-kill-subdir)
 (define-key dired-mode-map (kbd "h") #'my-dired-other-window)
 (define-key dired-mode-map (kbd "r") #'dired-do-query-replace-regexp)
+(define-key dired-mode-map (kbd "T") #'my-dired-tmpdir)
 (define-key dired-mode-map (kbd "x") nil)
 (define-key dired-mode-map (kbd "X") #'dired-do-flagged-delete)
 (define-key dired-mode-map (kbd "z") #'dired-hide-subdir)
