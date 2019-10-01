@@ -37,5 +37,6 @@ Returns the location of an Org file the FILE is exported from."
 (define-key plain-tex-mode-map "\C-c\C-j" #'counsel-outline)
 
 (key-chord-define latex-mode-map "xw" #'ff-get-other-file)
-(key-chord-define LaTeX-mode-map "xw" #'ff-get-other-file)
 (key-chord-define plain-tex-mode-map "xw" #'ff-get-other-file)
+(when (boundp 'LaTeX-mode-map)
+  (key-chord-define LaTeX-mode-map "xw" #'ff-get-other-file))
