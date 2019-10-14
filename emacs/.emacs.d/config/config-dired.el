@@ -133,8 +133,10 @@ expand it in DESTINATION-DIRECTORY, returning a list of possible
 alternative names."
   (let* ((filename (directory-file-name (file-relative-name file
                                                             source-directory)))
-         (dirname (expand-file-name (file-name-directory filename)
-                                    destination-directory)))
+         (dirname (if (file-name-directory filename)
+                      (expand-file-name (file-name-directory filename)
+                                        destination-directory)
+                    destination-directory)))
     (mapcar (lambda (basename)
               (file-name-as-directory (expand-file-name basename dirname)))
             (my-punct-delimited-prefixes (file-name-nondirectory filename)))))
