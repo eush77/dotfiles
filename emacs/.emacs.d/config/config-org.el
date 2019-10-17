@@ -3,6 +3,7 @@
 (package-install-selected-packages)
 
 (require 'enlive)
+(require 'org-datetree)
 (require 'org-depend)
 (require 'subr-x)
 
@@ -645,6 +646,43 @@ Returns nil if there is no extractor for URL."
                       (t right)))
               timestamps
               ""))
+
+;;; Datetree
+
+(defun my-org-datetree-move-entries ()
+  "Move level-1 entries with timestamps into the datetree.
+
+Returns t if any changes have been made, nil otherwise."
+  (require 'hl-line)
+  (save-excursion
+    (while (org-up-heading-safe))
+    (when (string-match-p
+           "\\`20[1-9][0-9]\\'"
+           (org-element-property :raw-value (org-element-context)))
+      (let ((hl-line-mode t)
+            (case-fold-search)
+            (modified-p))
+        (while (re-search-forward (concat "^\\*\\s *"
+                                          org-todo-regexp
+                                          "?\\s *"
+                                          org-ts-regexp)
+                                  nil t)
+          (let* ((dct (decode-time (org-time-string-to-time
+                                    (or (match-string 2) (match-string 1)))))
+                 (date (list (nth 4 dct) (nth 3 dct) (nth 5 dct))))
+            (hl-line-highlight)
+            (when (condition-case err (y-or-n-p "Move entry into datetree? ")
+                    ((error quit)
+                     (hl-line-unhighlight)
+                     (signal (car err) (cdr err))))
+              (hl-line-unhighlight)
+              (org-cut-subtree)
+              (org-datetree-file-entry-under (current-kill 0) date)
+              (org-reveal)
+              (setq modified-p t))))
+        modified-p))))
+
+(add-hook 'org-ctrl-c-ctrl-c-hook #'my-org-datetree-move-entries)
 
 ;;; Ediff
 
