@@ -119,3 +119,7 @@
 blocks."
     :lighter "SP/{}"
     :keymap 'my-sp-c++-restrict-to-blocks-mode-map))
+
+;;; Java
+
+(define-key java-mode-map [remap indent-region] #'clang-format-region)
