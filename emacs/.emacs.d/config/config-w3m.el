@@ -199,6 +199,12 @@ configuration and doesn't close buffers in other windows."
       (bury-buffer (window-buffer))
       (set-window-buffer (selected-window) (other-buffer)))))
 
+;;; w3m-db-history
+
+(define-advice w3m-db-history (:before (&rest _) my-new-session)
+  "Switch to a new session."
+  (w3m-create-empty-session))
+
 ;;; w3m-download
 
 (defun my-w3m-download--default-directory (func &rest args)
