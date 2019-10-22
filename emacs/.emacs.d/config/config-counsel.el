@@ -95,10 +95,12 @@ Git repository.
 
 See `counsel-git-grep'."
   (interactive "P")
-  (if (region-active-p)
-      (counsel-git-grep cmd (buffer-substring (region-beginning)
-                                              (region-end)))
-    (counsel-git-grep cmd (thing-at-point 'symbol))))
+  (counsel-git-grep
+   (if (region-active-p)
+       (buffer-substring (region-beginning) (region-end))
+     (thing-at-point 'symbol))
+   nil
+   cmd))
 
 (defun my-counsel-git-grep-add-project (&rest directories)
   "Add configuration for a project with DIRECTORIES to
@@ -111,30 +113,31 @@ Git Grep will be limited to DIRECTORIES."
     (dolist (directory directories)
       (push (cons directory cmd) counsel-git-grep-projects-alist))))
 
-(defun my-counsel-git-grep--projects (args)
+(define-advice counsel-git-grep
+    (:before (&optional initial-input initial-directory cmd) my-projects)
   "Use `counsel-git-grep-projects-alist' configuration when the
-`default-directory' resides in a project. With a prefix argument,
+INITIAL-DIRECTORY resides in a project. With a prefix argument,
 force using Git root instead.
 
-If `default-directory' does not reside in a project, the behavior
-is unchanged."
-  (if (cl-find-if
-       (lambda (x)
-         (string-match (car x) (expand-file-name default-directory)))
-       counsel-git-grep-projects-alist)
-      (cons (not (car args)) (cdr args))
-    args))
-(advice-add 'counsel-git-grep
-            :filter-args #'my-counsel-git-grep--projects)
+If INITIAL-DIRECTORY does not reside in a project, the behavior
+is unchanged.
 
-(defun my-counsel-git-grep--region (args)
+INITIAL-DIRECTORY defaults to `default-directory'."
+    (when (and (cl-find-if
+                (lambda (x)
+                  (string-match (car x)
+                                (expand-file-name (or initial-directory
+                                                      default-directory))))
+                counsel-git-grep-projects-alist)
+               (null cmd))
+      (setq current-prefix-arg t)))
+
+(define-advice counsel-git-grep (:filter-args (args) my-region)
   "Grep for an active region."
   (if (region-active-p)
-      (list (car args)
-            (buffer-substring (mark) (point)))
+      (cons (buffer-substring (mark) (point))
+            (cdr args))
     args))
-(advice-add 'counsel-git-grep
-            :filter-args #'my-counsel-git-grep--region)
 
 (defun my-counsel-git-grep--rg (func &rest args)
   "Fall back to `counsel-rg' if not in a Git project."
