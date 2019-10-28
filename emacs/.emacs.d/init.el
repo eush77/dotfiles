@@ -115,6 +115,7 @@
 ;; Not all of the configuration is included here - see the config directory
 ;; for more configuration (typically requiring additional packages installed)
 ;; and load corresponding entries in the host file.
+(load "config-artist")
 (load "config-base")
 (load "config-color-identifiers-mode")
 (load "config-counsel")
