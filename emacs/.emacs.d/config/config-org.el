@@ -649,40 +649,70 @@ Returns nil if there is no extractor for URL."
 
 ;;; Datetree
 
-(defun my-org-datetree-move-entries ()
-  "Move level-1 entries with timestamps into the datetree.
+(defun my-org-in-datetree-p ()
+  "t if point is inside a datetree, nil otherwise."
+  (catch 'return
+    (save-excursion
+      (org-back-to-heading)
+      (while (not (string-match-p
+                   "\\`20[1-9][0-9]\\'"
+                   (org-element-property :raw-value
+                                         (org-element-context))))
+        (unless (org-up-heading-safe)
+          (throw 'return nil)))
+      (or (= 1 (org-current-level))
+          (progn (org-up-heading-safe)
+                 (and (org-element-property :DATE_TREE
+                                            (org-element-context))
+                      t))))))
 
-Returns t if any changes have been made, nil otherwise."
+(defun my-org-datetree-file-entries ()
+  "File top-level entries into the datetree."
+  (interactive)
   (require 'hl-line)
   (save-excursion
-    (while (org-up-heading-safe))
-    (when (string-match-p
-           "\\`20[1-9][0-9]\\'"
-           (org-element-property :raw-value (org-element-context)))
-      (let ((hl-line-mode t)
-            (case-fold-search)
-            (modified-p))
-        (while (re-search-forward (concat "^\\*\\s *"
-                                          org-todo-regexp
-                                          "?\\s *"
-                                          org-ts-regexp)
-                                  nil t)
-          (let* ((dct (decode-time (org-time-string-to-time
-                                    (or (match-string 2) (match-string 1)))))
-                 (date (list (nth 4 dct) (nth 3 dct) (nth 5 dct))))
-            (hl-line-highlight)
-            (when (condition-case err (y-or-n-p "Move entry into datetree? ")
-                    ((error quit)
-                     (hl-line-unhighlight)
-                     (signal (car err) (cdr err))))
-              (hl-line-unhighlight)
-              (org-cut-subtree)
-              (org-datetree-file-entry-under (current-kill 0) date)
-              (org-reveal)
-              (setq modified-p t))))
-        modified-p))))
+    (let ((hl-line-mode t)
+          (case-fold-search))
+      (while (re-search-forward (concat "^\\*\\s *"
+                                        org-todo-regexp
+                                        "?\\s *"
+                                        org-ts-regexp)
+                                nil t)
+        (let ((timestamp (org-element-context)))
+          (cl-assert (eq (org-element-type timestamp) 'timestamp))
+          (hl-line-highlight)
+          (when (condition-case err (y-or-n-p "File into datetree? ")
+                  ((error quit)
+                   (hl-line-unhighlight)
+                   (signal (car err) (cdr err))))
+            (hl-line-unhighlight)
+            (org-cut-subtree)
+            (org-datetree-file-entry-under
+             (current-kill 0)
+             (list (org-element-property :month-start timestamp)
+                   (org-element-property :day-start timestamp)
+                   (org-element-property :year-start timestamp)))
+            (org-reveal)))))))
 
-(add-hook 'org-ctrl-c-ctrl-c-hook #'my-org-datetree-move-entries)
+(define-advice org-timestamp-change
+    (:around (func n &rest args) my-datetree-file-or-cleanup)
+  "File heading or clean up the datetree if change is a no-op."
+  (let ((element (org-element-context)))
+    (cl-assert (eq (org-element-type element) 'timestamp))
+    (apply func n args)
+    (when (and (zerop n)
+               (equal (org-element-context) element))
+      (if (my-org-in-datetree-p)
+          (when (yes-or-no-p "Clean up the datetree? ")
+            (org-datetree-cleanup))
+        (when (y-or-n-p "File into datetree? ")
+          (org-cut-subtree)
+          (org-datetree-file-entry-under
+           (current-kill 0)
+           (list (org-element-property :month-start element)
+                 (org-element-property :day-start element)
+                 (org-element-property :year-start element)))
+          (org-reveal))))))
 
 ;;; Ediff
 
