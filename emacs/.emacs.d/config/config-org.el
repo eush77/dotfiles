@@ -1071,7 +1071,7 @@ This may silently modify any entry from the point onward."
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
  '(org-todo-keywords '((type  "TODO(!)" "NEXT(!)" "WAIT(@)"
-                              "|" "DONE(!)" "DROP(@)")
+                              "|" "DONE(!)" "DROP(!)")
                        (sequence "PLAN" "|" "PASS" "FAIL")))
  '(org-todo-keyword-faces '(("PLAN" . "yellow")
                             ("PASS" . "green")
