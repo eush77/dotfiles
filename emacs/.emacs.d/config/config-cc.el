@@ -122,4 +122,11 @@ blocks."
 
 ;;; Java
 
+(define-key java-mode-map (kbd "C-c C-a") #'sp-beginning-of-sexp)
+(define-key java-mode-map (kbd "C-c C-b") #'sp-backward-sexp)
+(define-key java-mode-map (kbd "C-c C-d") #'sp-kill-sexp)
+(define-key java-mode-map (kbd "C-c C-e") #'sp-end-of-sexp)
+(define-key java-mode-map (kbd "C-c C-f") #'sp-forward-sexp)
+(define-key java-mode-map (kbd "C-c C-u C-M-b") #'sp-backward-barf-sexp)
+(define-key java-mode-map (kbd "C-c C-u C-M-f") #'sp-forward-barf-sexp)
 (define-key java-mode-map [remap indent-region] #'clang-format-region)
