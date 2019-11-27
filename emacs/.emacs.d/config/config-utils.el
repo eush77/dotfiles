@@ -567,21 +567,23 @@ replace silently. `t' when called interactively."
       end
       t)))
   (save-excursion
-    (perform-replace (mapconcat (pcase-lambda (`(,start . ,end))
-                                  (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
-                                          start
-                                          (or end "")))
-                                (append (alist-get langid my-nbsp-patterns)
-                                        (alist-get major-mode my-nbsp-patterns))
-                                "\\|")
-                     (concat "\\1" nbsp "\\2")
-                     query-p
-                     t
-                     nil
-                     nil
-                     nil
-                     start
-                     end)))
+    (let ((case-replace))
+      (perform-replace
+       (mapconcat (pcase-lambda (`(,start . ,end))
+                    (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
+                            start
+                            (or end "")))
+                  (append (alist-get langid my-nbsp-patterns)
+                          (alist-get major-mode my-nbsp-patterns))
+                  "\\|")
+       (concat "\\1" nbsp "\\2")
+       query-p
+       t
+       nil
+       nil
+       nil
+       start
+       end))))
 
 (defun my-nbsp-fix-paragraph (langid nbsp &optional query-p)
   "Fix non-breaking spaces in the current paragraph.
