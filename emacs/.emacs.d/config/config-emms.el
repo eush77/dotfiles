@@ -118,13 +118,22 @@ Active sink is defined as the last one in the list printed by
     (cadr (split-string (buffer-substring (line-beginning-position 0)
                                           (point-max))))))
 
-(defun my-emms-volume-pulse-get-volume--select-sink ()
+(defun emms-volume--pulse-get-volume@my-select-sink ()
   "Select the active `emms-volume-pulse-sink'."
   (setq emms-volume-pulse-sink (my-emms-pulse-get-sink)))
 
+(defun emms-volume-pulse-change@my-default-directory (func &rest args)
+  "Run command in a local directory."
+  (let ((default-directory "/"))
+    (apply func args)))
+
 (with-eval-after-load "emms-volume-pulse"
   (advice-add 'emms-volume--pulse-get-volume
-              :before #'my-emms-volume-pulse-get-volume--select-sink))
+              :before #'emms-volume--pulse-get-volume@my-select-sink)
+  (advice-add 'emms-volume--pulse-get-volume
+              :around #'emms-volume-pulse-change@my-default-directory)
+  (advice-add 'emms-volume-pulse-change
+              :around #'emms-volume-pulse-change@my-default-directory))
 
 ;;; Volume
 
