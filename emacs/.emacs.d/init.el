@@ -42,6 +42,7 @@
     (my-switch-window-overlay-current custom-face)
     (my-switch-window-overlay-other custom-face)
     (my-w3m-default-face-remapping-specs custom-variable)
+    (my-w3m-image-size-limit custom-variable)
     (my-window-size-delta custom-variable))
   "Settings for my personal configuration."
   :prefix "my-"

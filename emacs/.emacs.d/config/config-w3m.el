@@ -96,6 +96,38 @@ point instead."
           (end (next-single-property-change (point) 'face)))
       (buffer-substring-no-properties begin end ))))
 
+;;; my-w3m-prescale-images
+
+(defcustom my-w3m-image-size-limit '(100 . 100)
+  "Maximum initial size of an inline image after page load, as
+pair (WIDTH . HEIGHT)."
+  :type '(cons (number :tag "Width") (number :tag "Height")))
+
+(defun my-w3m-prescale-images (&rest _ignored)
+  "Scale all images in the current buffer according to
+MY-W3M-IMAGE-SIZE-LIMIT."
+  (let ((display-inline-images-p (w3m-display-inline-images-p))
+        (point (point-min)))
+    (w3m-turnoff-inline-images)
+    (save-excursion
+      (while
+          (setq point (next-single-property-change point 'w3m-image))
+        (when-let* ((url (w3m-image point))
+                    (size (or (get-text-property point 'w3m-image-size)
+                              (image-size (w3m-create-image url))))
+                    (rate (* (min (/ (float (car my-w3m-image-size-limit))
+                                     (car size))
+                                  (/ (float (cdr my-w3m-image-size-limit))
+                                     (cdr size)))
+                             100)))
+          (when (< rate 100)
+            (goto-char point)
+            (w3m-resize-inline-image-internal url rate)))))
+    (when display-inline-images-p
+      (w3m-toggle-inline-images t))))
+
+(add-hook 'w3m-display-functions #'my-w3m-prescale-images)
+
 ;;; w3m-bookmark-file
 
 (defun w3m-bookmark-file-modtime--chase-links (func &rest args)
