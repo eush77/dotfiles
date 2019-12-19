@@ -1100,12 +1100,13 @@ This may silently modify any entry from the point onward."
 (custom-set-variables
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
- '(org-todo-keywords '((type  "TODO(!)" "NEXT(!)" "WAIT(@)"
-                              "|" "DONE(!)" "DROP(!)")
+ '(org-todo-keywords '((type  "TODO(t!)" "NEXT(n!)" "WAIT(w@)"
+                              "|" "DONE(d!)" "DROP(r!)")
                        (sequence "PLAN" "|" "PASS" "FAIL")))
  '(org-todo-keyword-faces '(("PLAN" . "yellow")
                             ("PASS" . "green")
-                            ("FAIL" . "red"))))
+                            ("FAIL" . "red")))
+ '(org-use-fast-todo-selection 'expert))
 
 (defun my-org-drop-headings (end)
   "Drop headings from point to END."
