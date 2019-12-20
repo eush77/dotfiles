@@ -861,7 +861,7 @@ url into the current buffer as a headline with properties."
     (unless (eq insert-fn 'ignore)
       insert-fn)))
 
-;;; ff-get-other-file
+;;; Find-Other-File
 
 (defun my-locate-org-file (file)
   "Find FILE in `org-directory'.
