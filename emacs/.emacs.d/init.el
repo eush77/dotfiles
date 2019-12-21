@@ -160,6 +160,7 @@
 (with-eval-after-load "highlight" (load "config-highlight"))
 (with-eval-after-load "hippie-exp" (load "config-hippie-expand"))
 (with-eval-after-load "htmlize" (load "config-htmlize"))
+(with-eval-after-load "ibuffer" (load "config-ibuffer"))
 (with-eval-after-load "info" (load "config-info"))
 (with-eval-after-load "js2-mode" (load "config-js2"))
 (with-eval-after-load "litable" (load "config-litable"))
