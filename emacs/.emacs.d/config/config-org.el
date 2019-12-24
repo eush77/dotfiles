@@ -697,10 +697,11 @@ Returns nil if there is no extractor for URL."
 (define-advice org-timestamp-change
     (:around (func n &rest args) my-datetree-file-or-cleanup)
   "File heading or clean up the datetree if change is a no-op."
-  (let ((element (org-element-context)))
-    (cl-assert (eq (org-element-type element) 'timestamp))
+  (let* ((element (org-element-context))
+         (at-timestamp-p (eq (org-element-type element) 'timestamp)))
     (apply func n args)
-    (when (and (zerop n)
+    (when (and at-timestamp-p
+               (zerop n)
                (equal (org-element-context) element))
       (if (my-org-in-datetree-p)
           (when (yes-or-no-p "Clean up the datetree? ")
