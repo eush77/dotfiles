@@ -7,8 +7,7 @@
  '(eshell-ls-initial-args '("--classify"
                             "--color=auto"
                             "--group-directories-first"
-                            "-v"))
- '(eshell-prefer-lisp-functions t))
+                            "-v")))
 
 ;; Advice `eshell-dirs-substitute-cd' to list directory contents.
 (defun eshell-dirs-substitute-cd--ls (func &rest args)
