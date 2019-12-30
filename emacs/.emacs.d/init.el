@@ -36,6 +36,7 @@
     (my-rr-replay-buffer-name custom-variable)
     (my-rr-replay-port custom-variable)
     (my-rr-trace-root-directory custom-variable)
+    (my-shell-command-kill-buffer-when-terminated custom-variable)
     (my-sml-dedicated-window-identification custom-face)
     (my-switch-window-current custom-face)
     (my-switch-window-other custom-face)
