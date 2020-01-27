@@ -12,3 +12,9 @@
   (define-key pdf-view-mode-map (kbd "k") #'pdf-view-previous-line-or-previous-page)
   (define-key pdf-view-mode-map (kbd "h") #'image-backward-hscroll)
   (define-key pdf-view-mode-map (kbd "l") #'image-forward-hscroll))
+
+(with-eval-after-load "pdf-outline"
+  (define-key pdf-outline-buffer-mode-map (kbd "O")
+    #'pdf-outline-follow-link)
+  (define-key pdf-outline-buffer-mode-map (kbd "RET")
+    #'pdf-outline-follow-link-and-quit))
