@@ -693,12 +693,17 @@ Resize window
 
 ;;; Window switching
 
+(defun my-select-window-and-frame (window)
+  "Select WINDOW and raise its frame."
+  (select-window window)
+  (select-frame-set-input-focus (window-frame window)))
+
 ;;;###autoload
 (defun my-switch-to-mru-window ()
   "Switch to most recently used window."
   (interactive)
-  (select-window (or (get-mru-window t t t) (minibuffer-window)))
-  (select-frame-set-input-focus (window-frame (selected-window))))
+  (my-select-window-and-frame
+   (or (get-mru-window t t t) (minibuffer-window))))
 
 (defun my-frame-wm-desktop (&optional frame)
   "Get _NET_WM_DESKTOP number of a FRAME or nil.
@@ -770,7 +775,7 @@ See `my-active-windows'.")
   "Switch to the next Nth window in `my-switch-window-order'."
   (interactive "p")
   (if (zerop n)
-      (select-window
+      (my-select-window-and-frame
        (elt my-switch-window-order my-switch-window-index))
     (setq my-switch-window-index
           (mod (+ my-switch-window-index (cl-signum n))
@@ -781,7 +786,7 @@ See `my-active-windows'.")
 
 (defun my-switch-window-nth (n)
   "Switch to N-th window in `my-switch-window-order'."
-  (select-window (elt my-switch-window-order n)))
+  (my-select-window-and-frame (elt my-switch-window-order n)))
 
 (defvar my-switch-window-overlays []
   "Window-number overlays for `my-switch-window-hydra/body'.")
@@ -933,6 +938,6 @@ FORCE-DISPLAY-P is non-nil."
   (cl-case (and (not force-display-p)
                 (length (my-active-windows)))
     (1 (message "No other window"))
-    (2 (select-window (car (remq (selected-window)
-                                 (my-active-windows)))))
+    (2 (my-select-window-and-frame
+        (car (remq (selected-window) (my-active-windows)))))
     (otherwise (my-switch-window-hydra/body))))
