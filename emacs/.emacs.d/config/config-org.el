@@ -828,13 +828,30 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
          (string-trim (replace-regexp-in-string "[[:space:]\n]+" " "
                                                 (enlive-text el))))))))
 
+(defun my-org-tretyakovgallery-insert (url)
+  "Insert headline for a Tretyakov Gallery URL."
+  (interactive "sURL: ")
+  (let* ((page (enlive-fetch url))
+         (title
+          (replace-regexp-in-string
+           "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
+           (enlive-text
+            (car (enlive-get-elements-by-class-name
+                  page "header-event__title"))))))
+    (org-insert-heading)
+    (insert (org-make-link-string url title))
+    (when (string-match-p "/cinema/" url)
+      (org-set-tags ":cinema:"))))
+
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
     ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
     ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/"
      my-org-goodreads-insert)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
-    ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore))
+    ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore)
+    ("TRETYAKOVGALLERY" "\\`https?://www\\.tretyakovgallery\\.ru/"
+     my-org-tretyakovgallery-insert))
   "List of extractors configured for URLs.
 
 Each extractor is a triple (NAME URL-REGEXP INSERT-FN), where
