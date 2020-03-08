@@ -783,6 +783,31 @@ Each element is a cons cell (PREFIX . PROPERTY).")
                (org-set-property property value))))
          (cl-return))))))
 
+(defun my-org-garagemca-insert (url)
+  "Insert headline for a Garage MCA URL."
+  (interactive "sURL: ")
+  (let* ((page (enlive-fetch url))
+         (page-en (enlive-fetch (replace-regexp-in-string
+                                 "/ru/" "/en/" url)))
+         (title
+          (enlive-text (car (enlive-get-elements-by-class-name
+                             page "event__header__title"))))
+         (org-end-time-was-given)
+         (timestamp
+          (replace-regexp-in-string
+           "–" "-"
+           (enlive-text
+            (--map-when
+             (and (consp it) (eq (car it) 'comment))
+             " "
+             (car (enlive-get-elements-by-class-name
+                   page-en "event__meta__timestamp")))))))
+    (org-insert-heading)
+    (org-insert-time-stamp (org-read-date nil t timestamp)
+                           t nil nil nil (list org-end-time-was-given))
+    (insert " ")
+    (insert (org-make-link-string url title))))
+
 (defvar my-org-goodreads-genre-limit 3
   "Maximum number of genres inserted into GENRES property.")
 
@@ -846,6 +871,7 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
     ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
+    ("GARAGEMCA" "\\`https?://garagemca\\.org/" my-org-garagemca-insert)
     ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/"
      my-org-goodreads-insert)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
