@@ -853,6 +853,32 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
          (string-trim (replace-regexp-in-string "[[:space:]\n]+" " "
                                                 (enlive-text el))))))))
 
+(defun my-org-timepad-insert (url)
+  "Insert headline for a Timepad URL."
+  (interactive "sURL: ")
+  (cl-assert (string-match "/event/\\([[:digit:]]+\\)/" url))
+  (let ((event
+         (with-current-buffer (url-retrieve-synchronously
+                               (concat "https://api.timepad.ru/v1/events/"
+                                       (match-string 1 url)))
+           (json-read-from-string
+            (decode-coding-string (buffer-substring (point) (point-max))
+                                  'utf-8)))))
+    (org-insert-heading)
+    (org-insert-time-stamp
+     (date-to-time (alist-get 'starts_at event))
+     t nil nil nil
+     (list
+      (format-time-string "%R"
+                          (date-to-time (alist-get 'ends_at event)))))
+    (insert " ")
+    (insert (org-make-link-string url (alist-get 'name event)))
+    (org-set-property
+     "LOCATION"
+     (concat (alist-get 'name (alist-get 'organization event))
+             ", "
+             (alist-get 'address (alist-get 'location event))))))
+
 (defun my-org-tretyakovgallery-insert (url)
   "Insert headline for a Tretyakov Gallery URL."
   (interactive "sURL: ")
@@ -876,6 +902,8 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
      my-org-goodreads-insert)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
     ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore)
+    ("TIMEPAD" "\\`https?://[^./]+\\.timepad\\.ru/event/[[:digit:]]+/"
+     my-org-timepad-insert)
     ("TRETYAKOVGALLERY" "\\`https?://www\\.tretyakovgallery\\.ru/"
      my-org-tretyakovgallery-insert))
   "List of extractors configured for URLs.
