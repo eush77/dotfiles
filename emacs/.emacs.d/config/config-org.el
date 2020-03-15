@@ -745,6 +745,8 @@ Returns nil if there is no extractor for URL."
 
 ;;; Extract
 
+(defvar my-org-extracted-timestamps)
+
 (defvar my-org-audible-properties
   '(("By: " . "AUTHOR")
     ("Narrated by: " . "NARRATOR")
@@ -888,11 +890,48 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
            "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
            (enlive-text
             (car (enlive-get-elements-by-class-name
-                  page "header-event__title"))))))
+                  page "header-event__title")))))
+         (duration
+          ;; Round up to the nearest 10-minutes mark.
+          (* (fceiling
+              (/ (apply
+                  #'+
+                  (--mapcat
+                   (let ((text (enlive-text it)))
+                     (and (string-match
+                           "\\b\\([[:digit:]]+\\) мин\\.\\'"
+                           text)
+                          (list (string-to-number
+                                 (match-string 1 text)))))
+                   (enlive-get-elements-by-class-name
+                    page "event-desc__lid")))
+                 10.0))
+             10))
+         (timestamps
+          (--map (with-temp-buffer
+                   (let ((start-time
+                          (org-read-date
+                           t t
+                           (alist-get 'value (cadr it)))))
+                     (org-insert-time-stamp
+                      start-time t nil nil nil
+                      (and (not (zerop duration))
+                           (format-time-string
+                            "-%R"
+                            (time-add start-time
+                                      (* duration 60))))))
+                   (buffer-string))
+                 (enlive-get-elements-by-class-name
+                  page
+                  "event-schedule-time__input"))))
     (org-insert-heading)
+    (when timestamps
+      (insert (car timestamps) " "))
     (insert (org-make-link-string url title))
     (when (string-match-p "/cinema/" url)
-      (org-set-tags ":cinema:"))))
+      (org-set-tags ":cinema:"))
+    (when (boundp 'my-org-extracted-timestamps)
+      (setq my-org-extracted-timestamps timestamps))))
 
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
