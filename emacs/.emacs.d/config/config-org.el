@@ -884,52 +884,89 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 (defun my-org-tretyakovgallery-insert (url)
   "Insert headline for a Tretyakov Gallery URL."
   (interactive "sURL: ")
-  (let* ((page (enlive-fetch url))
-         (title
-          (replace-regexp-in-string
-           "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
-           (enlive-text
-            (car (enlive-get-elements-by-class-name
-                  page "header-event__title")))))
-         (duration
-          ;; Round up to the nearest 10-minutes mark.
-          (* (fceiling
-              (/ (apply
-                  #'+
-                  (--mapcat
-                   (let ((text (enlive-text it)))
-                     (and (string-match
-                           "\\b\\([[:digit:]]+\\) мин\\.\\'"
-                           text)
-                          (list (string-to-number
-                                 (match-string 1 text)))))
-                   (enlive-get-elements-by-class-name
-                    page "event-desc__lid")))
-                 10.0))
-             10))
-         (timestamps
-          (--map (with-temp-buffer
-                   (let ((start-time
-                          (org-read-date
-                           t t
-                           (alist-get 'value (cadr it)))))
-                     (org-insert-time-stamp
-                      start-time t nil nil nil
-                      (and (not (zerop duration))
-                           (format-time-string
-                            "-%R"
-                            (time-add start-time
-                                      (* duration 60))))))
-                   (buffer-string))
-                 (enlive-get-elements-by-class-name
-                  page
-                  "event-schedule-time__input"))))
+  (pcase-let*
+      ((page (enlive-fetch url))
+       (title
+        ;; Strip content rating.
+        (replace-regexp-in-string
+         "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
+         (enlive-text
+          (car (enlive-get-elements-by-class-name
+                page "header-event__title")))))
+       (`(,timestamps . ,tags)
+        (if (string-match-p "/cinema/" url)
+            (let ((duration
+                   ;; Round up to the nearest 10-minutes mark.
+                   (* (fceiling
+                       (/ (apply
+                           #'+
+                           (--mapcat
+                            (let ((text (enlive-text it)))
+                              (and (string-match
+                                    "\\b\\([[:digit:]]+\\) мин\\.\\'"
+                                    text)
+                                   (list (string-to-number
+                                          (match-string 1 text)))))
+                            (enlive-get-elements-by-class-name
+                             page "event-desc__lid")))
+                          10.0))
+                      10)))
+              (cons
+               (--map (with-temp-buffer
+                        (let ((start-time
+                               (org-read-date
+                                t t
+                                (alist-get 'value (cadr it)))))
+                          (org-insert-time-stamp
+                           start-time t nil nil nil
+                           (and (not (zerop duration))
+                                (format-time-string
+                                 "-%R"
+                                 (time-add start-time
+                                           (* duration 60))))))
+                        (buffer-string))
+                      (enlive-get-elements-by-class-name
+                       page
+                       "event-schedule-time__input"))
+               "cinema"))
+          (pcase-let*
+              ((page-en
+                (enlive-fetch
+                 (replace-regexp-in-string "\\.ru/" ".ru/en/" url)))
+               (type
+                (downcase
+                 (enlive-text (car (enlive-get-elements-by-class-name
+                                    page-en "event-info__type")))))
+               (`(,duration . ,tags)
+                (cond ((string-equal type "lectures")
+                       '(120 . "lecture"))
+                      ((string-equal type "guided tours")
+                       '(80 . ("museum" "tour")))
+                      (t '(nil . nil))))
+               (start-time
+                (org-read-date
+                 t t
+                 (concat (enlive-text
+                          (car (enlive-get-elements-by-class-name
+                                page-en "event-info__date")))
+                         " "
+                         (enlive-text
+                          (car (enlive-get-elements-by-class-name
+                                page-en "event-info__time")))))))
+            (cons (with-temp-buffer
+                    (org-insert-time-stamp
+                     start-time t nil nil nil
+                     (and duration
+                          (format-time-string "-%R"
+                                              (time-add start-time
+                                                        (* duration 60)))))
+                    (list (buffer-string)))
+                  tags)))))
     (org-insert-heading)
     (when timestamps
       (insert (car timestamps) " "))
     (insert (org-make-link-string url title))
-    (when (string-match-p "/cinema/" url)
-      (org-set-tags ":cinema:"))
+    (org-set-tags tags)
     (when (boundp 'my-org-extracted-timestamps)
       (setq my-org-extracted-timestamps timestamps))))
 
