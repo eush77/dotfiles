@@ -75,12 +75,16 @@
 (put 'upcase-region 'disabled nil)
 
 ;; Set initial input in `rename-buffer'
-(defun my-rename-buffer (func name &optional unique)
-  "Like `rename-buffer', but interactively set initial input to
-the name of the current buffer."
-  (interactive (list (read-from-minibuffer "Rename buffer: " (buffer-name))))
+(define-advice rename-buffer
+    (:around (func name &optional unique) my-initial-input)
+  "Set initial input in the minibuffer."
+  (interactive
+   (list (read-from-minibuffer
+          "Rename buffer: "
+          (if (string-match-p "\\`\\*.*\\*\\'" (buffer-name))
+              "<"
+            (buffer-name)))))
   (funcall func name unique))
-(advice-add 'rename-buffer :around #'my-rename-buffer)
 
 ;; Set a minimal scroll margin for `recenter-top-bottom'.
 (custom-set-variables '(scroll-margin 1))
