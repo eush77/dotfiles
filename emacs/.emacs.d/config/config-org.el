@@ -1,10 +1,14 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
 (add-to-list 'package-selected-packages 'enlive)
+(add-to-list 'package-selected-packages 'dash)
+(add-to-list 'package-selected-packages 's)
 (package-install-selected-packages)
 
+(require 'dash)
 (require 'enlive)
 (require 'org-datetree)
 (require 'org-depend)
+(require 's)
 (require 'subr-x)
 
 ;;; Agenda
@@ -855,6 +859,32 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
          (string-trim (replace-regexp-in-string "[[:space:]\n]+" " "
                                                 (enlive-text el))))))))
 
+(defun my-org-rambler-kassa-insert (url)
+  "Insert headline for a Rambler Kassa URL."
+  (interactive "sURL: ")
+  (let* ((page (enlive-fetch url))
+         (title
+          (enlive-text
+           (car (enlive-get-elements-by-class-name page "item_title"))))
+         (title2
+          (s-trim
+           (car (s-split "—"
+                         (enlive-text
+                          (car (enlive-get-elements-by-class-name
+                                page "item_title2")))))))
+         (title (if (string-empty-p title2)
+                    title
+                  (format "%s (%s)" title title2)))
+         (tag
+          (pcase
+              (cadr (s-match "/\\([^/]+\\)/[[:digit:]]+" url))
+            ("movie" "cinema")
+            ("performance" "play")
+            ("concert" "music"))))
+    (org-insert-heading)
+    (insert " " (org-make-link-string url title))
+    (org-set-tags tag)))
+
 (defun my-org-timepad-insert (url)
   "Insert headline for a Timepad URL."
   (interactive "sURL: ")
@@ -978,6 +1008,8 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
      my-org-goodreads-insert)
     ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
     ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore)
+    ("RAMBLER-KASSA" "\\`https?://kassa\\.rambler\\.ru/"
+     my-org-rambler-kassa-insert)
     ("TIMEPAD" "\\`https?://[^./]+\\.timepad\\.ru/event/[[:digit:]]+/"
      my-org-timepad-insert)
     ("TRETYAKOVGALLERY" "\\`https?://www\\.tretyakovgallery\\.ru/"
