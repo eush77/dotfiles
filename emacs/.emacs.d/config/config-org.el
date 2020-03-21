@@ -834,20 +834,26 @@ Each element is a cons cell (PREFIX . PROPERTY).")
           (enlive-text (car (enlive-get-elements-by-class-name
                              page "event__header__title"))))
          (org-end-time-was-given)
+         (start-time
+          (org-read-date
+           nil t
+           (replace-regexp-in-string
+            "–" "-"
+            (enlive-text
+             (--map-when
+              (and (consp it) (eq (car it) 'comment))
+              " "
+              (car (enlive-get-elements-by-class-name
+                    page-en "event__meta__timestamp")))))))
          (timestamp
-          (replace-regexp-in-string
-           "–" "-"
-           (enlive-text
-            (--map-when
-             (and (consp it) (eq (car it) 'comment))
-             " "
-             (car (enlive-get-elements-by-class-name
-                   page-en "event__meta__timestamp")))))))
+          (with-temp-buffer
+            (org-insert-time-stamp
+             start-time t nil nil nil (list org-end-time-was-given))
+            (buffer-string))))
     (org-insert-heading)
-    (org-insert-time-stamp (org-read-date nil t timestamp)
-                           t nil nil nil (list org-end-time-was-given))
-    (insert " ")
-    (insert (org-make-link-string url title))))
+    (insert timestamp " " (org-make-link-string url title))
+    (when (boundp 'my-org-extracted-timestamps)
+      (setq my-org-extracted-timestamps (list timestamp)))))
 
 (defvar my-org-goodreads-genre-limit 3
   "Maximum number of genres inserted into GENRES property.")
@@ -924,27 +930,34 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
   "Insert headline for a Timepad URL."
   (interactive "sURL: ")
   (cl-assert (string-match "/event/\\([[:digit:]]+\\)/" url))
-  (let ((event
-         (with-current-buffer (url-retrieve-synchronously
-                               (concat "https://api.timepad.ru/v1/events/"
-                                       (match-string 1 url)))
-           (json-read-from-string
-            (decode-coding-string (buffer-substring (point) (point-max))
-                                  'utf-8)))))
+  (let* ((event
+          (with-current-buffer (url-retrieve-synchronously
+                                (concat "https://api.timepad.ru/v1/events/"
+                                        (match-string 1 url)))
+            (json-read-from-string
+             (decode-coding-string (buffer-substring (point) (point-max))
+                                   'utf-8))))
+         (timestamp
+          (with-temp-buffer
+            (org-insert-time-stamp
+             (date-to-time (alist-get 'starts_at event))
+             t nil nil nil
+             (list
+              (format-time-string "%R"
+                                  (date-to-time
+                                   (alist-get 'ends_at event)))))
+            (buffer-string))))
     (org-insert-heading)
-    (org-insert-time-stamp
-     (date-to-time (alist-get 'starts_at event))
-     t nil nil nil
-     (list
-      (format-time-string "%R"
-                          (date-to-time (alist-get 'ends_at event)))))
-    (insert " ")
-    (insert (org-make-link-string url (alist-get 'name event)))
+    (insert timestamp
+            " "
+            (org-make-link-string url (alist-get 'name event)))
     (org-set-property
      "LOCATION"
      (concat (alist-get 'name (alist-get 'organization event))
              ", "
-             (alist-get 'address (alist-get 'location event))))))
+             (alist-get 'address (alist-get 'location event))))
+    (when (boundp 'my-org-extracted-timestamps)
+      (setq my-org-extracted-timestamps (list timestamp)))))
 
 (defun my-org-tretyakovgallery-insert (url)
   "Insert headline for a Tretyakov Gallery URL."
