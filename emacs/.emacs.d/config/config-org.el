@@ -751,6 +751,41 @@ Returns nil if there is no extractor for URL."
 
 (defvar my-org-extracted-timestamps)
 
+(defun my-org-artguide-insert (url)
+  "Insert headline for an ArtGuide URL."
+  (interactive "sURL: ")
+  (let* ((page (enlive-fetch url))
+         (title
+          (enlive-text
+           (car (enlive-get-elements-by-tag-name
+                 (car (enlive-get-elements-by-class-name
+                       page "event-info"))
+                 'h1))))
+         (deadline
+          (concat
+           "20"                         ; for 4-digit year
+           (s-join "-"
+                   (reverse
+                    (s-split "\\."
+                             (enlive-text
+                              (cadr
+                               (enlive-get-elements-by-tag-name
+                                (car (enlive-get-elements-by-class-name
+                                      page "schedule-date-time"))
+                                'span))))))))
+         (location
+          (mapconcat #'enlive-text
+                     (enlive-get-elements-by-tag-name
+                      (car (enlive-get-elements-by-class-name
+                            page "schedule-place"))
+                      'a)
+                     ", ")))
+    (org-insert-heading)
+    (insert " " (org-make-link-string url title))
+    (org-set-tags "museum")
+    (org-deadline nil deadline)
+    (org-set-property "LOCATION" location)))
+
 (defvar my-org-audible-properties
   '(("By: " . "AUTHOR")
     ("Narrated by: " . "NARRATOR")
@@ -1002,6 +1037,8 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 
 (defcustom my-org-extractors
   '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
+    ("ARTGUIDE" "\\`https?://artguide\\.com/events/"
+     my-org-artguide-insert)
     ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
     ("GARAGEMCA" "\\`https?://garagemca\\.org/" my-org-garagemca-insert)
     ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/"
