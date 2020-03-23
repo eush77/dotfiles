@@ -495,7 +495,7 @@ Returns nil if there is no extractor for URL."
   "New item"
   (my-org-capture-tree ""))
 
-(defun my-org-capture-region (%i &optional %f %:from %:link %:subject)
+(defun my-org-capture-region (type %i &optional %f %:from %:link %:subject)
   "Active region"
   (let* ((magit-id (and (eq major-mode 'magit-revision-mode)
                         (save-excursion (goto-char (point-min))
@@ -526,15 +526,21 @@ Returns nil if there is no extractor for URL."
                     ('gnus-article-mode %:subject)
                     ('magit-revision-mode (magit-rev-format "%s" magit-id))
                     (_ ""))))
-    (concat (my-org-capture-tree subject)
-            (when from
-              (with-temp-buffer
-                (insert "Captured from " from ":\n")
-                (fill-region (point-min) (point-max))
-                (buffer-string)))
-            "#+BEGIN_QUOTE\n"
-            body
-            "#+END_QUOTE\n")))
+    (cl-case type
+      ('entry
+       (concat (my-org-capture-tree subject)
+               (when from
+                 (with-temp-buffer
+                   (insert "Captured from " from ":\n")
+                   (fill-region (point-min) (point-max))
+                   (buffer-string)))
+               "#+BEGIN_QUOTE\n"
+               body
+               "#+END_QUOTE\n"))
+      ('item
+       (replace-regexp-in-string "^" "- "
+                                 (string-trim body)))
+      (otherwise (user-error "Unsupported entry type")))))
 
 (defun my-org-capture-region-context ()
   (or (region-active-p) (derived-mode-p 'exwm-mode)))
@@ -557,7 +563,7 @@ Returns nil if there is no extractor for URL."
      ("r" ,(documentation 'my-org-capture-region) entry
       (file org-default-notes-file)
       "%(with-current-buffer (org-capture-get :original-buffer)
-          (my-org-capture-region \"%i\" \"%f\"
+          (my-org-capture-region 'entry \"%i\" \"%f\"
                                  \"%:from\" \"%:link\" \"%:subject\"))")
      ("c" ,(documentation 'my-org-capture-current-link) entry
       (file org-default-notes-file)
@@ -585,7 +591,12 @@ Returns nil if there is no extractor for URL."
       (function my-org-capture-list-item-target)
       "%(with-current-buffer (org-capture-get :original-buffer)
           (my-org-capture-current-link 'item \"%:link\" \"%:description\"
-                                       \"%f\" \"%F\"))")))
+                                       \"%f\" \"%F\"))")
+     ("lr" ,(documentation 'my-org-capture-region) item
+      (function my-org-capture-list-item-target)
+      "%(with-current-buffer (org-capture-get :original-buffer)
+          (my-org-capture-region 'item \"%i\" \"%f\"
+                                 \"%:from\" \"%:link\" \"%:subject\"))")))
  '(org-capture-templates-contexts
    '(("r" (my-org-capture-region-context))
      ("c" (my-org-capture-current-link-context))
