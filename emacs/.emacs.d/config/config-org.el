@@ -478,18 +478,24 @@ Returns nil if there is no extractor for URL."
   (and (region-active-p) (eq major-mode 'w3m-mode)))
 
 (defun my-org-capture-list-item-target ()
-  (if-let ((marker
-            (--find
-             (let ((marker-buffer (marker-buffer it)))
-               (and (bufferp marker-buffer)
-                    (not (eq marker-buffer (current-buffer)))
-                    (with-current-buffer marker-buffer
-                      (derived-mode-p 'org-mode))))
-             global-mark-ring)))
-      (progn (message "Marker found in `global-mark-ring'")
-             (set-buffer (marker-buffer marker))
-             (goto-char marker))
-    (user-error "No Org buffer found in `global-mark-ring'")))
+ (if-let ((marker
+           (or (--find
+                (let ((marker-buffer (marker-buffer it)))
+                  (and (bufferp marker-buffer)
+                       (not (eq marker-buffer (current-buffer)))
+                       (with-current-buffer marker-buffer
+                         (derived-mode-p 'org-mode))))
+                global-mark-ring)
+               (when-let
+                   ((buffer
+                     (--find (with-current-buffer it
+                               (derived-mode-p 'org-mode))
+                             (-map #'window-buffer
+                                   (cdr (my-active-windows))))))
+                 (with-current-buffer buffer (point-marker))))))
+     (progn (set-buffer (marker-buffer marker))
+            (goto-char marker))
+   (user-error "No other Org buffer found in `global-mark-ring' or `my-active-windows'")))
 
 (defun my-org-capture-new ()
   "New item"
