@@ -479,10 +479,13 @@ Returns nil if there is no extractor for URL."
 
 (defun my-org-capture-list-item-target ()
   (if-let ((marker
-            (seq-find (lambda (marker)
-                        (with-current-buffer (marker-buffer marker)
-                          (derived-mode-p 'org-mode)))
-                      global-mark-ring)))
+            (--find
+             (let ((marker-buffer (marker-buffer it)))
+               (and (bufferp marker-buffer)
+                    (not (eq marker-buffer (current-buffer)))
+                    (with-current-buffer marker-buffer
+                      (derived-mode-p 'org-mode))))
+             global-mark-ring)))
       (progn (message "Marker found in `global-mark-ring'")
              (set-buffer (marker-buffer marker))
              (goto-char marker))
