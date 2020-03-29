@@ -145,6 +145,7 @@
 (with-eval-after-load "cc-mode" (load "config-cc"))
 (with-eval-after-load "compile" (load "config-compile"))
 (with-eval-after-load "custom" (load "config-custom"))
+(with-eval-after-load "dash" (load "config-dash"))
 (with-eval-after-load "dired" (load "config-dired"))
 (with-eval-after-load "doc-view" (load "config-doc-view"))
 (with-eval-after-load "ediff" (load "config-ediff"))

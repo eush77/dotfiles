@@ -1,0 +1,1 @@
+(dash-enable-font-lock)
