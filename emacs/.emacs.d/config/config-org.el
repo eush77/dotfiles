@@ -1,10 +1,12 @@
 ;;; -*- lexical-binding: t; eval: (outline-minor-mode) -*-
 (add-to-list 'package-selected-packages 'enlive)
 (add-to-list 'package-selected-packages 'dash)
+(add-to-list 'package-selected-packages 'dash-functional)
 (add-to-list 'package-selected-packages 's)
 (package-install-selected-packages)
 
 (require 'dash)
+(require 'dash-functional)
 (require 'enlive)
 (require 'org-datetree)
 (require 'org-depend)
@@ -324,11 +326,12 @@ Archive files are those matching `org-archive-location'."
 (defvar my-org-capture-position-cursor t
   "Non-nil if capture templates include cursor positioning %?.")
 
-(defvar my-org-capture-time-stamp nil
+(defvar my-org-capture-timestamp nil
   "Date string inserted as an active time stamp in capture trees.
 
-The string is parsed by `org-read-date' and inserted as an active
-time stamp with optional end time in the entry heading.")
+If non-nil, the string is parsed by `org-read-date' and inserted
+as an active time stamp with optional end time in the entry
+heading.")
 
 (defun my-org-capture-position-cursor ()
   "Insert cursor-positioning sequence."
@@ -337,11 +340,15 @@ time stamp with optional end time in the entry heading.")
 
 (defvar org-end-time-was-given)
 
-(defun my-org-capture-insert-time-stamp ()
-  "Insert `my-org-capture-time-stamp' as an active time stamp."
-  (when my-org-capture-time-stamp
+(defun my-org-capture-insert-timestamp (&optional timestamp)
+  "Insert timestamp into the captured headline.
+
+If `my-org-capture-timestamp' is non-nil, insert
+`my-org-capture-timestamp'. Otherwise if TIMESTAMP is non-nil,
+insert TIMESTAMP."
+  (when-let ((timestamp (or my-org-capture-timestamp timestamp)))
     (let ((org-end-time-was-given))
-      (org-insert-time-stamp (org-read-date nil t my-org-capture-time-stamp)
+      (org-insert-time-stamp (org-read-date nil t timestamp)
                              t nil nil nil (list org-end-time-was-given))
       (insert " "))))
 
@@ -358,27 +365,40 @@ time stamp with optional end time in the entry heading.")
   "Generate Org capture tree with TITLE."
   (with-temp-buffer
     (org-insert-heading)
-    (my-org-capture-insert-time-stamp)
+    (my-org-capture-insert-timestamp)
     (my-org-capture-position-cursor)
     (insert title)
     (my-org-capture-set-todo-keyword)
     (buffer-string)))
 
-(defun my-org-capture-extract-tree (url)
-  "Generate Org capture tree extracted from URL.
+(defvar my-org-capture-extracted-timestamps)
+(setf (documentation-property 'my-org-capture-extracted-timestamps
+                              'variable-documentation)
+      "List of timestamps extracted by `my-org-capture-extract-tree'.
 
-Returns nil if there is no extractor for URL."
-  (when-let ((insert-fn (my-org-extractor-insert-fn url)))
-    (with-temp-buffer
-      (funcall insert-fn url)
-      (let ((case-fold-search))
-        (org-back-to-heading)
-        (looking-at org-heading-regexp)
-        (goto-char (match-beginning 2))
-        (my-org-capture-insert-time-stamp)
-        (my-org-capture-position-cursor))
-      (my-org-capture-set-todo-keyword)
-      (buffer-string))))
+If this variable is bound when evaluating
+`my-org-capture-extract-tree', it is set to the list of
+timestamps extracted from the argument url.")
+
+(defun my-org-capture-extract-tree (url)
+  "Generate Org capture tree extracted from URL, or nil.
+
+If `my-org-capture-extracted-timestamps' is bound, set it to the
+list of extracted timestamps."
+  (when-let ((el (my-org-extract url)))
+    (let ((timestamps (org-element-property :timestamps el)))
+      (when (boundp 'my-org-capture-extracted-timestamps)
+        (setq my-org-capture-extracted-timestamps timestamps))
+      (with-temp-buffer
+        (insert (my-org-interpret el))
+        (let ((case-fold-search))
+          (org-back-to-heading)
+          (looking-at org-heading-regexp)
+          (goto-char (match-beginning 2)))
+        (my-org-capture-insert-timestamp (car timestamps))
+        (my-org-capture-position-cursor)
+        (my-org-capture-set-todo-keyword)
+        (buffer-string)))))
 
 (defun my-org-capture-current-link (type %:link &optional %:description %f %F)
   "Current link"
@@ -769,347 +789,372 @@ Returns nil if there is no extractor for URL."
 
 ;;; Extract
 
-(defvar my-org-extracted-timestamps)
+(defun my-org-interpret (el)
+  "Interpret extracted headline EL as Org syntax.
 
-(defun my-org-artguide-insert (url)
-  "Insert headline for an ArtGuide URL."
-  (interactive "sURL: ")
-  (let* ((page (enlive-fetch url))
-         (title
-          (enlive-text
-           (car (enlive-get-elements-by-tag-name
-                 (car (enlive-get-elements-by-class-name
-                       page "event-info"))
-                 'h1))))
-         (deadline
-          (concat
-           "20"                         ; for 4-digit year
-           (s-join "-"
-                   (reverse
-                    (s-split "\\."
-                             (enlive-text
-                              (cadr
-                               (enlive-get-elements-by-tag-name
-                                (car (enlive-get-elements-by-class-name
-                                      page "schedule-date-time"))
-                                'span))))))))
-         (location
-          (mapconcat #'enlive-text
-                     (enlive-get-elements-by-tag-name
-                      (car (enlive-get-elements-by-class-name
-                            page "schedule-place"))
-                      'a)
-                     ", ")))
-    (org-insert-heading)
-    (insert " " (org-make-link-string url title))
-    (org-set-tags "museum")
-    (org-deadline nil deadline)
-    (org-set-property "LOCATION" location)))
+Combines the following interpreters:
+  - `org-element-headline-interpreter',
+  - `org-element-planning-interpreter',
+  - `org-element-property-drawer-interpreter'."
+  (concat
+   (org-element-headline-interpreter el nil)
+   (let ((planning (org-element-planning-interpreter el nil)))
+     (when (not (string-empty-p planning))
+       (concat planning "\n")))
+   (when-let
+       ((props
+         (-map (pcase-lambda (`(,prop ,value &rest _))
+                 (format "%s: %s\n" prop value))
+               (cdr (-partition-before-pred
+                     (-andfn #'symbolp
+                             (-compose #'s-uppercase-p #'symbol-name))
+                     (cadr el))))))
+     (concat (org-element-property-drawer-interpreter
+              nil (apply #'concat props))
+             "\n"))))
+
+(defun my-org-extract-from-url (url &optional title &rest props)
+  "Extract headline from a generic URL with optional TITLE.
+
+Insert additional property pairs PROPS into the headline's
+property list."
+  `(headline (:level 1
+              :title ,(if title (org-make-link-string url title) url)
+              ,@props)))
+
+(defun my-org-extract-from-artguide (url)
+  "Extract headline from an ArtGuide URL."
+  (and
+   (string-match-p "\\`https?://artguide\\.com/events/" url)
+   (let* ((page (enlive-fetch url))
+          (title (enlive-text (enlive-query page [.event-info > h1])))
+          (deadline
+           (pcase-let
+               ((`(,day ,month ,year)
+                 (-map #'string-to-number
+                       (split-string
+                        (enlive-text
+                         (cadr
+                          (enlive-query-all page
+                                            [.schedule-date-time > span])))
+                        "\\."))))
+             `(timestamp (:type active
+                          :year-start ,(+ 2000 year)
+                          :month-start ,month
+                          :day-start ,day))))
+          (location
+           (mapconcat #'enlive-text
+                      (enlive-query-all page [.schedule-place a])
+                      ", ")))
+     (my-org-extract-from-url url title
+                              :tags '("museum")
+                              :deadline deadline
+                              :LOCATION location))))
 
 (defvar my-org-audible-properties
-  '(("By: " . "AUTHOR")
-    ("Narrated by: " . "NARRATOR")
-    ("Length: " . "DURATION"))
+  '(("By: " . :AUTHOR)
+    ("Narrated by: " . :NARRATOR)
+    ("Length: " . :DURATION))
   "Mapping from property lines on the Audible website to Org properties.
 
 Each element is a cons cell (PREFIX . PROPERTY).")
 
-(defun my-org-audible-insert (url)
-  "Insert headline for an Audible URL."
-  (interactive "sURL: ")
-  (let ((retry-count 0))
-    (cl-loop
-     (when (= retry-count 3)
-       (error "Could not scrape %s" url))
-     (let* ((hero-content (enlive-query (enlive-fetch url) [.hero-content]))
-            (title (enlive-text (enlive-query hero-content [h1]))))
-       (if (string-empty-p title)
-           (progn (sleep-for .1)
-                  (cl-incf retry-count))
-         (org-insert-heading)
-         (insert title)
-         (org-set-tags ":audible:")
-         (org-set-property "AUDIBLE" url)
-         (dolist (span (enlive-query-all hero-content [.bc-row > .bc-text]))
-           (pcase-let*
-               ((text (string-trim (replace-regexp-in-string
-                                    "[[:space:]\n]+" " "
-                                    (enlive-text span))))
-                (`(,property . ,value)
-                 (seq-some (pcase-lambda (`(,prefix . ,property))
-                             (when (string-prefix-p prefix text)
-                               (cons property (string-remove-prefix prefix text))))
-                           my-org-audible-properties)))
-             (when property
-               (org-set-property property value))))
-         (cl-return))))))
+(defun my-org-extract-from-audible (url)
+  "Extract headline from an Audible URL."
+  (and
+   (string-match-p "\\`https?://www\\.audible\\.com/pd/" url)
+   (let ((retry-count 0))
+     (cl-loop
+      (when (= retry-count 3)
+        (error "Could not scrape %s" url))
+      (let* ((hero-content
+              (enlive-query (enlive-fetch url) [.hero-content]))
+             (title (enlive-text (enlive-query hero-content [h1]))))
+        (if (string-empty-p title)
+            (progn (sleep-for .1)
+                   (cl-incf retry-count))
+          (cl-return
+           `(headline
+             (:level 1
+              :AUDIBLE ,url
+              :title ,title
+              :tags ("audible")
+              ,@(--mapcat
+                 (pcase-let ((`(,prefix . ,prop)
+                              (assoc it my-org-audible-properties
+                                     #'string-prefix-p)))
+                   (and prop (list prop (s-chop-prefix prefix it))))
+                 (-map (-compose #'s-trim
+                                 #'s-collapse-whitespace
+                                 #'enlive-text)
+                       (enlive-query-all
+                        hero-content
+                        [.bc-col > .bc-row > .bc-text]))))))))))))
 
-(defun my-org-garagemca-insert (url)
-  "Insert headline for a Garage MCA URL."
-  (interactive "sURL: ")
-  (let* ((page (enlive-fetch url))
-         (page-en (enlive-fetch (replace-regexp-in-string
-                                 "/ru/" "/en/" url)))
-         (title
-          (enlive-text (car (enlive-get-elements-by-class-name
-                             page "event__header__title"))))
-         (org-end-time-was-given)
-         (start-time
-          (org-read-date
-           nil t
-           (replace-regexp-in-string
-            "–" "-"
-            (enlive-text
-             (--map-when
-              (and (consp it) (eq (car it) 'comment))
-              " "
-              (car (enlive-get-elements-by-class-name
-                    page-en "event__meta__timestamp")))))))
-         (timestamp
-          (with-temp-buffer
-            (org-insert-time-stamp
-             start-time t nil nil nil (list org-end-time-was-given))
-            (buffer-string))))
-    (org-insert-heading)
-    (insert timestamp " " (org-make-link-string url title))
-    (when (boundp 'my-org-extracted-timestamps)
-      (setq my-org-extracted-timestamps (list timestamp)))))
+(defun my-org-extract-from-garagemca (url)
+  "Extract headline from a Garage MCA URL."
+  (and
+   (string-match-p "\\`https?://garagemca\\.org/" url)
+   (let* ((page (enlive-fetch url))
+          (page-en
+           (enlive-fetch
+            (replace-regexp-in-string "/ru/" "/en/" url)))
+          (title
+           (enlive-text (enlive-query page [.event__header__title])))
+          (org-end-time-was-given)
+          (start-time
+           (org-read-date
+            nil t
+            (replace-regexp-in-string
+             "–" "-"
+             (enlive-text
+              (--map-when
+               (and (enlive-is-element it) (eq (car it) 'comment))
+               " "
+               (enlive-query page-en [.event__meta__timestamp]))))))
+          (timestamp
+           (with-temp-buffer
+             (org-insert-time-stamp
+              start-time t nil nil nil (list org-end-time-was-given))
+             (buffer-string))))
+     (my-org-extract-from-url url title
+                              :timestamps (list timestamp)))))
 
 (defvar my-org-goodreads-genre-limit 3
   "Maximum number of genres inserted into GENRES property.")
 
 (defvar my-org-goodreads-properties
-  '(("author" . "AUTHOR")
-    ("numberOfPages" . "PAGES")
-    ("isbn" . "ISBN")
-    ("inLanguage" . "LANGUAGE"))
+  '(("author" . :AUTHOR)
+    ("numberOfPages" . :PAGES)
+    ("isbn" . :ISBN)
+    ("inLanguage" . :LANGUAGE))
   "Mapping from itemprop html properties on the Goodreads website to Org properties.
 
 Each element is a cons cell (ITEMPROP . PROPERTY).")
 
-(defun my-org-goodreads-insert (url)
-  "Insert headline for a Goodreads URL."
-  (interactive "sURL: ")
-  (let* ((page (enlive-fetch url))
-         (metacol (enlive-get-element-by-id page "metacol")))
-    (org-insert-heading)
-    (insert (string-trim
-             (enlive-text (enlive-get-element-by-id metacol "bookTitle"))))
-    (org-set-tags ":book:")
-    (org-set-property "GOODREADS" url)
-    (let ((series
-           (string-trim (enlive-text
-                         (enlive-get-element-by-id metacol "bookSeries")))))
-      (unless (string-empty-p series)
-        (org-set-property
-         "SERIES"
-         (replace-regexp-in-string "\\`(\\(.*\\))\\'" "\\1" series))))
-    (org-set-property
-     "GENRES"
-     (mapconcat #'enlive-text
-                (seq-take (enlive-query-all page
-                                            [.left > .bookPageGenreLink])
-                          my-org-goodreads-genre-limit)
-                ", "))
-    (dolist (el (enlive-filter metacol
-                               (lambda (el) (enlive-attr el 'itemprop))))
-      (when-let ((property (cdr (assoc (enlive-attr el'itemprop)
-                                       my-org-goodreads-properties))))
-        (org-set-property
-         property
-         (string-trim (replace-regexp-in-string "[[:space:]\n]+" " "
-                                                (enlive-text el))))))))
-
-(defun my-org-rambler-kassa-insert (url)
-  "Insert headline for a Rambler Kassa URL."
-  (interactive "sURL: ")
-  (let* ((page (enlive-fetch url))
-         (title
-          (enlive-text
-           (car (enlive-get-elements-by-class-name page "item_title"))))
-         (title2
-          (s-trim
-           (car (s-split "—"
+(defun my-org-extract-from-goodreads (url)
+  "Extract headline from a Goodreads URL."
+  (and
+   (string-match-p "\\`https?://www\\.goodreads\\.com/book/show/" url)
+   (let* ((page (enlive-fetch url))
+          (metacol (enlive-query page [:metacol])))
+     `(headline
+       (:level 1
+               :GOODREADS ,url
+               :title ,(string-trim
+                        (enlive-text
+                         (enlive-query metacol [:bookTitle])))
+               :tags ("book")
+               :GENRES ,(mapconcat
+                         #'enlive-text
+                         (-take my-org-goodreads-genre-limit
+                                (enlive-query-all
+                                 page [.left > .bookPageGenreLink]))
+                         ", ")
+               ,@(let ((series
+                        (string-trim
                          (enlive-text
-                          (car (enlive-get-elements-by-class-name
-                                page "item_title2")))))))
-         (title (if (string-empty-p title2)
-                    title
-                  (format "%s (%s)" title title2)))
-         (tag
-          (pcase
-              (cadr (s-match "/\\([^/]+\\)/[[:digit:]]+" url))
-            ("movie" "cinema")
-            ("performance" "play")
-            ("concert" "music"))))
-    (org-insert-heading)
-    (insert " " (org-make-link-string url title))
-    (org-set-tags tag)))
+                          (enlive-query metacol [:bookSeries])))))
+                   (unless (string-empty-p series)
+                     (list :SERIES
+                           (replace-regexp-in-string "\\`(\\(.*\\))\\'" "\\1"
+                                                     series))))
+               ,@(--mapcat
+                  (when-let ((prop
+                              (alist-get (enlive-attr it 'itemprop)
+                                         my-org-goodreads-properties
+                                         nil nil #'equal)))
+                    (list prop
+                          (s-trim (s-collapse-whitespace (enlive-text it)))))
+                  (enlive-filter metacol
+                                 (lambda (el) (enlive-attr el 'itemprop)))))))))
 
-(defun my-org-timepad-insert (url)
-  "Insert headline for a Timepad URL."
-  (interactive "sURL: ")
-  (cl-assert (string-match "/event/\\([[:digit:]]+\\)/" url))
-  (let* ((event
-          (with-current-buffer (url-retrieve-synchronously
-                                (concat "https://api.timepad.ru/v1/events/"
-                                        (match-string 1 url)))
-            (json-read-from-string
-             (decode-coding-string (buffer-substring (point) (point-max))
-                                   'utf-8))))
-         (timestamp
-          (with-temp-buffer
-            (org-insert-time-stamp
-             (date-to-time (alist-get 'starts_at event))
-             t nil nil nil
-             (list
-              (format-time-string "%R"
-                                  (date-to-time
-                                   (alist-get 'ends_at event)))))
-            (buffer-string))))
-    (org-insert-heading)
-    (insert timestamp
-            " "
-            (org-make-link-string url (alist-get 'name event)))
-    (org-set-property
-     "LOCATION"
-     (concat (alist-get 'name (alist-get 'organization event))
-             ", "
-             (alist-get 'address (alist-get 'location event))))
-    (when (boundp 'my-org-extracted-timestamps)
-      (setq my-org-extracted-timestamps (list timestamp)))))
+(defun my-org-extract-from-rambler-kassa (url)
+  "Extract headline from a Rambler Kassa URL."
+  (when-let*
+      ((tag
+        (pcase (caddr
+                (s-match
+                 (concat "\\`https?://kassa\\.rambler\\.ru/"
+                         "\\([a-z]+/\\)?\\([a-z]+\\)/[[:digit:]]+")
+                 url))
+          ("concert" "music")
+          ("movie" "cinema")
+          ("performance" "play")))
+       (page (enlive-fetch url))
+       (title (enlive-text (enlive-query page [.item_title])))
+       (title2
+        (s-trim
+         (car
+          (s-split "—"
+                   (enlive-text (enlive-query page [.item_title2]))))))
+       (title (if (string-empty-p title2)
+                  title
+                (format "%s (%s)" title title2))))
+    (my-org-extract-from-url url title
+                             :tags (list tag))))
 
-(defun my-org-tretyakovgallery-insert (url)
-  "Insert headline for a Tretyakov Gallery URL."
-  (interactive "sURL: ")
-  (pcase-let*
-      ((page (enlive-fetch url))
-       (title
-        ;; Strip content rating.
-        (replace-regexp-in-string
-         "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
-         (enlive-text
-          (car (enlive-get-elements-by-class-name
-                page "header-event__title")))))
-       (`(,timestamps . ,tags)
-        (if (string-match-p "/cinema/" url)
-            (let ((duration
-                   ;; Round up to the nearest 10-minutes mark.
-                   (* (fceiling
-                       (/ (apply
-                           #'+
-                           (--mapcat
-                            (let ((text (enlive-text it)))
-                              (and (string-match
-                                    "\\b\\([[:digit:]]+\\) мин\\.\\'"
-                                    text)
-                                   (list (string-to-number
-                                          (match-string 1 text)))))
-                            (enlive-get-elements-by-class-name
-                             page "event-desc__lid")))
-                          10.0))
-                      10)))
-              (cons
-               (--map (with-temp-buffer
-                        (let ((start-time
-                               (org-read-date
-                                t t
-                                (alist-get 'value (cadr it)))))
-                          (org-insert-time-stamp
-                           start-time t nil nil nil
-                           (and (not (zerop duration))
-                                (format-time-string
-                                 "-%R"
-                                 (time-add start-time
-                                           (* duration 60))))))
-                        (buffer-string))
-                      (enlive-get-elements-by-class-name
-                       page
-                       "event-schedule-time__input"))
-               "cinema"))
-          (pcase-let*
-              ((page-en
-                (enlive-fetch
-                 (replace-regexp-in-string "\\.ru/" ".ru/en/" url)))
-               (type
-                (downcase
-                 (enlive-text (car (enlive-get-elements-by-class-name
-                                    page-en "event-info__type")))))
-               (`(,duration . ,tags)
-                (cond ((string-equal type "lectures")
-                       '(120 . "lecture"))
-                      ((string-equal type "guided tours")
-                       '(80 . ("museum" "tour")))
-                      (t '(nil . nil))))
-               (start-time
-                (org-read-date
-                 t t
-                 (concat (enlive-text
-                          (car (enlive-get-elements-by-class-name
-                                page-en "event-info__date")))
-                         " "
-                         (enlive-text
-                          (car (enlive-get-elements-by-class-name
-                                page-en "event-info__time")))))))
-            (cons (with-temp-buffer
-                    (org-insert-time-stamp
-                     start-time t nil nil nil
-                     (and duration
-                          (format-time-string "-%R"
-                                              (time-add start-time
-                                                        (* duration 60)))))
-                    (list (buffer-string)))
-                  tags)))))
-    (org-insert-heading)
-    (when timestamps
-      (insert (car timestamps) " "))
-    (insert (org-make-link-string url title))
-    (org-set-tags tags)
-    (when (boundp 'my-org-extracted-timestamps)
-      (setq my-org-extracted-timestamps timestamps))))
+(defcustom my-org-timepad-token nil
+  "TimePad API token for `my-org-extract-from-timepad'.
+
+Needs to have at least `view_events' permission.
+
+Get the token from URL `http://dev.timepad.ru/api/oauth/'."
+  :group 'my
+  :type '(choice (const :tag "Not set" nil) string))
+
+(defun my-org-extract-from-timepad (url)
+  "Extract headline from a TimePad URL."
+  (when-let*
+      ((event-id
+        (cadr
+         (s-match
+          "\\`https?://[^./]+\\.timepad\\.ru/event/\\([[:digit:]]+\\)/"
+          url)))
+       (url-request-extra-headers
+        (cond (my-org-timepad-token
+               `(("Authorization" . ,(concat "Bearer " my-org-timepad-token))))
+              ((yes-or-no-p "Need a token to access TimePad API. Customize? ")
+               (customize-variable 'my-org-timepad-token))))
+       (event
+        (with-current-buffer
+            (url-retrieve-synchronously
+             (concat "https://api.timepad.ru/v1/events/" event-id))
+          (pcase-let ((`(,status ,status-code ,status-message)
+                       (assoc url-http-response-status url-http-codes))
+                      (response
+                       (json-read-from-string
+                        (decode-coding-string
+                         (buffer-substring (point) (point-max)) 'utf-8))))
+            (if (eq status-code 'OK)
+                response
+              (error "%s %s: %s"
+                     status status-message
+                     (alist-get 'message
+                                (alist-get 'response_status response)))))))
+       (timestamp
+        (with-temp-buffer
+          (org-insert-time-stamp
+           (date-to-time (alist-get 'starts_at event))
+           t nil nil nil
+           (list
+            (format-time-string "%R"
+                                (date-to-time
+                                 (alist-get 'ends_at event)))))
+          (buffer-string)))
+       (location
+        (concat (alist-get 'name (alist-get 'organization event))
+                ", "
+                (alist-get 'address (alist-get 'location event)))))
+    (my-org-extract-from-url url (alist-get 'name event)
+                             :LOCATION location
+                             :timestamps (list timestamp))))
+
+(defun my-org-extract-from-tretyakovgallery (url)
+  "Extract headline from a Tretyakov Gallery URL."
+  (and
+   (string-match-p "\\`https?://www\\.tretyakovgallery\\.ru/" url)
+   (pcase-let*
+       ((page (enlive-fetch url))
+        (title
+         ;; Strip content rating.
+         (replace-regexp-in-string
+          "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
+          (enlive-text (enlive-query page [.header-event__title]))))
+        (`(,timestamps . ,tags)
+         (if (string-match-p "/cinema/" url)
+             (let ((duration
+                    ;; Round up to the nearest 10-minutes mark.
+                    (* (fceiling
+                        (/ (apply
+                            #'+
+                            (--mapcat
+                             (let ((text (enlive-text it)))
+                               (and (string-match
+                                     "\\b\\([[:digit:]]+\\) мин\\.\\'"
+                                     text)
+                                    (list (string-to-number
+                                           (match-string 1 text)))))
+                             (enlive-query-all page [.event-desc__lid])))
+                           10.0))
+                       10)))
+               (cons
+                (--map (with-temp-buffer
+                         (let ((start-time
+                                (org-read-date
+                                 t t
+                                 (alist-get 'value (cadr it)))))
+                           (org-insert-time-stamp
+                            start-time t nil nil nil
+                            (and (not (zerop duration))
+                                 (format-time-string
+                                  "-%R"
+                                  (time-add start-time
+                                            (* duration 60))))))
+                         (buffer-string))
+                       (enlive-query-all page [.event-schedule-time__input]))
+                '("cinema")))
+           (pcase-let*
+               ((page-en
+                 (enlive-fetch
+                  (replace-regexp-in-string "\\.ru/" ".ru/en/" url)))
+                (type
+                 (downcase
+                  (enlive-text
+                   (enlive-query page-en [.event-info__type]))))
+                (`(,duration . ,tags)
+                 (pcase type
+                   ("concerts and performances" '(120 . ("music")))
+                   ("lectures" '(120 . ("lecture")))
+                   ("guided tours" '(80 . ("museum" "tour")))
+                   (t '(nil . nil))))
+                (start-time
+                 (org-read-date
+                  t t
+                  (concat
+                   (enlive-text (enlive-query page-en [.event-info__date]))
+                   " "
+                   (enlive-text (enlive-query page-en [.event-info__time]))))))
+             (cons (with-temp-buffer
+                     (org-insert-time-stamp
+                      start-time t nil nil nil
+                      (and duration
+                           (format-time-string "-%R"
+                                               (time-add start-time
+                                                         (* duration 60)))))
+                     (list (buffer-string)))
+                   tags)))))
+     (my-org-extract-from-url url title
+                              :tags tags
+                              :timestamps timestamps))))
 
 (defcustom my-org-extractors
-  '(("AMAZON" "\\`https?://[^/]*\\.amazon\\.com/" ignore)
-    ("ARTGUIDE" "\\`https?://artguide\\.com/events/"
-     my-org-artguide-insert)
-    ("AUDIBLE" "\\`https?://www\\.audible\\.com/pd/" my-org-audible-insert)
-    ("GARAGEMCA" "\\`https?://garagemca\\.org/" my-org-garagemca-insert)
-    ("GOODREADS" "\\`https?://www\\.goodreads\\.com/book/show/"
-     my-org-goodreads-insert)
-    ("IMDB" "\\`https?://www\\.imdb\\.com/title/" ignore)
-    ("MYANIMELIST" "\\`https?://myanimelist\\.net/anime/" ignore)
-    ("RAMBLER-KASSA" "\\`https?://kassa\\.rambler\\.ru/"
-     my-org-rambler-kassa-insert)
-    ("TIMEPAD" "\\`https?://[^./]+\\.timepad\\.ru/event/[[:digit:]]+/"
-     my-org-timepad-insert)
-    ("TRETYAKOVGALLERY" "\\`https?://www\\.tretyakovgallery\\.ru/"
-     my-org-tretyakovgallery-insert))
-  "List of extractors configured for URLs.
+  '(my-org-extract-from-artguide
+    my-org-extract-from-audible
+    my-org-extract-from-garagemca
+    my-org-extract-from-goodreads
+    my-org-extract-from-rambler-kassa
+    my-org-extract-from-timepad
+    my-org-extract-from-tretyakovgallery)
+  "List of Org extractors for URLs.
 
-Each extractor is a triple (NAME URL-REGEXP INSERT-FN), where
-URL-REGEXP specifies urls the extractor can operate on, and
-INSERT-FN is a function that inserts the title and info from the
-url into the current buffer as a headline with properties."
+Each extractor is a function that takes a URL and returns either
+an Org headline element extracted from the URL or nil if the
+extractor cannot be applied.
+
+If the URL describes an event with one or more potential start
+times, the extractor must set `:timestamps' property on the
+returned headline with the list of all alternative timestamp
+strings."
   :group 'my
-  :type '(repeat (list (string :tag "Name")
-                       (string :tag "URL Regexp")
-                       (function :tag "Insert Function"))))
+  :type '(repeat (function)))
 
-(defun my-org-extractor (url)
-  "Get the extractor matching URL."
-  (seq-some (pcase-lambda ((and extractor `(_ ,url-regexp _)))
-              (and (string-match-p url-regexp url) extractor))
-            my-org-extractors))
+(defun my-org-extract (url)
+  "Extract headline from a URL using the defined extractors.
 
-(defun my-org-extractor-name (url)
-  "Get the name of the extractor matching URL."
-  (first (my-org-extractor url)))
-
-(defun my-org-extractor-insert-fn (url)
-  "Get the insert function of the extractor matching URL."
-  (when-let ((insert-fn (third (my-org-extractor url))))
-    (unless (eq insert-fn 'ignore)
-      insert-fn)))
+Cycles through `my-org-extractors' until the first extractor that
+returns non-nil."
+  (--some (funcall it url) my-org-extractors))
 
 ;;; Find-Other-File
 
@@ -1511,6 +1556,18 @@ silently."
     (and (eq (org-element-type title) 'link)
          (org-element-property :raw-link title))))
 
+(defun my-org-url-property-name (url)
+  "Property name corresponding to a URL."
+  (s-join
+   "-"
+   (reverse
+    (s-split "\\."
+             (upcase
+              (caddr
+               (s-match
+                "\\`https?://\\(www\\.\\)?\\([^/]+\\)\\(\\.[a-z]+\\)/"
+                url)))))))
+
 (defun my-org-convert-url-property (type &optional property)
   "Move URL from a headling property to a link in the title and back.
 
@@ -1529,7 +1586,7 @@ if converting to a property and one of the patterns matches, or
    `(toggle ,(read-string
               "Property: "
               (or (if-let ((link (my-org-convert-url-get-link)))
-                      (my-org-extractor-name link)
+                      (my-org-url-property-name link)
                     (seq-some
                      (pcase-lambda (`(,property . ,value))
                        (and (url-type (url-generic-parse-url value))
@@ -1543,7 +1600,7 @@ if converting to a property and one of the patterns matches, or
          (link (my-org-convert-url-get-link)))
     (setq property
           (or property
-              (and link (my-org-extractor-name link))
+              (and link (my-org-url-property-name link))
               "URL"))
     (let ((url-prop
            (org-element-property (intern (concat ":" property)) element)))

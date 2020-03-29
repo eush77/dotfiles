@@ -33,6 +33,7 @@
     (my-org-extractors custom-variable)
     (my-org-notes-directory custom-variable)
     (my-org-plan-directory custom-variable)
+    (my-org-timepad-token custom-variable)
     (my-rr-replay-buffer-name custom-variable)
     (my-rr-replay-port custom-variable)
     (my-rr-trace-root-directory custom-variable)
