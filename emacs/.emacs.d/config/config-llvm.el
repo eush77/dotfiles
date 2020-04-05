@@ -72,7 +72,7 @@
 files."
   (unless (string-match
            (concat "^\\(.*/\\(?:include/\\(?:llvm\\|clang\\)\\|lib\\)/\\)\\(.*\\)\\(/[^/]+\\)"
-                   "\\(\\.cpp\\|\\.h\\|\\.td\\|\\.gen\\|\\.inc\\)$")
+                   "\\(\\.cc\\|\\.cpp\\|\\.h\\|\\.td\\|\\.gen\\|\\.inc\\)$")
            file)
     (user-error "No other file"))
   (let ((full-prefix (match-string 1 file))
@@ -80,14 +80,18 @@ files."
         (base (match-string 3 file))
         (ext (match-string 4 file)))
     (pcase ext
-      ((pred (string= ".cpp")) (list (concat (substring base 1) ".h")
-                                     (concat dir base ".h")
-                                     (concat dir ".h")
-                                     (concat (file-name-directory dir)
-                                             "Target"
-                                             base
-                                             ".h")))
-      ((pred (string= ".h")) (list (concat dir base ".cpp")
+      ((or (pred (string= ".cc"))
+           (pred (string= ".cpp")))
+       (list (concat (substring base 1) ".h")
+             (concat dir base ".h")
+             (concat dir ".h")
+             (concat (file-name-directory dir)
+                     "Target"
+                     base
+                     ".h")))
+      ((pred (string= ".h")) (list (concat (substring base 1) ".cc")
+                                   (concat (substring base 1) ".cpp")
+                                   (concat dir base ".cpp")
                                    (concat dir base base ".cpp")
                                    (concat (file-name-directory dir)
                                            "CodeGen"
