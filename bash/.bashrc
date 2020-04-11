@@ -412,7 +412,7 @@ function i {
 			args+=("--index-search=$term")
 		fi
 
-		info "$topic" "${args[@]}"
+		info --usage "$topic" "${args[@]}"
 	elif [[ -z "$term" ]]; then
 		w3mman -l "$docfile"
 	else
