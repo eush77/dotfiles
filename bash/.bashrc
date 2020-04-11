@@ -63,7 +63,11 @@ if type -P git >/dev/null; then
 	GIT_PS1_SHOWUPSTREAM=verbose
 	GIT_PS1_STATESEPARATOR=
 
-	source /usr/share/git/git-prompt.sh
+	if [[ -f /usr/share/git/git-prompt.sh ]]; then
+		source /usr/share/git/git-prompt.sh
+	else
+		source /usr/lib/git-core/git-sh-prompt
+	fi
 else
 	alias __git_ps1=true
 fi
