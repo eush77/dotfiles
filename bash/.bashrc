@@ -12,7 +12,7 @@ export LESS_TERMCAP_se="$(tput sgr0)"
 export LESS_TERMCAP_us="$(tput setaf 3)"
 export LESS_TERMCAP_ue="$(tput sgr0)"
 
-export PAGER=less
+export PAGER="less --quit-if-one-screen"
 export W3MMAN_W3M='w3m -o confirm_qq=false'
 export WWW_HOME='https://google.com/'
 
@@ -234,6 +234,24 @@ function cdkb {
 	fi
 }
 
+# fzf-browse [<dir>] - Browse files with Fzf.
+function fzf-browse {
+	local DIR="${1:-$PWD}"
+	( cd "$DIR" &&
+	  fzf --bind="alt-n:preview-page-down" \
+	      --bind="alt-p:preview-page-up" \
+	      --bind="alt-v:page-up" \
+	      --bind="change:top" \
+	      --bind="ctrl-c:cancel" \
+	      --bind="ctrl-j:jump" \
+	      --bind="ctrl-v:page-down" \
+	      --bind="return:execute(less {})" \
+	      --height=100% \
+	      --layout=reverse-list \
+	      --preview="ctags -x {} | ifne -n cat {}" \
+	      --preview-window=:60% )
+}
+
 # Create a directory if it doesn't exist.
 function to {
 	if [[ "$#" -ne 1 ]]; then
@@ -428,6 +446,20 @@ function youtube-mw {
 # Hook up Direnv.
 [[ "$(type -t direnv)" = "file" ]] &&
 	eval "$(direnv hook bash)"
+
+# Hook up Fzf.
+[[ -f ~/.fzf.bash ]] && {
+	export FZF_DEFAULT_OPTS;
+	printf -v FZF_DEFAULT_OPTS "%s " \
+	       --bind=ctrl-k:kill-line \
+	       --color=dark \
+	       --info=inline \
+	       --height=40% \
+	       --layout=reverse;
+	source ~/.fzf.bash;
+	bind '"\C-t": transpose-chars';
+	bind -x '"\M-v": fzf-file-widget';
+}
 
 # Hook up Z.
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh

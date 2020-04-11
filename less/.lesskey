@@ -2,4 +2,4 @@
 \kx	back-screen
 
 #env
-LESS = --ignore-case --jump-target=6 --no-init --quit-if-one-screen --RAW-CONTROL-CHARS --search-skip-screen
+LESS = --ignore-case --jump-target=6 --no-init --RAW-CONTROL-CHARS --search-skip-screen
