@@ -3,6 +3,8 @@
 #======================== Environment Variables ============================
 export EDITOR=mg
 
+export LESSOPEN="| source-highlight --out-format esc -i %s"
+
 # LESS_TERMCAP variables can't be put in a `.lesskey' file in Less 487.
 # https://unix.stackexchange.com/questions/328597/how-to-make-lesskey-terminal-independent
 export LESS_TERMCAP_md="$(tput bold; tput setaf 6)"
