@@ -64,6 +64,9 @@
 ;; Indentation
 (custom-set-variables '(indent-tabs-mode nil))
 
+;; Timer listing
+(put 'list-timers 'disabled nil)
+
 ;; Enable narrowing.
 (put 'narrow-to-region 'disabled nil)
 
