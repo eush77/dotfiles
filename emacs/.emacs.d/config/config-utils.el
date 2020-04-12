@@ -410,6 +410,11 @@ _SPC_: set mark | _o__O_: open         | _d__D_: delete  | _M-w_: copy      | _q
 
 ;;; Shell commands
 
+(defun my-local-shell-command-to-string (command)
+  "Execute COMMAND on the local host."
+  (let ((default-directory "/"))
+    (shell-command-to-string command)))
+
 (defvar my-pinned-shell-command nil
   "Command to execute with `my-shell-command-on-buffer'. If nil,
 prompt for the command each time.")
@@ -714,11 +719,10 @@ If FRAME is nil, use selected frame."
      (or (cadr
           (split-string
            ;; Run `xprop' from a local directory.
-           (let ((default-directory "~"))
-             (shell-command-to-string
-              (format "xprop -id %s _NET_WM_DESKTOP"
-                      (alist-get 'outer-window-id
-                                 (frame-parameters frame)))))
+           (my-local-shell-command-to-string
+            (format "xprop -id %s _NET_WM_DESKTOP"
+                    (alist-get 'outer-window-id
+                               (frame-parameters frame))))
            "="))
          ""))))
 

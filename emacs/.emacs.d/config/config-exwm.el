@@ -9,7 +9,8 @@
   (interactive "nChange screen brightness by [-100..100]: ")
   (call-process "xbacklight" nil nil nil "-inc" (number-to-string amount))
   (message "Screen brightness set to %s%%"
-           (string-trim (shell-command-to-string "xbacklight -get"))))
+           (string-trim
+            (my-local-shell-command-to-string "xbacklight -get"))))
 
 ;;;###autoload
 (defcustom my-exwm-brightness-change-amount 10
@@ -40,7 +41,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (interactive)
   (let ((state
          (string-to-number
-          (shell-command-to-string
+          (my-local-shell-command-to-string
            "synclient -l | awk '/TouchpadOff/ { print $3 }'"))))
     (call-process "synclient" nil nil nil
                   (format "TouchpadOff=%d" (- 1 state)))))
@@ -88,9 +89,9 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 ;;; XDG Applications
 
 (defvar my-xdg-web-browser-app
-  (let ((default-directory "~"))
-    (string-trim (shell-command-to-string
-                  "xdg-settings get default-web-browser")))
+  (string-trim
+   (my-local-shell-command-to-string
+    "xdg-settings get default-web-browser"))
   "App name of the default XDG web browser.")
 
 (defvar my-xdg-web-browser-class-name
