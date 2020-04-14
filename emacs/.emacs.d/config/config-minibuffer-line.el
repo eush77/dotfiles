@@ -94,10 +94,11 @@ to exact time.
                              (string-width globals)
                              (string-width battery)
                              (string-width clock))))
-                  (globals-width (- frame-width
-                                    space-width
-                                    (string-width battery)
-                                    (string-width clock))))
+                  (globals-width (min (length globals)
+                                      (- frame-width
+                                         space-width
+                                         (string-width battery)
+                                         (string-width clock)))))
              (my-mode-line-escape
               (concat (substring globals 0 globals-width)
                       (make-string space-width ? )
