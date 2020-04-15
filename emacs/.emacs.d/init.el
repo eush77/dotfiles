@@ -189,6 +189,7 @@
 (with-eval-after-load "simple" (load "config-simple"))
 (with-eval-after-load "smerge-mode" (load "config-smerge"))
 (with-eval-after-load "swap-buffers" (load "config-swap-buffers"))
+(with-eval-after-load "telega" (load "config-telega"))
 (with-eval-after-load "tex-mode" (load "config-tex"))
 (with-eval-after-load "view" (load "config-view"))
 (with-eval-after-load "web-server" (load "config-web-server"))
