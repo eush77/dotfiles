@@ -63,6 +63,15 @@
    #'my-compilation-save-buffers-predicate)
  '(compilation-scroll-output t))
 
+;;; Display-Buffer
+
+(define-advice compilation-start
+    (:around (func &rest args) my-display-buffer)
+  "Display output in the same window."
+  (let ((display-buffer-overriding-action
+         '(display-buffer-same-window)))
+    (apply func args)))
+
 ;;; History
 
 (defvar-local my-compile-history nil
