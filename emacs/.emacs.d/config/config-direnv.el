@@ -7,6 +7,8 @@
                            eshell-mode
                            magit-status-mode)))
 
+;;; Eshell
+
 (with-eval-after-load "eshell"
   (defun my-eshell--direnv-path-env (&rest args)
     "Update `eshell-path-env'."
@@ -20,3 +22,31 @@
     (setq eshell-path-env (getenv "PATH")))
   (advice-add 'direnv-update-directory-environment
               :after #'my-direnv-update-directory-environment--eshell))
+
+;;; Tramp
+
+(defcustom my-direnv-enabled-hosts nil
+  "List of remote hosts to use Direnv on.
+
+Each host must have `direnv' executable accessible in the default
+environment."
+  :type '(repeat string)
+  :group 'my)
+
+(defun tramp-sh-handle-start-file-process@my-direnv (args)
+  "Enable Direnv for hosts in `my-direnv-enabled-hosts'."
+  (with-parsed-tramp-file-name (expand-file-name default-directory) nil
+    (if (member host my-direnv-enabled-hosts)
+        (pcase-let ((`(,name ,buffer ,program . ,args) args))
+          `(,name
+            ,buffer
+            "direnv"
+            "exec"
+            ,localname
+            ,program
+            ,@args))
+      args)))
+
+(with-eval-after-load "tramp-sh"
+  (advice-add 'tramp-sh-handle-start-file-process
+              :filter-args #'tramp-sh-handle-start-file-process@my-direnv))

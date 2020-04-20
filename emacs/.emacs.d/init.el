@@ -14,6 +14,7 @@
 ;; My customization group
 (defgroup my
   '((my-compilation-ignored-buffers custom-variable)
+    (my-direnv-enabled-hosts custom-variable)
     (my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
     (my-exwm-brightness-change-amount custom-variable)
