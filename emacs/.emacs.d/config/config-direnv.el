@@ -7,6 +7,18 @@
                            eshell-mode
                            magit-status-mode)))
 
+;;; Gdb
+
+(defun gdb@my-direnv (func &rest args)
+  "Disable Direnv output."
+  (let ((tramp-remote-process-environment
+         (append tramp-remote-process-environment
+                 '("DIRENV_LOG_FORMAT= "))))
+    (apply func args)))
+
+(with-eval-after-load "gdb-mi"
+  (advice-add 'gdb :around #'gdb@my-direnv))
+
 ;;; Eshell
 
 (with-eval-after-load "eshell"
@@ -36,7 +48,9 @@ environment."
 (defun tramp-sh-handle-start-file-process@my-direnv (args)
   "Enable Direnv for hosts in `my-direnv-enabled-hosts'."
   (pcase-let ((`(,name ,buffer . ,program) args))
-    (if (stringp (car program))
+    (if (and (stringp (car program))
+             (not (--find (eq (second it) 'eshell-gather-process-output)
+                          (backtrace-frames))))
         (with-parsed-tramp-file-name (expand-file-name default-directory) nil
           (if (member host my-direnv-enabled-hosts)
               `(,name
