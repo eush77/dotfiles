@@ -35,16 +35,17 @@ environment."
 
 (defun tramp-sh-handle-start-file-process@my-direnv (args)
   "Enable Direnv for hosts in `my-direnv-enabled-hosts'."
-  (with-parsed-tramp-file-name (expand-file-name default-directory) nil
-    (if (member host my-direnv-enabled-hosts)
-        (pcase-let ((`(,name ,buffer ,program . ,args) args))
-          `(,name
-            ,buffer
-            "direnv"
-            "exec"
-            ,localname
-            ,program
-            ,@args))
+  (pcase-let ((`(,name ,buffer . ,program) args))
+    (if (stringp (car program))
+        (with-parsed-tramp-file-name (expand-file-name default-directory) nil
+          (if (member host my-direnv-enabled-hosts)
+              `(,name
+                ,buffer
+                "direnv"
+                "exec"
+                ,localname
+                ,@program)
+            args))
       args)))
 
 (with-eval-after-load "tramp-sh"
