@@ -184,6 +184,7 @@
 (with-eval-after-load "purescript-mode" (load "config-purescript"))
 (with-eval-after-load "racket-mode" (load "config-racket"))
 (with-eval-after-load "rst" (load "config-rst"))
+(with-eval-after-load "rust-mode" (load "config-rust"))
 (with-eval-after-load "scroll-all" (load "config-scroll-all"))
 (with-eval-after-load "sgml-mode" (load "config-sgml"))
 (with-eval-after-load "shr" (load "config-shr"))
