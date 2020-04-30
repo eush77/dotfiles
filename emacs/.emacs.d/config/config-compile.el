@@ -11,6 +11,21 @@
 (advice-add 'compilation-handle-exit
             :after #'my-compilation-filter-ansi-color)
 
+;;; Buffer Saving
+
+(defvar org-directory)
+
+(defun my-compilation-save-buffers-predicate ()
+  "Non-nil if the current buffer is saved before compiling."
+  (and (derived-mode-p 'bibtex-mode 'prog-mode 'text-mode)
+       (not (string-equal
+             (directory-file-name (file-name-directory buffer-file-name))
+             (directory-file-name (expand-file-name org-directory))))))
+
+(custom-set-variables
+ '(compilation-save-buffers-predicate
+   #'my-compilation-save-buffers-predicate))
+
 ;;; Commands
 
 ;;;###autoload
@@ -51,17 +66,6 @@
                            (beginning-of-line 4)
                            (buffer-substring (point) (line-end-position))))))
     (compile (compilation-read-command command))))
-
-;;; Custom Setup
-
-(defun my-compilation-save-buffers-predicate ()
-  "Non-nil if the current buffer is saved before compiling."
-  (derived-mode-p 'bibtex-mode 'prog-mode 'text-mode))
-
-(custom-set-variables
- '(compilation-save-buffers-predicate
-   #'my-compilation-save-buffers-predicate)
- '(compilation-scroll-output t))
 
 ;;; Display-Buffer
 
@@ -175,3 +179,8 @@ With prefix argument SELECT-P, select the window as well."
           (recompile))))
     (when select-p
       (select-window window))))
+
+;;; Scrolling
+
+(custom-set-variables
+ '(compilation-scroll-output t))
