@@ -410,6 +410,7 @@ _SPC_: set mark | _o__O_: open         | _d__D_: delete  | _M-w_: copy      | _q
 
 ;;; Shell commands
 
+;;;###autoload
 (defun my-local-shell-command-to-string (command)
   "Execute COMMAND on the local host."
   (let ((default-directory "/"))
