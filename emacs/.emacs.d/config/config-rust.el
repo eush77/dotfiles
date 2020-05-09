@@ -6,4 +6,5 @@
 
 ;;; Keymap
 
+(define-key rust-mode-map (kbd "C-c C-f") nil)
 (define-key rust-mode-map (kbd "C-M-\\") #'rust-format-buffer)
