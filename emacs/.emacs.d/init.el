@@ -160,6 +160,7 @@
 (with-eval-after-load "exwm" (load "config-exwm"))
 (with-eval-after-load "ffap" (load "config-ffap"))
 (with-eval-after-load "files" (load "config-files"))
+(with-eval-after-load "follow" (load "config-follow"))
 (with-eval-after-load "gdb-mi" (load "config-gdb-mi"))
 (with-eval-after-load "golden-ratio" (load "config-golden-ratio"))
 (with-eval-after-load "guess-language" (load "config-guess-language"))
