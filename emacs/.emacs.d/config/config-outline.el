@@ -143,7 +143,7 @@ direction. The meaning of COUNT is inverted."
   "Cycle heading at point"
   (let ((point-before (point)))
     (apply func args)
-    (when (and (outline-minor-mode)
+    (when (and outline-minor-mode
                (= point-before (point))
                (outline-on-heading-p))
       (my-outline-cycle-subtree))))
