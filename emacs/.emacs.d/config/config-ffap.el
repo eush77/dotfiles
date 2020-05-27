@@ -1,3 +1,5 @@
+;;; ffap-c-path
+
 ;;;###autoload
 (defun my-gcc-include-paths (lang)
   "Get the list of system include paths for language LANG, as
@@ -14,3 +16,12 @@ returned by the GCC compiler."
 (custom-set-variables
  '(ffap-c-path (my-gcc-include-paths "c"))
  '(ffap-c++-path (my-gcc-include-paths "c++")))
+
+;;; ffap-machine-at-point
+
+(define-advice ffap-machine-at-point (:before-while () my-dired)
+  "Return nil in `dired-mode'.
+
+File names rarely refer to machines but regularly look like they
+do."
+  (not (derived-mode-p 'dired-mode)))
