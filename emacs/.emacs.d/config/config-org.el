@@ -1469,8 +1469,20 @@ If the new state is `DROP', drop the whole subtree."
 
 ;;; Typography
 
+(defun my-org-nbsp-fixup-pattern (start end)
+  "Protect the pattern against Org inline syntax."
+  (cons (if (or (null start) (string-empty-p start))
+            "[^*/=]"
+          start)
+        (if (or (null end) (string-empty-p end))
+            "[^*/=]"
+          end)))
+
 (setf (alist-get 'org-mode my-nbsp-patterns)
       '(("[^/$]" . "---")))
+
+(setf (alist-get 'org-mode my-nbsp-pattern-fixups)
+      #'my-org-nbsp-fixup-pattern)
 
 (defun my-org-region-snap-to-elements (begin end)
   "Extend region bounds to nearest element boundaries.

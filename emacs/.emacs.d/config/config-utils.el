@@ -518,6 +518,14 @@ the empty string if nil. Whenever START and END match around a
 sequence of whitespace-only characters, these characters are to
 be replaced with a single non-breaking space.")
 
+;;;###autoload
+(defcustom my-nbsp-pattern-fixups nil
+  "Mode-specific fixups to `my-nbsp-patterns'
+
+A list of pairs (MODE . FIXUP) where MODE is a major mode symbol,
+and FUNCTION that takes two arguments `start' and `end', applies
+the fixup, and returns them as a pair.")
+
 (defvar-local my-nbsp-sequence nil
   "Non-breaking space sequence to use in the current buffer.")
 
@@ -573,23 +581,27 @@ replace silently. `t' when called interactively."
       end
       t)))
   (save-excursion
-    (let ((case-replace))
-      (perform-replace
-       (mapconcat (pcase-lambda (`(,start . ,end))
-                    (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
-                            start
-                            (or end "")))
-                  (append (alist-get langid my-nbsp-patterns)
-                          (alist-get major-mode my-nbsp-patterns))
-                  "\\|")
-       (concat "\\1" nbsp "\\2")
-       query-p
-       t
-       nil
-       nil
-       nil
-       start
-       end))))
+    (let ((case-replace)
+          (fixup (alist-get major-mode my-nbsp-pattern-fixups 'cons)))
+      (dotimes (_ 3)
+        (perform-replace (mapconcat
+                          (pcase-lambda (`(,start . ,end))
+                            (pcase-let* ((`(,start . ,end)
+                                          (funcall fixup start end)))
+                              (format "\\(?1:%s\\)\\s-+\\(?2:%s\\)"
+                                      start
+                                      (or end ""))))
+                          (append (alist-get langid my-nbsp-patterns)
+                                  (alist-get major-mode my-nbsp-patterns))
+                          "\\|")
+                         (concat "\\1" nbsp "\\2")
+                         query-p
+                         t
+                         nil
+                         nil
+                         nil
+                         start
+                         end)))))
 
 (defun my-nbsp-fix-paragraph (langid nbsp &optional query-p)
   "Fix non-breaking spaces in the current paragraph.
