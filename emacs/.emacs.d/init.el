@@ -111,6 +111,9 @@
 (add-to-list 'package-selected-packages 'swiper)
 (add-to-list 'package-selected-packages 'w3m)
 (add-to-list 'package-selected-packages 'window-jump)
+(add-to-list 'package-selected-packages 'zone-rainbow)
+(add-to-list 'package-selected-packages 'zone-select)
+(add-to-list 'package-selected-packages 'zone-sl)
 
 (when window-system
   (add-to-list 'package-selected-packages 'gnus-desktop-notify)
@@ -144,6 +147,7 @@
 (load "config-vc")
 (load "config-w3m")
 (load "config-winner")
+(load "config-zone")
 (with-eval-after-load "bibtex" (load "config-bibtex"))
 (with-eval-after-load "bookmark" (load "config-bookmark"))
 (with-eval-after-load "calendar" (load "config-calendar"))
