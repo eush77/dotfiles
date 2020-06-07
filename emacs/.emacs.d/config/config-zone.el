@@ -4,5 +4,5 @@
 (zone-when-idle 600)
 
 (define-advice zone (:before-until () my-exwm)
-  "Don't zone out of buffers in `exwm-mode'."
-  (derived-mode-p 'exwm-mode))
+  "Don't zone out of buffers in certain modes."
+  (derived-mode-p 'exwm-mode 'pdf-view-mode))
