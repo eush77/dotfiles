@@ -139,6 +139,7 @@ alias lc='ls -1v --group-directories-first --ignore-backups'
 alias ls='ls --color=auto'
 alias pacaur='pacaur --color=auto'
 alias pacman='pacman --color=auto'
+alias rgrep='pls -a -- grep --color=always --line-number --recursive --with-filename'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias reinit='source ~/.bashrc'
 alias sudo='sudo '  # Expand aliases under `sudo'.
