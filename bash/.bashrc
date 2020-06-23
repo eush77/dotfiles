@@ -108,8 +108,10 @@ bind 'Meta-n: menu-complete'
 bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
 
+bind '"\C-h": "\C-apls -a -- \C-m"'
+bind '"\C-j": "\C-e |& fzf\C-m"'
+bind '"\C-l": "\C-e |& $PAGER\C-m"'
 bind -x '"\M-i": READLINE_LINE="i $READLINE_LINE"; let READLINE_POINT+=2'
-bind -x '"\M-g": READLINE_LINE+=" |& $PAGER"'
 bind -x '"\M-s": READLINE_LINE="sudo $READLINE_LINE"; let READLINE_POINT+=5'
 
 # Commacd
