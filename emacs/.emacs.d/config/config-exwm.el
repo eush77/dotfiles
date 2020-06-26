@@ -4,13 +4,29 @@
 
 ;;; External Commands
 
+(defvar my-exwm-brightness-deferred-p nil)
+(defvar my-exwm-brightness-deferred-amount 0)
+
+(defun my-exwm-brightness-change-sentinel (process _event)
+  (setq my-exwm-brightness-deferred-p nil)
+  (if (zerop my-exwm-brightness-deferred-amount)
+      (message "Screen brightness set to %s%%"
+               (truncate
+                (string-to-number
+                 (my-local-shell-command-to-string "xbacklight -get"))))
+    (my-exwm-brightness-change my-exwm-brightness-deferred-amount)))
+
 (defun my-exwm-brightness-change (amount)
   "Change screen brightness by AMOUNT."
   (interactive "nChange screen brightness by [-100..100]: ")
-  (call-process "xbacklight" nil nil nil "-inc" (number-to-string amount))
-  (message "Screen brightness set to %s%%"
-           (string-trim
-            (my-local-shell-command-to-string "xbacklight -get"))))
+  (if my-exwm-brightness-deferred-p
+      (setq my-exwm-brightness-deferred-amount
+            (+ my-exwm-brightness-deferred-amount amount))
+    (setq my-exwm-brightness-deferred-p t
+          my-exwm-brightness-deferred-amount 0)
+    (make-process :name "xbacklight"
+                  :command `("xbacklight" "-inc" ,(number-to-string amount))
+                  :sentinel #'my-exwm-brightness-change-sentinel)))
 
 ;;;###autoload
 (defcustom my-exwm-brightness-change-amount 10
