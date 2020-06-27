@@ -1,6 +1,9 @@
 # -*- mode: shell-script; indent-tabs-mode: t; tab-width: 4; -*-#
 
-#======================== Environment Variables ============================
+#
+# Environment
+#
+
 export EDITOR=mg
 
 export LESSOPEN="| source-highlight --out-format esc -i %s"
@@ -20,12 +23,14 @@ export W3MMAN_W3M='w3m -o confirm_qq=false'
 export WWW_HOME='https://google.com/'
 
 eval "$(dircolors)"
-#===========================================================================
 
 # If not running interactively, don't go any further.
 [[ $- != *i* ]] && return
 
-#============================ Shell Settings ===============================
+#
+# Shell Settings
+#
+
 FIGNORE='~'
 HISTCONTROL=ignoreboth
 HISTFILESIZE=20000
@@ -96,9 +101,11 @@ shopt -s \
 # Load bash-completion, if available.
 [[ -r /usr/share/bash-completion/bash_completion ]] &&
 	source /usr/share/bash-completion/bash_completion
-#===========================================================================
 
-#============================ Readline =====================================
+#
+# Readline
+#
+
 bind 'set colored-stats on'
 bind 'set completion-ignore-case on'
 bind 'set convert-meta on'
@@ -116,9 +123,11 @@ bind -x '"\M-s": READLINE_LINE="sudo $READLINE_LINE"; let READLINE_POINT+=5'
 
 # Commacd
 bind '"\C-]": ",,, "'
-#===========================================================================
 
-#============================== Aliases ====================================
+#
+# Aliases
+#
+
 # Include Grc aliases.
 [[ -r /etc/profile.d/grc.bashrc ]] && source /etc/profile.d/grc.bashrc
 [[ "$(type -t make)" = alias ]] && unalias make  # Preserve CMake coloring
@@ -154,9 +163,11 @@ alias mplayer.tl='mplayer -profile tl'
 alias mplayer.tr='mplayer -profile tr'
 alias mplayer.bl='mplayer -profile bl'
 alias mplayer.br='mplayer -profile br'
-#===========================================================================
 
-#================================= Functions ===============================
+#
+# Functions
+#
+
 function e {
 	# Use indirection to allow EDITOR to be redefined by the host.
 	$EDITOR "$@"
@@ -440,24 +451,31 @@ function youtube-mw {
 		youtube-dl --simulate --mark-watched \
 				   --username="$YOUTUBE_USERNAME" -- "$id"
 }
-#===========================================================================
 
-#======================= System Setup ======================================
+#
+# Utilities
+#
+
+: acpi :
+
 # Show battery status if running on a TTY.
 [[ -z "$DISPLAY" ]] &&
 	[[ -e /sys/class/power_supply/BAT1/status ]] &&
 	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
 	acpi --battery
 
-# Hook up Commacd.
+: commacd :
+
 [[ -r /usr/share/commacd/commacd.bash ]] &&
 	source /usr/share/commacd/commacd.bash
 
-# Hook up Direnv.
+: direnv :
+
 [[ "$(type -t direnv)" = "file" ]] &&
 	eval "$(direnv hook bash)"
 
-# Hook up Fzf.
+: fzf :
+
 [[ -f ~/.fzf.bash ]] && {
 	export FZF_DEFAULT_OPTS;
 	printf -v FZF_DEFAULT_OPTS "%s " \
@@ -471,12 +489,13 @@ function youtube-mw {
 	bind -x '"\M-v": fzf-file-widget';
 }
 
-# Hook up Z.
+: z :
+
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
-#===========================================================================
 
-#======================= Host Config =======================================
+#
+# Host Config
+#
+
 [[ -r ~/.bashrc.host ]] && source ~/.bashrc.host
-#===========================================================================
-
 true
