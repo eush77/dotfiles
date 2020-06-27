@@ -197,6 +197,7 @@
 (with-eval-after-load "rust-mode" (load "config-rust"))
 (with-eval-after-load "scroll-all" (load "config-scroll-all"))
 (with-eval-after-load "sgml-mode" (load "config-sgml"))
+(with-eval-after-load "sh-script" (load "config-sh-script"))
 (with-eval-after-load "shr" (load "config-shr"))
 (with-eval-after-load "simple" (load "config-simple"))
 (with-eval-after-load "smerge-mode" (load "config-smerge"))
