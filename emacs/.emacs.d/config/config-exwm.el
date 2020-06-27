@@ -56,11 +56,13 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   "Enable or disable touchpad."
   (interactive)
   (let ((state
-         (string-to-number
-          (my-local-shell-command-to-string
-           "synclient -l | awk '/TouchpadOff/ { print $3 }'"))))
-    (call-process "synclient" nil nil nil
-                  (format "TouchpadOff=%d" (- 1 state)))))
+         (- 1 (string-to-number
+               (my-local-shell-command-to-string
+                "synclient -l | awk '/TouchpadOff/ { print $3 }'")))))
+    (call-process "synclient" nil nil nil (format "TouchpadOff=%d" state))
+    (cl-case state
+      (1 (start-process "unclutter" nil "unclutter" "--timeout=1"))
+      (0 (quit-process (get-process "unclutter"))))))
 
 ;;; IBuffer
 
