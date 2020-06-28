@@ -489,6 +489,11 @@ function youtube-mw {
 	bind -x '"\M-v": fzf-file-widget';
 }
 
+: pkgfile :
+
+[[ -r "/usr/share/doc/pkgfile/command-not-found.bash" ]] &&
+	source "/usr/share/doc/pkgfile/command-not-found.bash"
+
 : z :
 
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
