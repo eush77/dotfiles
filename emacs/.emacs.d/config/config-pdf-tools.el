@@ -91,6 +91,15 @@ group, scale the scroll amount by the number of followers."
   (advice-add 'pdf-view-scroll-up-or-next-page
               :around #'pdf-view-next-line-or-next-page@my-follow))
 
+;;; midnight-minor-mode
+
+(define-advice pdf-view-midnight-minor-mode
+    (:before (&optional arg) my-recompute-colors)
+  "Recompute `pdf-view-midnight-colors'."
+  (setq pdf-view-midnight-colors
+        (cons (face-attribute 'default :foreground)
+              (face-attribute 'default :background))))
+
 ;;; keymap
 
 (with-eval-after-load "pdf-tools"
