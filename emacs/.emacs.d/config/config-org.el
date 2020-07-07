@@ -1714,6 +1714,45 @@ If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
     (process-send-region process (point-min) (point-max))
     (kill-buffer)))
 
+(defun my-ws-send-org-checklist
+    (process agenda-command &optional revert-buffers-p &rest agenda-args)
+  "Render agenda buffer as an html checklist and send to PROCESS.
+
+AGENDA-COMMAND is the agenda function to call. AGENDA-ARGS are
+the arguments to this function.
+
+If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
+  (when revert-buffers-p
+    (cl-letf (((symbol-function 'yes-or-no-p) (lambda (_) t)))
+      (org-revert-all-org-buffers)))
+  (with-current-buffer
+      (save-window-excursion
+        (apply agenda-command agenda-args)
+        (org-agenda-redo t)
+        (current-buffer))
+    (let ((checklist))
+      (goto-char (point-max))
+      (while (let ((point (point)))
+               (org-agenda-previous-item 1)
+               (< (point) point))
+        (goto-char (1+ (next-single-property-change
+                        (next-single-property-change
+                         (line-beginning-position)
+                         'face)
+                        'face)))
+        (push `(label
+                (input :type "checkbox"
+                       ,(buffer-substring (point) (line-end-position)))
+                (br))
+              checklist))
+      (ws-response-header process 200 '("Content-Type" . "text/html"))
+      (process-send-string
+       process
+       (xmlgen
+        `(html (head (meta :name "viewport"
+                           :content "width=device-width, initial-scale=1"))
+               (body ,@checklist)))))))
+
 (defun my-ws-send-org-html
     (process org-file &optional revert-buffer-p)
   "Export ORG-FILE as html and send to PROCESS.
