@@ -2,7 +2,36 @@
 (require 'counsel)
 (require 'dash)
 
-;;; External Commands
+;;; Media Commands
+
+(defun my-exwm-audio-next ()
+  "Switch to the next track.
+
+The key is handled by `yandex-music-controls' addon [1] in Firefox.
+
+\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+  (interactive)
+  (my-xdg-web-browser-send-key (kbd "C-S-.")))
+
+(my-xdg-web-browser-send-key (kbd "M-z"))
+
+(defun my-exwm-audio-play ()
+  "Toggle play/pause.
+
+The key is handled by `yandex-music-controls' addon [1] in Firefox.
+
+\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+  (interactive)
+  (my-xdg-web-browser-send-key (kbd "C-S-SPC")))
+
+(defun my-exwm-audio-prev ()
+  "Switch to the previous track.
+
+The key is handled by `yandex-music-controls' addon [1] in Firefox.
+
+\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+  (interactive)
+  (my-xdg-web-browser-send-key (kbd "C-S-,")))
 
 (defvar my-exwm-brightness-deferred-p nil)
 (defvar my-exwm-brightness-deferred-amount 0)
@@ -165,6 +194,16 @@ BUFFER defaults to the current buffer."
             (insert url)
             (thing-at-point 'url)))))))
 
+;;;###autoload
+(defun my-xdg-web-browser-send-key (key)
+  "Send KEY to a browser window."
+  (let ((buffer (my-xdg-web-browser-buffer)))
+    (save-window-excursion
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer buffer))
+      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
+
 ;;; exwm-edit
 
 (defun my-exwm-edit ()
@@ -186,6 +225,9 @@ BUFFER defaults to the current buffer."
 
 (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
 (exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
+(exwm-input-set-key (kbd "<XF86AudioNext>") #'my-exwm-audio-next)
+(exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-exwm-audio-play)
+(exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-exwm-audio-prev)
 (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
 (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-exwm-brightness-down)
 (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-exwm-brightness-up)
