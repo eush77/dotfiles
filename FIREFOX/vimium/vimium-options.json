@@ -1,5 +1,5 @@
 {
-  "settingsVersion": "1.64.3",
+  "settingsVersion": "1.66",
   "exclusionRules": [
     {
       "pattern": "https?://mail.google.com/*",
@@ -9,7 +9,7 @@
   "filterLinkHints": true,
   "waitForEnterForFilteredHints": true,
   "hideHud": false,
-  "keyMappings": "map <a-q> removeTab\nmap ] focusInput\nmap ^ goUp\nmap b goBack\nmap B goForward\nmap c copyCurrentUrl\nmap d LinkHints.activateModeToDownloadLink\nmap g Vomnibar.activate\nmap G Vomnibar.activateInNewTab\nmap q passNextKey\nmap u LinkHints.activateModeToCopyLinkUrl\nunmap x",
+  "keyMappings": "map <a-q> removeTab\nmap ] focusInput\nmap ^ goUp\nmap b goBack\nmap B goForward\nmap c copyCurrentUrl\nmap d LinkHints.activateModeToDownloadLink\nmap g Vomnibar.activate\nmap G Vomnibar.activateInNewTab\nmap q passNextKey\nmap t Vomnibar.activateTabSelection\nmap u LinkHints.activateModeToCopyLinkUrl\nunmap x",
   "linkHintCharacters": "sadfjklewcmpgh",
   "linkHintNumbers": "0123456789",
   "newTabUrl": "about:newtab",
