@@ -147,7 +147,8 @@ BUFFER defaults to the current buffer."
       (if-let ((window (get-buffer-window buffer t)))
           (select-window window)
         (pop-to-buffer-same-window buffer))
-    (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app))))
+    (let ((default-directory "/"))
+      (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app)))))
 
 ;;;###autoload
 (defun my-xdg-web-browser-get-current-url ()
