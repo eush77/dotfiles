@@ -1714,44 +1714,39 @@ If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
     (process-send-region process (point-min) (point-max))
     (kill-buffer)))
 
-(defun my-ws-send-org-checklist
-    (process agenda-command &optional revert-buffers-p &rest agenda-args)
-  "Render agenda buffer as an html checklist and send to PROCESS.
+(defun my-ws-send-org-checklist (process file &optional revert-p)
+  "Render Org file as an html checklist and send to PROCESS.
 
-AGENDA-COMMAND is the agenda function to call. AGENDA-ARGS are
-the arguments to this function.
+The checklist includes all headings with a todo keyword. The page
+includes an HTML form with a selector consisting of the rest of
+the headings and a button that sends a POST request.
 
-If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
-  (when revert-buffers-p
-    (cl-letf (((symbol-function 'yes-or-no-p) (lambda (_) t)))
-      (org-revert-all-org-buffers)))
+If REVERT-P is non-nil, revert that buffer."
   (with-current-buffer
-      (save-window-excursion
-        (apply agenda-command agenda-args)
-        (org-agenda-redo t)
-        (current-buffer))
-    (let ((checklist))
-      (goto-char (point-max))
-      (while (let ((point (point)))
-               (org-agenda-previous-item 1)
-               (< (point) point))
-        (goto-char (1+ (next-single-property-change
-                        (next-single-property-change
-                         (line-beginning-position)
-                         'face)
-                        'face)))
-        (push `(label
-                (input :type "checkbox"
-                       ,(buffer-substring (point) (line-end-position)))
-                (br))
-              checklist))
+    (cl-letf (((symbol-function 'yes-or-no-p) (-const revert-p)))
+      (find-file-noselect (expand-file-name file org-directory)))
+    (goto-char (point-max))
+    (let ((checklist)
+          (form))
+      (while (outline-previous-heading)
+        (let* ((el (org-element-at-point))
+               (title (org-element-property :title el))
+               (todo-keyword (org-element-property :todo-keyword el)))
+          (if todo-keyword
+              (push `(label (input :type "checkbox" ,title) (br))
+                    checklist)
+            (push `(option :value ,title ,title) form))))
       (ws-response-header process 200 '("Content-Type" . "text/html"))
       (process-send-string
        process
        (xmlgen
         `(html (head (meta :name "viewport"
                            :content "width=device-width, initial-scale=1"))
-               (body ,@checklist)))))))
+               (body ,@checklist
+                     (hr :style "margin-top: 1.5em;")
+                     (form :method "post"
+                           (button "+")
+                           (select :name "item" ,@form)))))))))
 
 (defun my-ws-send-org-html
     (process org-file &optional revert-buffer-p)
