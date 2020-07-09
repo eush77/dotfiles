@@ -251,6 +251,37 @@ including the sigil."
  '(eshell-prompt-function #'my-eshell-prompt-function)
  '(eshell-prompt-regexp "^[^#$]* [#$][[:digit:]]* "))
 
+;;; Command-Not-Found
+
+(defun my-eshell-command-not-found (file)
+  "Search for the file using `pkgfile'."
+  (-some--> "pkgfile"
+    (eshell-search-path it)
+    (with-temp-buffer
+      (when (zerop (call-process it nil t nil
+                                 "--binaries"
+                                 "--verbose"
+                                 "--"
+                                 file))
+        (goto-char (point-min))
+        (insert file " may be found in the following packages:\n")
+        (while (/= (point) (point-max))
+          (insert "  ")
+          (forward-line))
+        (buffer-string)))
+    (eshell-print it)
+    (eshell-search-path "true")))
+
+(defun my-eshell-setup-command-not-found ()
+  "Set up command-not-found handler for Eshell."
+  (add-hook 'eshell-alternate-command-hook
+            #'my-eshell-command-not-found
+            nil
+            t))
+
+(add-hook 'eshell-mode-hook
+          #'my-eshell-setup-command-not-found)
+
 ;;; Commands
 
 (defun my-eshell-toggle-sudo ()
@@ -311,8 +342,8 @@ numbered."
 
 ;; `eshell-mode-map' is local to the buffer, so set up key bindings in a hook.
 
-(defun my-eshell-mode-hook ()
-  "My hook for Eshell mode."
+(defun my-eshell-setup-keymap ()
+  "Set up keymap in Eshell mode."
   (define-key eshell-mode-map (kbd "M-<tab>") nil)
   (define-key eshell-mode-map (kbd "C-c C-h") #'counsel-esh-history)
   (define-key eshell-mode-map (kbd "C-c C-l") #'eshell/clear)
@@ -320,4 +351,4 @@ numbered."
   (define-key eshell-mode-map (kbd "C-c C-w")
     #'my-eshell-edit-indirect-output)
   (define-key eshell-mode-map (kbd "C-c s") #'my-eshell-toggle-sudo))
-(add-hook 'eshell-mode-hook #'my-eshell-mode-hook)
+(add-hook 'eshell-mode-hook #'my-eshell-setup-keymap)
