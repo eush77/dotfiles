@@ -1733,9 +1733,17 @@ If REVERT-P is non-nil, revert that buffer."
                (title (org-element-property :title el))
                (todo-keyword (org-element-property :todo-keyword el)))
           (if todo-keyword
-              (push `(label (input :type "checkbox" ,title) (br))
+              (push `(label
+                      (input :form "clear-form"
+                             :name ,(concat "item-"
+                                            (number-to-string
+                                             (length checklist)))
+                             :value ,title
+                             :type "checkbox"
+                             ,title)
+                            (br))
                     checklist)
-            (push `(option :value ,title ,title) form))))
+            (push `(option ,title) form))))
       (ws-response-header process 200 '("Content-Type" . "text/html"))
       (process-send-string
        process
@@ -1745,8 +1753,17 @@ If REVERT-P is non-nil, revert that buffer."
                (body ,@checklist
                      (hr :style "margin-top: 1.5em;")
                      (form :method "post"
-                           (button "+")
-                           (select :name "item" ,@form)))))))))
+                           (select :name "item"
+                                   (option :value "" "---")
+                                   ,@form)
+                           (button :name "action"
+                                   :value "add"
+                                   "+"))
+                     (form :id "clear-form"
+                           :method "post"
+                           (button :name "action"
+                                   :value "clear"
+                                   "☑ Clear marked")))))))))
 
 (defun my-ws-send-org-html
     (process org-file &optional revert-buffer-p)
