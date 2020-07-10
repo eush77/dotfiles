@@ -25,7 +25,7 @@ export WWW_HOME='https://google.com/'
 eval "$(dircolors)"
 
 # If not running interactively, don't go any further.
-[[ $- != *i* ]] && return
+[[ $- != *i* || "$TERM" == "dumb" ]] && return
 
 #
 # Shell Settings
@@ -116,7 +116,7 @@ bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
 
 bind '"\C-h": "\C-apls -a -- \C-m"'
-bind '"\C-j": "\C-e |& fzf\C-m"'
+[[ "${TERM%-*}" == "eterm" ]] || bind '"\C-j": "\C-e |& fzf\C-m"'
 bind '"\C-l": "\C-e |& $PAGER\C-m"'
 bind -x '"\M-i": READLINE_LINE="i $READLINE_LINE"; let READLINE_POINT+=2'
 bind -x '"\M-s": READLINE_LINE="sudo $READLINE_LINE"; let READLINE_POINT+=5'
