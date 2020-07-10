@@ -1749,16 +1749,16 @@ If REVERT-P is non-nil, revert that buffer."
        process
        (xmlgen
         `(html (head (meta :name "viewport"
-                           :content "width=device-width, initial-scale=1"))
+                           :content "width=device-width, initial-scale=1.5"))
                (body ,@checklist
                      (hr :style "margin-top: 1.5em;")
                      (form :method "post"
-                           (select :name "item"
-                                   (option :value "" "---")
-                                   ,@form)
                            (button :name "action"
                                    :value "add"
-                                   "+"))
+                                   "+")
+                           (select :name "item"
+                                   (option :value "" "---")
+                                   ,@form))
                      (form :id "clear-form"
                            :method "post"
                            (button :name "action"
