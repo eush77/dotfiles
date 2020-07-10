@@ -1714,8 +1714,8 @@ If REVERT-BUFFER-P is non-nil, revert Org buffers without asking."
     (process-send-region process (point-min) (point-max))
     (kill-buffer)))
 
-(defun my-ws-send-org-checklist (process file &optional revert-p)
-  "Render Org file as an html checklist and send to PROCESS.
+(defun my-ws-send-org-checklist (file process &optional revert-p)
+  "Render Org FILE as an html checklist and send to PROCESS.
 
 The checklist includes all headings with a todo keyword. The page
 includes an HTML form with a selector consisting of the rest of
@@ -1764,6 +1764,41 @@ If REVERT-P is non-nil, revert that buffer."
                            (button :name "action"
                                    :value "clear"
                                    "☑ Clear marked")))))))))
+
+(defun my-ws-post-org-checklist (file process headers &optional revert-p)
+  "Handle POST request to the checklist rendered from FILE.
+
+If REVERT-P is non-nil, revert that buffer."
+  (let ((state
+         (pcase (alist-get "action" headers nil nil #'string-equal)
+           ("add" t)
+           ("clear" nil)
+           (action
+            (ws-response-header process 422
+                                '("Content-Type" . "text/plain"))
+            (process-send-string
+             process (format "Action %S is not implemented" action))
+            (throw 'close-connection nil))))
+        (items
+         (or (-some--> (alist-get "item" headers nil nil #'string-equal)
+               (and (not (string-empty-p it)) it)
+               (decode-coding-string it 'utf-8)
+               (list it))
+             (seq-mapcat (pcase-lambda (`(,key . ,value))
+                           (when (and (stringp key)
+                                      (string-prefix-p "item-" key))
+                             (list (decode-coding-string value 'utf-8))))
+                         headers))))
+    (with-current-buffer
+        (cl-letf (((symbol-function 'yes-or-no-p) (-const revert-p)))
+          (find-file-noselect (expand-file-name file org-directory)))
+      (dolist (item items)
+        (or (-some--> item
+              (org-find-exact-headline-in-buffer it)
+              (goto-char it)
+              (or (org-todo state) t))
+            (ws-send-404 process "No such headline: %S" item)))
+      (save-buffer))))
 
 (defun my-ws-send-org-html
     (process org-file &optional revert-buffer-p)
