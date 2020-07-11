@@ -2,7 +2,99 @@
 (require 'counsel)
 (require 'dash)
 
-;;; Media Commands
+;;; exwm-edit
+
+(defun my-exwm-edit ()
+  "Edit text in the current text field."
+  (interactive)
+  (exwm-input--fake-key ?\C-a)
+  (sit-for 0)
+  (let ((previous-kill (current-kill 0 t)))
+    (exwm-input--fake-key ?\C-c)
+    (sit-for .2)
+    (let ((current-kill (current-kill 0 t)))
+      (kill-new
+       (read-string "Input: "
+                    (unless (string-equal current-kill previous-kill)
+                      current-kill)))))
+  (exwm-input--fake-key ?\C-v))
+
+;;; global keys
+
+(exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
+(exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
+(exwm-input-set-key (kbd "<XF86AudioNext>") #'my-exwm-audio-next)
+(exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-exwm-audio-play)
+(exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-exwm-audio-prev)
+(exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
+(exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-exwm-brightness-down)
+(exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-exwm-brightness-up)
+(exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-exwm-toggle-touchpad)
+(exwm-input-set-key (kbd "C-<return>") #'my-exwm-edit)
+(exwm-input-set-key (kbd "C-g") #'keyboard-quit)
+(exwm-input-set-key (kbd "C-M-j") #'window-jump-left)
+(exwm-input-set-key (kbd "C-M-k") #'window-jump-right)
+(exwm-input-set-key (kbd "C-M-n") #'window-jump-down)
+(exwm-input-set-key (kbd "C-M-p") #'window-jump-up)
+(exwm-input-set-key (kbd "M-`") #'my-exwm-workspace-switch-or-next)
+(exwm-input-set-key (kbd "M-<tab>") #'my-switch-window)
+(exwm-input-set-key (kbd "s-a") #'exwm-workspace-add)
+(exwm-input-set-key (kbd "s-d") #'exwm-workspace-delete)
+(exwm-input-set-key (kbd "s-l") #'my-exwm-lock-screen)
+(exwm-input-set-key (kbd "s-m") #'exwm-workspace-move)
+(exwm-input-set-key (kbd "s-n") #'my-exwm-workspace-next)
+(exwm-input-set-key (kbd "s-p") #'my-exwm-workspace-previous)
+(exwm-input-set-key (kbd "s-r") #'exwm-reset)
+(exwm-input-set-key (kbd "s-s") #'exwm-workspace-swap)
+(exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+
+(dotimes (n 8)
+  (exwm-input-set-key (kbd (format "<f%d>" (+ n 1)))
+                      (lambda ()
+                        (interactive)
+                        (exwm-workspace-switch n))))
+
+;;; ibuffer
+
+(defun my-counsel-ibuffer-by-exwm-class-name ()
+  "`counsel-ibuffer' limited to Exwm buffers of same X class."
+  (interactive)
+  (require 'ibuffer)
+  (cl-letf*
+      ((class-name exwm-class-name)
+       (get-buffers-function
+        (symbol-function 'counsel-ibuffer--get-buffers))
+       ((symbol-function 'counsel-ibuffer--get-buffers)
+        (lambda ()
+          (--filter (with-current-buffer (cdr it)
+                      (and (eq major-mode 'exwm-mode)
+                           (string-equal exwm-class-name class-name)))
+                    (funcall get-buffers-function)))))
+    (counsel-ibuffer)))
+
+;;; key chords
+
+;; Define keys participating in key chords in `exwm-mode-map' so that they are
+;; passed through to Emacs.
+(map-keymap
+ (lambda (event-type key-chord-map)
+   (when (eq event-type 'key-chord)
+     (map-keymap
+      (lambda (key _)
+        (define-key exwm-mode-map (string key)
+          (lambda ()
+            (interactive)
+            (exwm-input--fake-key key))))
+      key-chord-map)))
+ (current-global-map))
+
+(defun my-exwm-define-key-chords ()
+  "Define local key chords for Exwm buffer."
+  (key-chord-define-local "XB" #'my-counsel-ibuffer-by-exwm-class-name))
+
+(add-hook 'exwm-mode-hook #'my-exwm-define-key-chords)
+
+;;; media player
 
 (defun my-exwm-audio-next ()
   "Switch to the next track.
@@ -12,8 +104,6 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
 \[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
   (interactive)
   (my-xdg-web-browser-send-key (kbd "C-S-.")))
-
-(my-xdg-web-browser-send-key (kbd "M-z"))
 
 (defun my-exwm-audio-play ()
   "Toggle play/pause.
@@ -32,6 +122,30 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
 \[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
   (interactive)
   (my-xdg-web-browser-send-key (kbd "C-S-,")))
+
+;;; simulation keys
+
+(custom-set-variables
+ '(exwm-input-simulation-keys
+   '(([?\C-_] . [?\C-z])
+     ([?\C-a] . [home])
+     ([?\C-b] . [left])
+     ([?\C-d] . [delete])
+     ([?\C-e] . [end])
+     ([?\C-f] . [right])
+     ([?\C-k] . [S-end delete])
+     ([?\C-n] . [down])
+     ([?\C-p] . [up])
+     ([?\C-v] . [next])
+     ([?\C-w] . [?\C-x])
+     ([?\C-y] . [?\C-v])
+     ([?\M-<] . [C-home])
+     ([?\M->] . [C-end])
+     ([?\M-h] . [?\C-a])
+     ([?\M-v] . [prior])
+     ([?\M-w] . [?\C-c]))))
+
+;;; screen brightness
 
 (defvar my-exwm-brightness-deferred-p nil)
 (defvar my-exwm-brightness-deferred-amount 0)
@@ -75,11 +189,15 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (interactive)
   (my-exwm-brightness-change my-exwm-brightness-change-amount))
 
+;;; screen lock
+
 (defun my-exwm-lock-screen ()
   "Lock screen."
   (interactive)
   (call-process "slock")
   (message "Welcome back"))
+
+;;; touchpad
 
 (defun my-exwm-toggle-touchpad ()
   "Enable or disable touchpad."
@@ -92,190 +210,35 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                           (end-of-line)
                           (- 1 (number-at-point))))))
 
-;;; IBuffer
 
-(defun my-counsel-ibuffer-by-exwm-class-name ()
-  "`counsel-ibuffer' limited to Exwm buffers of same X class."
+
+;;; unclutter
+
+(defcustom my-exwm-unclutter-timeout 3
+  "Number of seconds before an inactive cursor is hidden.
+
+Used if `unclutter' program is in PATH."
+  :type '(choice (const :tag "Off" nil)
+                 (integer :tag "Seconds"))
+  :group 'my)
+
+(defun my-exwm-unclutter ()
+  "Run `unclutter'.
+
+See `my-exwm-unclutter-timeout'."
   (interactive)
-  (require 'ibuffer)
-  (cl-letf*
-      ((class-name exwm-class-name)
-       (get-buffers-function
-        (symbol-function 'counsel-ibuffer--get-buffers))
-       ((symbol-function 'counsel-ibuffer--get-buffers)
-        (lambda ()
-          (--filter (with-current-buffer (cdr it)
-                      (and (eq major-mode 'exwm-mode)
-                           (string-equal exwm-class-name class-name)))
-                    (funcall get-buffers-function)))))
-    (counsel-ibuffer)))
+  (cl-assert my-exwm-unclutter-timeout)
+  (make-process
+   :name "unclutter"
+   :command `("unclutter" "--timeout"
+              ,(number-to-string my-exwm-unclutter-timeout))
+   :noquery t))
 
-;;; Key Chords
+(and my-exwm-unclutter-timeout
+     (executable-find "unclutter")
+     (add-hook 'exwm-init-hook #'my-exwm-unclutter))
 
-;; Define keys participating in key chords in `exwm-mode-map' so that they are
-;; passed through to Emacs.
-(map-keymap
- (lambda (event-type key-chord-map)
-   (when (eq event-type 'key-chord)
-     (map-keymap
-      (lambda (key _)
-        (define-key exwm-mode-map (string key)
-          (lambda ()
-            (interactive)
-            (exwm-input--fake-key key))))
-      key-chord-map)))
- (current-global-map))
-
-(defun my-exwm-define-key-chords ()
-  "Define local key chords for Exwm buffer."
-  (key-chord-define-local "XB" #'my-counsel-ibuffer-by-exwm-class-name))
-
-(add-hook 'exwm-mode-hook #'my-exwm-define-key-chords)
-
-;;; XDG Applications
-
-(defvar my-xdg-web-browser-app
-  (string-trim
-   (my-local-shell-command-to-string
-    "xdg-settings get default-web-browser"))
-  "App name of the default XDG web browser.")
-
-(defvar my-xdg-web-browser-class-name
-  (let* ((desktop-file
-          (cdr (assoc my-xdg-web-browser-app
-                      (counsel-linux-apps-list-desktop-files))))
-         (props (xdg-desktop-read-file desktop-file)))
-    (or (gethash "StartupWMClass" props)
-        (gethash "Name" props)))
-  "X class name of the default XDG web browser.")
-
-;;;###autoload
-(defun my-xdg-web-browser-buffer-p (&optional buffer)
-  "True if BUFFER is an Exwm buffer of the default XDG web browser.
-
-BUFFER defaults to the current buffer."
-  (with-current-buffer (or buffer (current-buffer))
-    (and (derived-mode-p 'exwm-mode)
-         (string-equal exwm-class-name
-                       my-xdg-web-browser-class-name))))
-
-(defun my-xdg-web-browser-buffer ()
-  "Get live Exwm buffer of the default XDG web browser, or nil."
-  (if (my-xdg-web-browser-buffer-p)
-      (current-buffer)
-    (seq-find #'my-xdg-web-browser-buffer-p (buffer-list))))
-
-;;;###autoload
-(defun my-xdg-web-browser ()
-  "Launch or switch to the default XDG web browser."
-  (interactive)
-  (if-let ((buffer (my-xdg-web-browser-buffer)))
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer-same-window buffer))
-    (let ((default-directory "/"))
-      (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app)))))
-
-;;;###autoload
-(defun my-xdg-web-browser-get-current-url ()
-  "Get URL visited in the default XDG web browser, or nil."
-  (when (eq (current-buffer) (my-xdg-web-browser-buffer))
-    (when (string-match-p "^Firefox" exwm-class-name)
-      (with-selected-window (get-buffer-window)
-        (exwm-input--fake-key ?\C-l)    ; Focus location bar
-        (sit-for 0)
-        (exwm-input--fake-key ?\C-c)
-        (sleep-for .2)
-        (let ((url (current-kill 0 t)))
-          (with-temp-buffer
-            (insert url)
-            (thing-at-point 'url)))))))
-
-;;;###autoload
-(defun my-xdg-web-browser-send-key (key)
-  "Send KEY to a browser window."
-  (let ((buffer (my-xdg-web-browser-buffer)))
-    (save-window-excursion
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer buffer))
-      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
-
-;;; exwm-edit
-
-(defun my-exwm-edit ()
-  "Edit text in the current text field."
-  (interactive)
-  (exwm-input--fake-key ?\C-a)
-  (sit-for 0)
-  (let ((previous-kill (current-kill 0 t)))
-    (exwm-input--fake-key ?\C-c)
-    (sit-for .2)
-    (let ((current-kill (current-kill 0 t)))
-      (kill-new
-       (read-string "Input: "
-                    (unless (string-equal current-kill previous-kill)
-                      current-kill)))))
-  (exwm-input--fake-key ?\C-v))
-
-;;; exwm-input-global-keys
-
-(exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
-(exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
-(exwm-input-set-key (kbd "<XF86AudioNext>") #'my-exwm-audio-next)
-(exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-exwm-audio-play)
-(exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-exwm-audio-prev)
-(exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
-(exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-exwm-brightness-down)
-(exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-exwm-brightness-up)
-(exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-exwm-toggle-touchpad)
-(exwm-input-set-key (kbd "C-<return>") #'my-exwm-edit)
-(exwm-input-set-key (kbd "C-g") #'keyboard-quit)
-(exwm-input-set-key (kbd "C-M-j") #'window-jump-left)
-(exwm-input-set-key (kbd "C-M-k") #'window-jump-right)
-(exwm-input-set-key (kbd "C-M-n") #'window-jump-down)
-(exwm-input-set-key (kbd "C-M-p") #'window-jump-up)
-(exwm-input-set-key (kbd "M-`") #'my-exwm-workspace-switch-or-next)
-(exwm-input-set-key (kbd "M-<tab>") #'my-switch-window)
-(exwm-input-set-key (kbd "s-a") #'exwm-workspace-add)
-(exwm-input-set-key (kbd "s-d") #'exwm-workspace-delete)
-(exwm-input-set-key (kbd "s-l") #'my-exwm-lock-screen)
-(exwm-input-set-key (kbd "s-m") #'exwm-workspace-move)
-(exwm-input-set-key (kbd "s-n") #'my-exwm-workspace-next)
-(exwm-input-set-key (kbd "s-p") #'my-exwm-workspace-previous)
-(exwm-input-set-key (kbd "s-r") #'exwm-reset)
-(exwm-input-set-key (kbd "s-s") #'exwm-workspace-swap)
-(exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
-
-(dotimes (n 8)
-  (exwm-input-set-key (kbd (format "<f%d>" (+ n 1)))
-                      (lambda ()
-                        (interactive)
-                        (exwm-workspace-switch n))))
-
-;;; exwm-input-simulation-keys
-
-(custom-set-variables
- '(exwm-input-simulation-keys
-   '(([?\C-_] . [?\C-z])
-     ([?\C-a] . [home])
-     ([?\C-b] . [left])
-     ([?\C-d] . [delete])
-     ([?\C-e] . [end])
-     ([?\C-f] . [right])
-     ([?\C-k] . [S-end delete])
-     ([?\C-n] . [down])
-     ([?\C-p] . [up])
-     ([?\C-v] . [next])
-     ([?\C-w] . [?\C-x])
-     ([?\C-y] . [?\C-v])
-     ([?\M-<] . [C-home])
-     ([?\M->] . [C-end])
-     ([?\M-h] . [?\C-a])
-     ([?\M-v] . [prior])
-     ([?\M-w] . [?\C-c]))))
-
-;;; exwm-update-class-hook
+;;; update-class hook
 
 (defun my-exwm-update-buffer-name ()
   (exwm-workspace-rename-buffer exwm-class-name))
@@ -283,7 +246,7 @@ BUFFER defaults to the current buffer."
 ;; Part of `exwm-config-default'
 (add-hook 'exwm-update-class-hook #'my-exwm-update-buffer-name)
 
-;;; exwm-workspace
+;;; workspaces
 
 (defun my-exwm-workspace-next (n)
   "Switch to the next N-th workspace."
@@ -438,7 +401,76 @@ use `my-select-frame-by-buffer-names'.")
 (advice-add 'exwm-workspace-delete
             :after #'my-exwm-workspace-update-switch-history)
 
-;;; exwm-xim
+;;; xdg web browser
+
+(defvar my-xdg-web-browser-app
+  (string-trim
+   (my-local-shell-command-to-string
+    "xdg-settings get default-web-browser"))
+  "App name of the default XDG web browser.")
+
+(defvar my-xdg-web-browser-class-name
+  (let* ((desktop-file
+          (cdr (assoc my-xdg-web-browser-app
+                      (counsel-linux-apps-list-desktop-files))))
+         (props (xdg-desktop-read-file desktop-file)))
+    (or (gethash "StartupWMClass" props)
+        (gethash "Name" props)))
+  "X class name of the default XDG web browser.")
+
+;;;###autoload
+(defun my-xdg-web-browser-buffer-p (&optional buffer)
+  "True if BUFFER is an Exwm buffer of the default XDG web browser.
+
+BUFFER defaults to the current buffer."
+  (with-current-buffer (or buffer (current-buffer))
+    (and (derived-mode-p 'exwm-mode)
+         (string-equal exwm-class-name
+                       my-xdg-web-browser-class-name))))
+
+(defun my-xdg-web-browser-buffer ()
+  "Get live Exwm buffer of the default XDG web browser, or nil."
+  (if (my-xdg-web-browser-buffer-p)
+      (current-buffer)
+    (seq-find #'my-xdg-web-browser-buffer-p (buffer-list))))
+
+;;;###autoload
+(defun my-xdg-web-browser ()
+  "Launch or switch to the default XDG web browser."
+  (interactive)
+  (if-let ((buffer (my-xdg-web-browser-buffer)))
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer-same-window buffer))
+    (let ((default-directory "/"))
+      (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app)))))
+
+;;;###autoload
+(defun my-xdg-web-browser-get-current-url ()
+  "Get URL visited in the default XDG web browser, or nil."
+  (when (eq (current-buffer) (my-xdg-web-browser-buffer))
+    (when (string-match-p "^Firefox" exwm-class-name)
+      (with-selected-window (get-buffer-window)
+        (exwm-input--fake-key ?\C-l)    ; Focus location bar
+        (sit-for 0)
+        (exwm-input--fake-key ?\C-c)
+        (sleep-for .2)
+        (let ((url (current-kill 0 t)))
+          (with-temp-buffer
+            (insert url)
+            (thing-at-point 'url)))))))
+
+;;;###autoload
+(defun my-xdg-web-browser-send-key (key)
+  "Send KEY to a browser window."
+  (let ((buffer (my-xdg-web-browser-buffer)))
+    (save-window-excursion
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer buffer))
+      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
+
+;;; xim
 
 (require 'exwm-xim)
 
@@ -447,29 +479,3 @@ use `my-select-frame-by-buffer-names'.")
 (--each (where-is-internal 'toggle-input-method (current-global-map))
   (when (= (length it) 1)
     (add-to-list 'exwm-input-prefix-keys (elt it 0))))
-
-;;; unclutter
-
-(defcustom my-exwm-unclutter-timeout 3
-  "Number of seconds before an inactive cursor is hidden.
-
-Used if `unclutter' program is in PATH."
-  :type '(choice (const :tag "Off" nil)
-                 (integer :tag "Seconds"))
-  :group 'my)
-
-(defun my-exwm-unclutter ()
-  "Run `unclutter'.
-
-See `my-exwm-unclutter-timeout'."
-  (interactive)
-  (cl-assert my-exwm-unclutter-timeout)
-  (make-process
-   :name "unclutter"
-   :command `("unclutter" "--timeout"
-              ,(number-to-string my-exwm-unclutter-timeout))
-   :noquery t))
-
-(and my-exwm-unclutter-timeout
-     (executable-find "unclutter")
-     (add-hook 'exwm-init-hook #'my-exwm-unclutter))
