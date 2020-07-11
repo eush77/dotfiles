@@ -84,16 +84,13 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 (defun my-exwm-toggle-touchpad ()
   "Enable or disable touchpad."
   (interactive)
-  (let ((state
-         (with-temp-buffer
-           (call-process "synclient" nil t nil "-l")
-           (search-backward "TouchpadOff")
-           (end-of-line)
-           (- 1 (number-at-point)))))
-    (call-process "synclient" nil nil nil (format "TouchpadOff=%d" state))
-    (cl-case state
-      (1 (start-process "unclutter" nil "unclutter" "--timeout=1"))
-      (0 (quit-process (get-process "unclutter"))))))
+  (call-process "synclient" nil nil nil
+                (format "TouchpadOff=%d"
+                         (with-temp-buffer
+                          (call-process "synclient" nil t nil "-l")
+                          (search-backward "TouchpadOff")
+                          (end-of-line)
+                          (- 1 (number-at-point))))))
 
 ;;; IBuffer
 
@@ -450,3 +447,29 @@ use `my-select-frame-by-buffer-names'.")
 (--each (where-is-internal 'toggle-input-method (current-global-map))
   (when (= (length it) 1)
     (add-to-list 'exwm-input-prefix-keys (elt it 0))))
+
+;;; unclutter
+
+(defcustom my-exwm-unclutter-timeout 3
+  "Number of seconds before an inactive cursor is hidden.
+
+Used if `unclutter' program is in PATH."
+  :type '(choice (const :tag "Off" nil)
+                 (integer :tag "Seconds"))
+  :group 'my)
+
+(defun my-exwm-unclutter ()
+  "Run `unclutter'.
+
+See `my-exwm-unclutter-timeout'."
+  (interactive)
+  (cl-assert my-exwm-unclutter-timeout)
+  (make-process
+   :name "unclutter"
+   :command `("unclutter" "--timeout"
+              ,(number-to-string my-exwm-unclutter-timeout))
+   :noquery t))
+
+(and my-exwm-unclutter-timeout
+     (executable-find "unclutter")
+     (add-hook 'exwm-init-hook #'my-exwm-unclutter))

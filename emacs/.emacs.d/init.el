@@ -18,6 +18,7 @@
     (my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
     (my-exwm-brightness-change-amount custom-variable)
+    (my-exwm-unclutter-timeout custom-variable)
     (my-find-directories custom-variable)
     (my-find-next-skipped-extensions custom-variable)
     (my-gdb-locals-max-type-length custom-variable)
