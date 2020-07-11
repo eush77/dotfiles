@@ -4,6 +4,7 @@
 
 ;;; exwm-edit
 
+;;;###autoload
 (defun my-exwm-edit ()
   "Edit text in the current text field."
   (interactive)
@@ -56,6 +57,7 @@
 
 ;;; ibuffer
 
+;;;###autoload
 (defun my-counsel-ibuffer-by-exwm-class-name ()
   "`counsel-ibuffer' limited to Exwm buffers of same X class."
   (interactive)
@@ -96,6 +98,7 @@
 
 ;;; media player
 
+;;;###autoload
 (defun my-exwm-audio-next ()
   "Switch to the next track.
 
@@ -105,6 +108,7 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
   (interactive)
   (my-xdg-web-browser-send-key (kbd "C-S-.")))
 
+;;;###autoload
 (defun my-exwm-audio-play ()
   "Toggle play/pause.
 
@@ -114,6 +118,7 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
   (interactive)
   (my-xdg-web-browser-send-key (kbd "C-S-SPC")))
 
+;;;###autoload
 (defun my-exwm-audio-prev ()
   "Switch to the previous track.
 
@@ -159,6 +164,7 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
                  (my-local-shell-command-to-string "xbacklight -get"))))
     (my-exwm-brightness-change my-exwm-brightness-deferred-amount)))
 
+;;;###autoload
 (defun my-exwm-brightness-change (amount)
   "Change screen brightness by AMOUNT."
   (interactive "nChange screen brightness by [-100..100]: ")
@@ -179,11 +185,13 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   :type 'integer
   :group 'my)
 
+;;;###autoload
 (defun my-exwm-brightness-down ()
   "Decrease screen brightness."
   (interactive)
   (my-exwm-brightness-change (- my-exwm-brightness-change-amount)))
 
+;;;###autoload
 (defun my-exwm-brightness-up ()
   "Increase screen brightness."
   (interactive)
@@ -191,6 +199,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 ;;; screen lock
 
+;;;###autoload
 (defun my-exwm-lock-screen ()
   "Lock screen."
   (interactive)
@@ -199,6 +208,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 
 ;;; touchpad
 
+;;;###autoload
 (defun my-exwm-toggle-touchpad ()
   "Enable or disable touchpad."
   (interactive)
@@ -248,17 +258,20 @@ See `my-exwm-unclutter-timeout'."
 
 ;;; workspaces
 
+;;;###autoload
 (defun my-exwm-workspace-next (n)
   "Switch to the next N-th workspace."
   (interactive "p")
   (exwm-workspace-switch (mod (+ exwm-workspace-current-index n)
                               (exwm-workspace--count))))
 
+;;;###autoload
 (defun my-exwm-workspace-previous (n)
   "Switch to the previous N-th workspace."
   (interactive "p")
   (my-exwm-workspace-next (- n)))
 
+;;;###autoload
 (defun my-exwm-workspace-switch-or-next (&optional force-display-p)
   "Switch to another workspace interactively.
 
@@ -428,6 +441,7 @@ BUFFER defaults to the current buffer."
          (string-equal exwm-class-name
                        my-xdg-web-browser-class-name))))
 
+;;;###autoload
 (defun my-xdg-web-browser-buffer ()
   "Get live Exwm buffer of the default XDG web browser, or nil."
   (if (my-xdg-web-browser-buffer-p)
