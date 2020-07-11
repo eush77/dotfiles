@@ -206,6 +206,14 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
   (call-process "slock")
   (message "Welcome back"))
 
+;;; suspend
+
+;;;###autoload
+(defun my-exwm-suspend ()
+  "Suspend the system."
+  (interactive)
+  (call-process "systemctl" nil nil nil "suspend"))
+
 ;;; touchpad
 
 ;;;###autoload
