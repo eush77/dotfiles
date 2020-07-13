@@ -2,6 +2,17 @@
 (require 'counsel)
 (require 'dash)
 
+;;; applications
+
+(defun my-exwm-app-class-name (app)
+  "Window Class name of an application APP." ;
+  (--> (xdg-desktop-read-file
+        (assoc-default
+         app
+         (counsel-linux-apps-list-desktop-files)))
+       (or (gethash "StartupWMClass" it)
+           (gethash "Name" it))))
+
 ;;; exwm-edit
 
 ;;;###autoload
@@ -28,9 +39,9 @@
 (exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-exwm-audio-play)
 (exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-exwm-audio-prev)
 (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
-(exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-exwm-brightness-down)
-(exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-exwm-brightness-up)
-(exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-exwm-toggle-touchpad)
+(exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-screen-brightness-down)
+(exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-screen-brightness-up)
+(exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-touchpad-toggle)
 (exwm-input-set-key (kbd "C-<return>") #'my-exwm-edit)
 (exwm-input-set-key (kbd "C-g") #'keyboard-quit)
 (exwm-input-set-key (kbd "C-M-j") #'window-jump-left)
@@ -41,7 +52,7 @@
 (exwm-input-set-key (kbd "M-<tab>") #'my-switch-window)
 (exwm-input-set-key (kbd "s-a") #'exwm-workspace-add)
 (exwm-input-set-key (kbd "s-d") #'exwm-workspace-delete)
-(exwm-input-set-key (kbd "s-l") #'my-exwm-lock-screen)
+(exwm-input-set-key (kbd "s-l") #'my-screen-lock)
 (exwm-input-set-key (kbd "s-m") #'exwm-workspace-move)
 (exwm-input-set-key (kbd "s-n") #'my-exwm-workspace-next)
 (exwm-input-set-key (kbd "s-p") #'my-exwm-workspace-previous)
@@ -152,55 +163,55 @@ The key is handled by `yandex-music-controls' addon [1] in Firefox.
 
 ;;; screen brightness
 
-(defvar my-exwm-brightness-deferred-p nil)
-(defvar my-exwm-brightness-deferred-amount 0)
+(defvar my-screen-brightness-deferred-p nil)
+(defvar my-screen-brightness-deferred-amount 0)
 
-(defun my-exwm-brightness-change-sentinel (process _event)
-  (setq my-exwm-brightness-deferred-p nil)
-  (if (zerop my-exwm-brightness-deferred-amount)
+(defun my-screen-brightness-change-sentinel (process _event)
+  (setq my-screen-brightness-deferred-p nil)
+  (if (zerop my-screen-brightness-deferred-amount)
       (message "Screen brightness set to %s%%"
                (truncate
                 (string-to-number
                  (my-local-shell-command-to-string "xbacklight -get"))))
-    (my-exwm-brightness-change my-exwm-brightness-deferred-amount)))
+    (my-screen-brightness-change my-screen-brightness-deferred-amount)))
 
 ;;;###autoload
-(defun my-exwm-brightness-change (amount)
+(defun my-screen-brightness-change (amount)
   "Change screen brightness by AMOUNT."
   (interactive "nChange screen brightness by [-100..100]: ")
-  (if my-exwm-brightness-deferred-p
-      (setq my-exwm-brightness-deferred-amount
-            (+ my-exwm-brightness-deferred-amount amount))
-    (setq my-exwm-brightness-deferred-p t
-          my-exwm-brightness-deferred-amount 0)
+  (if my-screen-brightness-deferred-p
+      (setq my-screen-brightness-deferred-amount
+            (+ my-screen-brightness-deferred-amount amount))
+    (setq my-screen-brightness-deferred-p t
+          my-screen-brightness-deferred-amount 0)
     (make-process :name "xbacklight"
                   :command `("xbacklight" "-inc" ,(number-to-string amount))
-                  :sentinel #'my-exwm-brightness-change-sentinel)))
+                  :sentinel #'my-screen-brightness-change-sentinel)))
 
 ;;;###autoload
-(defcustom my-exwm-brightness-change-amount 10
+(defcustom my-screen-brightness-change-amount 10
   "The amount to use when raising or lowering screen brightness.
 
-See `my-exwm-brightness-down', `my-exwm-brightness-up'."
+See `my-screen-brightness-down', `my-screen-brightness-up'."
   :type 'integer
   :group 'my)
 
 ;;;###autoload
-(defun my-exwm-brightness-down ()
+(defun my-screen-brightness-down ()
   "Decrease screen brightness."
   (interactive)
-  (my-exwm-brightness-change (- my-exwm-brightness-change-amount)))
+  (my-screen-brightness-change (- my-screen-brightness-change-amount)))
 
 ;;;###autoload
-(defun my-exwm-brightness-up ()
+(defun my-screen-brightness-up ()
   "Increase screen brightness."
   (interactive)
-  (my-exwm-brightness-change my-exwm-brightness-change-amount))
+  (my-screen-brightness-change my-screen-brightness-change-amount))
 
 ;;; screen lock
 
 ;;;###autoload
-(defun my-exwm-lock-screen ()
+(defun my-screen-lock ()
   "Lock screen."
   (interactive)
   (call-process "slock")
@@ -209,7 +220,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 ;;; suspend
 
 ;;;###autoload
-(defun my-exwm-suspend ()
+(defun my-suspend-system ()
   "Suspend the system."
   (interactive)
   (call-process "systemctl" nil nil nil "suspend"))
@@ -217,7 +228,7 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
 ;;; touchpad
 
 ;;;###autoload
-(defun my-exwm-toggle-touchpad ()
+(defun my-touchpad-toggle ()
   "Enable or disable touchpad."
   (interactive)
   (call-process "synclient" nil nil nil
@@ -227,8 +238,6 @@ See `my-exwm-brightness-down', `my-exwm-brightness-up'."
                           (search-backward "TouchpadOff")
                           (end-of-line)
                           (- 1 (number-at-point))))))
-
-
 
 ;;; unclutter
 
@@ -263,6 +272,71 @@ See `my-exwm-unclutter-timeout'."
 
 ;; Part of `exwm-config-default'
 (add-hook 'exwm-update-class-hook #'my-exwm-update-buffer-name)
+
+;;; web browser
+
+(defcustom my-web-browser-app
+  (string-trim
+   (my-local-shell-command-to-string
+    "xdg-settings get default-web-browser"))
+  "Web browser application."
+  :type 'string
+  :group 'my)
+
+;;;###autoload
+(defun my-web-browser-buffer-p (&optional buffer)
+  "True if BUFFER is an Exwm buffer of the web browser.
+
+BUFFER defaults to the current buffer."
+  (unless buffer
+    (setq buffer (current-buffer)))
+  (eq (with-current-buffer buffer (my-web-browser-buffer))
+      buffer))
+
+;;;###autoload
+(defun my-web-browser-buffer ()
+  "Get live Exwm buffer of the web browser, or nil. "
+  (let ((class-name (my-exwm-app-class-name my-web-browser-app)))
+    (--find (with-current-buffer it
+              (and (derived-mode-p 'exwm-mode)
+                   (string-equal exwm-class-name class-name)))
+            (cons (current-buffer) (buffer-list)))))
+
+;;;###autoload
+(defun my-web-browser ()
+  "Launch or switch to the web browser."
+  (interactive)
+  (if-let ((buffer (my-web-browser-buffer)))
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer-same-window buffer))
+    (let ((default-directory "/"))
+      (counsel-linux-app-action-default (cons nil my-web-browser-app)))))
+
+;;;###autoload
+(defun my-web-browser-get-current-url ()
+  "Get URL visited by the web browser in the current buffer."
+  (when (and (my-web-browser-buffer-p)
+             (string-match-p "^Firefox" exwm-class-name))
+    (with-selected-window (get-buffer-window)
+      (exwm-input--fake-key ?\C-l)    ; Focus location bar
+      (sit-for 0)
+      (exwm-input--fake-key ?\C-c)
+      (sleep-for .2)
+      (let ((url (current-kill 0 t)))
+        (with-temp-buffer
+          (insert url)
+          (thing-at-point 'url))))))
+
+;;;###autoload
+(defun my-web-browser-send-key (key)
+  "Send KEY to a browser window."
+  (let ((buffer (my-web-browser-buffer)))
+    (save-window-excursion
+      (if-let ((window (get-buffer-window buffer t)))
+          (select-window window)
+        (pop-to-buffer buffer))
+      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
 
 ;;; workspaces
 
@@ -421,76 +495,6 @@ use `my-select-frame-by-buffer-names'.")
             :after #'my-exwm-workspace-update-switch-history)
 (advice-add 'exwm-workspace-delete
             :after #'my-exwm-workspace-update-switch-history)
-
-;;; xdg web browser
-
-(defvar my-xdg-web-browser-app
-  (string-trim
-   (my-local-shell-command-to-string
-    "xdg-settings get default-web-browser"))
-  "App name of the default XDG web browser.")
-
-(defvar my-xdg-web-browser-class-name
-  (let* ((desktop-file
-          (cdr (assoc my-xdg-web-browser-app
-                      (counsel-linux-apps-list-desktop-files))))
-         (props (xdg-desktop-read-file desktop-file)))
-    (or (gethash "StartupWMClass" props)
-        (gethash "Name" props)))
-  "X class name of the default XDG web browser.")
-
-;;;###autoload
-(defun my-xdg-web-browser-buffer-p (&optional buffer)
-  "True if BUFFER is an Exwm buffer of the default XDG web browser.
-
-BUFFER defaults to the current buffer."
-  (with-current-buffer (or buffer (current-buffer))
-    (and (derived-mode-p 'exwm-mode)
-         (string-equal exwm-class-name
-                       my-xdg-web-browser-class-name))))
-
-;;;###autoload
-(defun my-xdg-web-browser-buffer ()
-  "Get live Exwm buffer of the default XDG web browser, or nil."
-  (if (my-xdg-web-browser-buffer-p)
-      (current-buffer)
-    (seq-find #'my-xdg-web-browser-buffer-p (buffer-list))))
-
-;;;###autoload
-(defun my-xdg-web-browser ()
-  "Launch or switch to the default XDG web browser."
-  (interactive)
-  (if-let ((buffer (my-xdg-web-browser-buffer)))
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer-same-window buffer))
-    (let ((default-directory "/"))
-      (counsel-linux-app-action-default (cons nil my-xdg-web-browser-app)))))
-
-;;;###autoload
-(defun my-xdg-web-browser-get-current-url ()
-  "Get URL visited in the default XDG web browser, or nil."
-  (when (eq (current-buffer) (my-xdg-web-browser-buffer))
-    (when (string-match-p "^Firefox" exwm-class-name)
-      (with-selected-window (get-buffer-window)
-        (exwm-input--fake-key ?\C-l)    ; Focus location bar
-        (sit-for 0)
-        (exwm-input--fake-key ?\C-c)
-        (sleep-for .2)
-        (let ((url (current-kill 0 t)))
-          (with-temp-buffer
-            (insert url)
-            (thing-at-point 'url)))))))
-
-;;;###autoload
-(defun my-xdg-web-browser-send-key (key)
-  "Send KEY to a browser window."
-  (let ((buffer (my-xdg-web-browser-buffer)))
-    (save-window-excursion
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer buffer))
-      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
 
 ;;; xim
 

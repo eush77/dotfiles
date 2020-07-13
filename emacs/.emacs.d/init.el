@@ -17,7 +17,6 @@
     (my-direnv-enabled-hosts custom-variable)
     (my-eshell-prompt-length custom-variable)
     (my-eshell-prompt-sigil-failure custom-face)
-    (my-exwm-brightness-change-amount custom-variable)
     (my-exwm-unclutter-timeout custom-variable)
     (my-find-directories custom-variable)
     (my-find-next-skipped-extensions custom-variable)
@@ -41,6 +40,7 @@
     (my-rr-replay-buffer-name custom-variable)
     (my-rr-replay-port custom-variable)
     (my-rr-trace-root-directory custom-variable)
+    (my-screen-brightness-change-amount custom-variable)
     (my-shell-command-kill-buffer-when-terminated custom-variable)
     (my-sml-dedicated-window-identification custom-face)
     (my-switch-window-current custom-face)
@@ -49,6 +49,7 @@
     (my-switch-window-overlay-other custom-face)
     (my-w3m-default-face-remapping-specs custom-variable)
     (my-w3m-image-size-limit custom-variable)
+    (my-web-browser-app custom-variable)
     (my-window-size-delta custom-variable))
   "Settings for my personal configuration."
   :prefix "my-"

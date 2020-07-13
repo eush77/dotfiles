@@ -405,7 +405,7 @@ list of extracted timestamps."
   (pcase-let
       ((`(,link . ,description)
         (cond ((derived-mode-p 'exwm-mode)
-               (if-let ((link (my-xdg-web-browser-get-current-url)))
+               (if-let ((link (my-web-browser-get-current-url)))
                    (cons link exwm-title)
                  (let ((message
                         "Couldn't get current url from the web browser"))
@@ -431,7 +431,7 @@ list of extracted timestamps."
 (defun my-org-capture-current-link-context ()
   (or (derived-mode-p 'gnus-article-mode 'w3m-mode)
       (buffer-file-name)
-      (and (boundp 'exwm-state) (my-xdg-web-browser-buffer-p))))
+      (and (boundp 'exwm-state) (my-web-browser-buffer-p))))
 
 (defvar my-org-capture-killed-link-urls nil
   "Urls from the kill ring.")
@@ -543,7 +543,7 @@ list of extracted timestamps."
                   (magit-rev-format "\"%s\" (%h by %an)" magit-id))
                  ('exwm-mode
                   (let ((description (format "\"%s\"" exwm-title)))
-                    (if-let ((link (my-xdg-web-browser-get-current-url)))
+                    (if-let ((link (my-web-browser-get-current-url)))
                         (org-make-link-string link description)
                       description)))
                  (_ (if (string-empty-p %f) (buffer-name) %f))))
