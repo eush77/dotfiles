@@ -13,6 +13,20 @@
        (or (gethash "StartupWMClass" it)
            (gethash "Name" it))))
 
+(defun my-exwm-find-buffer-by-app (app)
+  "Find Exwm buffer displaying APP. "
+  (my-exwm-find-buffer-by-class-name (my-exwm-app-class-name app)))
+
+(defun my-exwm-find-buffer-by-class-name (class-name)
+  "Find Exwm buffer by class name.
+
+The function favors the current buffer and the buffers displayed
+in the selected frame."
+  (--find (with-current-buffer it
+            (and (derived-mode-p 'exwm-mode)
+                 (string-equal exwm-class-name class-name)))
+          (cons (current-buffer) (buffer-list (selected-frame)))))
+
 ;;; exwm-edit
 
 ;;;###autoload
@@ -35,9 +49,10 @@
 
 (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
 (exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
-(exwm-input-set-key (kbd "<XF86AudioNext>") #'my-exwm-audio-next)
-(exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-exwm-audio-play)
-(exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-exwm-audio-prev)
+(exwm-input-set-key (kbd "<XF86AudioNext>") #'my-media-player-next-track)
+(exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-media-player-pause)
+(exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-media-player-previous-track)
+(exwm-input-set-key (kbd "<XF86AudioStop>") #'my-media-player)
 (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
 (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-screen-brightness-down)
 (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-screen-brightness-up)
@@ -109,35 +124,130 @@
 
 ;;; media player
 
+(require 'dbus)
+
+(defcustom my-media-players
+  '(("Yandex Music"
+     "ymp.desktop"
+     "yandex-music-player"
+     "org.mpris.MediaPlayer2.YandexMusic"))
+  "Alist of supported media players.
+
+Each entry is a 4-element list (NAME APP_NAME MPRIS WINDOW_CLASS)
+where:
+
+- NAME is a unique name of the player,
+- APP_NAME is the base name of its desktop entry file,
+- WINDOW_CLASS is the name of its X window class (nil to
+  determine automatically), and
+- MPRIS is the name of its MPRIS D-Bus service."
+  :type `(alist :key-type (string :tag "Name")
+                :value-type
+                (group (choice
+                        :tag "App Name"
+                        ,@(--map `(const ,(car it))
+                                 (counsel-linux-apps-list-desktop-files)))
+                       (choice :tag "Window Class"
+                               (const :tag "Auto" nil)
+                               string)
+                       (string :tag "MPRIS Service"))))
+  :group 'my)
+
+(defcustom my-media-player (caar my-media-players)
+  "Currently used media player.
+
+The name must be one of the keys in `my-media-players' alist."
+  :type `(radio ,@(--map `(const ,(car it)) my-media-players)
+                (string :tag "Other"
+                        :validate
+                        (lambda (widget)
+                          (unless (assoc (widget-value widget)
+                                         my-media-players)
+                            (widget-put
+                             widget :error
+                             "No such player defined in `my-media-players'")
+                            widget))))
+  :group 'my)
+
+(defun my-media-player-app ()
+  (car (assoc-default my-media-player my-media-players)))
+
+(defun my-media-player-class-name ()
+  (pcase-let ((`(,app ,class-name . _)
+               (assoc-default my-media-player my-media-players)))
+    (or class-name (my-exwm-app-class-name app))))
+
+(defun my-media-player-mpris-service ()
+  (caddr (assoc-default my-media-player my-media-players)))
+
 ;;;###autoload
-(defun my-exwm-audio-next ()
-  "Switch to the next track.
-
-The key is handled by `yandex-music-controls' addon [1] in Firefox.
-
-\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+(defun my-media-player-next-track ()
+  "Switch to the next track."
   (interactive)
-  (my-xdg-web-browser-send-key (kbd "C-S-.")))
+  (dbus-call-method :session
+                    (my-media-player-mpris-service)
+                    "/org/mpris/MediaPlayer2"
+                    "org.mpris.MediaPlayer2.Player"
+                    "Next"))
 
 ;;;###autoload
-(defun my-exwm-audio-play ()
-  "Toggle play/pause.
-
-The key is handled by `yandex-music-controls' addon [1] in Firefox.
-
-\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+(defun my-media-player-pause ()
+  "Toggle play/pause."
   (interactive)
-  (my-xdg-web-browser-send-key (kbd "C-S-SPC")))
+  (dbus-call-method :session
+                    (my-media-player-mpris-service)
+                    "/org/mpris/MediaPlayer2"
+                    "org.mpris.MediaPlayer2.Player"
+                    "PlayPause"))
 
 ;;;###autoload
-(defun my-exwm-audio-prev ()
-  "Switch to the previous track.
-
-The key is handled by `yandex-music-controls' addon [1] in Firefox.
-
-\[1]: https://addons.mozilla.org/en-US/firefox/addon/yandex-music-controls"
+(defun my-media-player-previous-track ()
+  "Switch to the previous track."
   (interactive)
-  (my-xdg-web-browser-send-key (kbd "C-S-,")))
+  (dbus-call-method :session
+                    (my-media-player-mpris-service)
+                    "/org/mpris/MediaPlayer2"
+                    "org.mpris.MediaPlayer2.Player"
+                    "Previous"))
+
+;;;###autoload
+(defun my-media-player ()
+  "Toggle display of the media player."
+  (interactive)
+  (let ((buffer
+         (my-exwm-find-buffer-by-class-name (my-media-player-class-name)))
+        (configuration (current-window-configuration)))
+    (cond ((eq (current-buffer) buffer)
+           (if (boundp 'my-saved-window-configuration)
+               (let ((configuration my-saved-window-configuration))
+                 (makunbound 'my-saved-window-configuration)
+                 (set-window-configuration configuration))
+             (quit-window)))
+          (buffer
+           ;; Delete other windows before switching to avoid jitter.
+           (delete-other-windows)
+           (exwm-workspace-switch-to-buffer buffer)
+           (setf (buffer-local-value 'my-saved-window-configuration buffer)
+                 configuration))
+          (t
+           ;; The buffer is created asynchronously, so schedule the rest of
+           ;; the function using `exwm-manage-finish-hook'.
+           (push
+            (lambda ()
+              (pop exwm-manage-finish-hook)
+              (setf
+               (buffer-local-value 'my-saved-window-configuration
+                                   (my-exwm-find-buffer-by-class-name
+                                    (my-media-player-class-name)))
+               configuration)
+              (when (one-window-p)
+                ;; The window may not be fully drawn for some reason, force
+                ;; redisplay to fix it.
+                (split-window))
+              (delete-other-windows))
+            exwm-manage-finish-hook)
+           (counsel-linux-app-action-default
+            (cons nil (my-media-player-app)))))))
 
 ;;; simulation keys
 
@@ -296,11 +406,7 @@ BUFFER defaults to the current buffer."
 ;;;###autoload
 (defun my-web-browser-buffer ()
   "Get live Exwm buffer of the web browser, or nil. "
-  (let ((class-name (my-exwm-app-class-name my-web-browser-app)))
-    (--find (with-current-buffer it
-              (and (derived-mode-p 'exwm-mode)
-                   (string-equal exwm-class-name class-name)))
-            (cons (current-buffer) (buffer-list)))))
+  (my-exwm-find-buffer-by-app my-web-browser-app))
 
 ;;;###autoload
 (defun my-web-browser ()

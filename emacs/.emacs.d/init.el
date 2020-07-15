@@ -26,6 +26,8 @@
     (my-hydra-emms-hint-line-time custom-face)
     (my-hydra-emms-hint-line-title custom-face)
     (my-magit-log-exclude-refs-regexp custom-variable)
+    (my-media-player custom-variable)
+    (my-media-players custom-variable)
     (my-nbsp-pattern-fixups custom-variable)
     (my-nbsp-patterns custom-variable)
     (my-nov-default-face-remapping-specs custom-variable)
