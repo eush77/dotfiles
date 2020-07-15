@@ -1824,6 +1824,7 @@ If REVERT-BUFFER-P is non-nil, revert Org buffer without asking."
 
 (define-key org-mode-map (kbd "M-<tab>") nil)
 
+(define-key org-mode-map (kbd "C-'") nil)
 (define-key org-mode-map (kbd "C-`") #'my-insert-tilde)
 (define-key org-mode-map (kbd "C-c C-\\") #'org-toggle-link-display)
 (define-key org-mode-map (kbd "C-c C-/ C-p") #'my-org-convert-url-property)
