@@ -130,7 +130,11 @@ in the selected frame."
   '(("Yandex Music"
      "ymp.desktop"
      "yandex-music-player"
-     "org.mpris.MediaPlayer2.YandexMusic"))
+     "org.mpris.MediaPlayer2.YandexMusic")
+    ("Spotify"
+     "spotify.desktop"
+     "Spotify"
+     "org.mpris.MediaPlayer2.spotify"))
   "Alist of supported media players.
 
 Each entry is a 4-element list (NAME APP_NAME MPRIS WINDOW_CLASS)
