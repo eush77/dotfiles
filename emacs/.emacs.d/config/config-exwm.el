@@ -47,6 +47,21 @@ in the selected frame."
 
 ;;; global keys
 
+(defun my-exwm-ctrl-ret (arg)
+  "Command associated with C-<return> in Exwm buffers.
+
+Without prefix argument, toggle key-chord state in the current
+buffer, equivalent to (my-exwm-key-chord-state (current-buffer)
+t).
+
+With prefix argument, call `my-exwm-edit'."
+  (declare (interactive-only t))
+  (interactive "P")
+  (when (derived-mode-p 'exwm-mode)
+    (if arg
+        (my-exwm-edit)
+      (my-exwm-key-chord-state (current-buffer) t))))
+
 (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
 (exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
 (exwm-input-set-key (kbd "<XF86AudioNext>") #'my-media-player-next-track)
@@ -57,7 +72,7 @@ in the selected frame."
 (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-screen-brightness-down)
 (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-screen-brightness-up)
 (exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-touchpad-toggle)
-(exwm-input-set-key (kbd "C-<return>") #'my-exwm-edit)
+(exwm-input-set-key (kbd "C-<return>") #'my-exwm-ctrl-ret)
 (exwm-input-set-key (kbd "C-g") #'keyboard-quit)
 (exwm-input-set-key (kbd "C-M-j") #'window-jump-left)
 (exwm-input-set-key (kbd "C-M-k") #'window-jump-right)
@@ -102,19 +117,61 @@ in the selected frame."
 
 ;;; key chords
 
-;; Define keys participating in key chords in `exwm-mode-map' so that they are
-;; passed through to Emacs.
+(defun my-exwm-input-fake-key-command ()
+  "Pass command keys through to the Exwm buffer."
+  (interactive)
+  (mapc #'exwm-input--fake-key (this-command-keys)))
+
+(defvar my-exwm-key-chord-keys nil
+  "List of keys that participare in key chords.")
+
 (map-keymap
  (lambda (event-type key-chord-map)
    (when (eq event-type 'key-chord)
      (map-keymap
       (lambda (key _)
-        (define-key exwm-mode-map (string key)
-          (lambda ()
-            (interactive)
-            (exwm-input--fake-key key))))
+        (add-to-list 'my-exwm-key-chord-keys key))
       key-chord-map)))
  (current-global-map))
+
+(defun my-exwm-key-chord-state (buffer &optional toggle-p)
+  "Manage key-chord state in Exwm BUFFER.
+
+If TOGGLE-P is non-nil, switch the state to the opposite.
+
+Return the current state.
+
+The state is stored in the buffer-local variable
+`my-exwm-key-chord-state' and is t by default. Calling this
+function forces the variable to be created if it's missing."
+  (cl-assert (with-current-buffer buffer
+               (derived-mode-p 'exwm-mode)))
+  (let ((value
+         (if (local-variable-p 'my-exwm-key-chord-state buffer)
+             (buffer-local-value 'my-exwm-key-chord-state buffer)
+           (setf (buffer-local-value 'my-exwm-key-chord-state buffer) t))))
+    (when toggle-p
+      (setq value (not value))
+      (setf (buffer-local-value 'my-exwm-key-chord-state buffer) value)
+      (message "Key chords %s in %S"
+               (if value "enabled" "disabled")
+               buffer)
+      (if (eq buffer (current-buffer))
+          (my-exwm-apply-key-chord-state buffer)))
+    value))
+
+(defun my-exwm-apply-key-chord-state (buffer)
+  "Apply key-chord state in Exwm BUFFER."
+  (let ((command (and (my-exwm-key-chord-state buffer)
+                      'my-exwm-input-fake-key-command)))
+    (dolist (key my-exwm-key-chord-keys)
+      (define-key exwm-mode-map (string key) command))))
+
+(define-advice exwm-input--set-active-window
+    (:after (&optional id) my-exwm-key-chord-state)
+  "Apply key-chord state in the current buffer."
+  (when id
+    (my-exwm-apply-key-chord-state (current-buffer))))
 
 (defun my-exwm-define-key-chords ()
   "Define local key chords for Exwm buffer."
