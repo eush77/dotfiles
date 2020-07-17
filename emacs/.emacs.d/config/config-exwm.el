@@ -219,8 +219,7 @@ The name must be one of the keys in `my-media-players' alist."
   "Toggle display of the media player."
   (interactive)
   (let ((buffer
-         (my-exwm-find-buffer-by-class-name (my-media-player-class-name)))
-        (configuration (current-window-configuration)))
+         (my-exwm-find-buffer-by-class-name (my-media-player-class-name))))
     (cond ((eq (current-buffer) buffer)
            (if (boundp 'my-saved-window-configuration)
                (let ((configuration my-saved-window-configuration))
@@ -228,30 +227,37 @@ The name must be one of the keys in `my-media-players' alist."
                  (set-window-configuration configuration))
              (quit-window)))
           (buffer
-           ;; Delete other windows before switching to avoid jitter.
-           (delete-other-windows)
-           (exwm-workspace-switch-to-buffer buffer)
-           (setf (buffer-local-value 'my-saved-window-configuration buffer)
-                 configuration))
+           (let ((saved-configuration (current-window-configuration)))
+             ;; Delete other windows before switching to avoid jitter.
+             (delete-other-windows)
+             (exwm-workspace-switch-to-buffer buffer)
+             (setf (buffer-local-value 'my-saved-window-configuration buffer)
+                   saved-configuration)))
           (t
            ;; The buffer is created asynchronously, so schedule the rest of
-           ;; the function using `exwm-manage-finish-hook'.
-           (push
-            (lambda ()
-              (pop exwm-manage-finish-hook)
-              (setf
-               (buffer-local-value 'my-saved-window-configuration
-                                   (my-exwm-find-buffer-by-class-name
-                                    (my-media-player-class-name)))
-               configuration)
-              (when (one-window-p)
-                ;; The window may not be fully drawn for some reason, force
-                ;; redisplay to fix it.
-                (split-window))
-              (delete-other-windows))
-            exwm-manage-finish-hook)
+           ;; the function using `exwm-update-class-hook'.
+           (setq my-media-player--saved-configuration
+                 (current-window-configuration))
+           (add-hook 'exwm-update-class-hook
+                     #'my-media-player--on-update-class
+                     t)
            (counsel-linux-app-action-default
             (cons nil (my-media-player-app)))))))
+
+(defvar my-media-player--saved-configuration)
+
+(defun my-media-player--on-update-class ()
+  (remove-hook 'exwm-update-class-hook 'my-media-player--on-update-class)
+  (setf (buffer-local-value 'my-saved-window-configuration
+                            (my-exwm-find-buffer-by-class-name
+                             (my-media-player-class-name)))
+        my-media-player--saved-configuration)
+  (makunbound 'my-media-player--saved-configuration)
+  (when (one-window-p)
+    ;; The window may not be fully drawn for some reason, force redisplay to
+    ;; fix it.
+    (split-window))
+  (delete-other-windows))
 
 ;;; simulation keys
 
