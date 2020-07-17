@@ -134,7 +134,11 @@ in the selected frame."
     ("Spotify"
      "spotify.desktop"
      "Spotify"
-     "org.mpris.MediaPlayer2.spotify"))
+     "org.mpris.MediaPlayer2.spotify")
+    ("Spotifyd"
+     "spotify.desktop"
+     "Spotify"
+     "org.mpris.MediaPlayer2.spotifyd"))
   "Alist of supported media players.
 
 Each entry is a 4-element list (NAME APP_NAME MPRIS WINDOW_CLASS)
