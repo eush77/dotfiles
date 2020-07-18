@@ -332,6 +332,58 @@ The name must be one of the keys in `my-media-players' alist."
     (split-window))
   (delete-other-windows))
 
+;;; notification server
+
+(defun my-notify-server-information (&rest args)
+  "GetServerInformation for `my-notify-message'."
+  '("Emacs Message" "my" "0.0.1" "1.2"))
+
+(defun my-notify-capabilities (&rest args)
+  "GetCapabilities for `my-notify-message'."
+  '("body"))
+
+(defun my-notify-message (app-name
+                          _replaces_id
+                          _app_icon
+                          summary
+                          body
+                          _actions
+                          _hints
+                          _expire_timeout)
+  "Handle D-Bus notification using `message'."
+  (if body
+      (message "%s: %s (%s)" app-name summary body)
+    (message "%s: %s" app-name summary)))
+
+(defun my-notify-close (id)
+  "CloseNotification for `my-notify-message'."
+  nil)
+
+(dbus-register-method :session
+                      "org.freedesktop.Notifications"
+                      "/org/freedesktop/Notifications"
+                      "org.freedesktop.Notifications"
+                      "GetCapabilities"
+                      #'my-notify-capabilities)
+(dbus-register-method :session
+                      "org.freedesktop.Notifications"
+                      "/org/freedesktop/Notifications"
+                      "org.freedesktop.Notifications"
+                      "CloseNotification"
+                      #'my-notify-close)
+(dbus-register-method :session
+                      "org.freedesktop.Notifications"
+                      "/org/freedesktop/Notifications"
+                      "org.freedesktop.Notifications"
+                      "Notify"
+                      #'my-notify-message)
+(dbus-register-method :session
+                      "org.freedesktop.Notifications"
+                      "/org/freedesktop/Notifications"
+                      "org.freedesktop.Notifications"
+                      "GetServerInformation"
+                      #'my-notify-server-information)
+
 ;;; simulation keys
 
 (custom-set-variables
