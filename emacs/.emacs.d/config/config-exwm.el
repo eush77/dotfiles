@@ -187,25 +187,29 @@ function forces the variable to be created if it's missing."
   '(("Yandex Music"
      "ymp.desktop"
      "yandex-music-player"
-     "org.mpris.MediaPlayer2.YandexMusic")
+     "org.mpris.MediaPlayer2.YandexMusic"
+     nil)
     ("Spotify"
      "spotify.desktop"
      "Spotify"
-     "org.mpris.MediaPlayer2.spotify")
+     "org.mpris.MediaPlayer2.spotify"
+     nil)
     ("Spotifyd"
      "spotify.desktop"
      "Spotify"
-     "org.mpris.MediaPlayer2.spotifyd"))
+     "org.mpris.MediaPlayer2.spotifyd"
+     "spotifyd"))
   "Alist of supported media players.
 
-Each entry is a 4-element list (NAME APP_NAME MPRIS WINDOW_CLASS)
+Each entry is a list (NAME APP_NAME WINDOW_CLASS MPRIS SERVICE)
 where:
 
 - NAME is a unique name of the player,
 - APP_NAME is the base name of its desktop entry file,
 - WINDOW_CLASS is the name of its X window class (nil to
-  determine automatically), and
-- MPRIS is the name of its MPRIS D-Bus service."
+  determine automatically),
+- MPRIS is the name of its MPRIS D-Bus service, and
+- SERVICE is the name of its Systemd service."
   :type `(alist :key-type (string :tag "Name")
                 :value-type
                 (group (choice
@@ -215,7 +219,7 @@ where:
                        (choice :tag "Window Class"
                                (const :tag "Auto" nil)
                                string)
-                       (string :tag "MPRIS Service"))))
+                       (string :tag "MPRIS Service")))
   :group 'my)
 
 (defcustom my-media-player (caar my-media-players)
@@ -245,35 +249,43 @@ The name must be one of the keys in `my-media-players' alist."
 (defun my-media-player-mpris-service ()
   (caddr (assoc-default my-media-player my-media-players)))
 
+(defun my-media-player-systemd-service ()
+  (cadddr (assoc-default my-media-player my-media-players)))
+
+(defun my-media-player-call-method (name)
+  "Call method NAME on the MediaPlayer2 D-Bus interface."
+  (condition-case error
+      (dbus-call-method :session
+                        (my-media-player-mpris-service)
+                        "/org/mpris/MediaPlayer2"
+                        "org.mpris.MediaPlayer2.Player"
+                        name
+                        :timeout 1000)
+    (dbus-error
+     (if-let* ((service (my-media-player-systemd-service))
+               ((yes-or-no-p
+                 (format "%s\nRestart %s.service? "
+                         (error-message-string error) service))))
+         (call-process "systemctl" nil nil nil "restart" "--user" service)
+       (signal 'dbus-error (cdr error))))))
+
 ;;;###autoload
 (defun my-media-player-next-track ()
   "Switch to the next track."
   (interactive)
-  (dbus-call-method :session
-                    (my-media-player-mpris-service)
-                    "/org/mpris/MediaPlayer2"
-                    "org.mpris.MediaPlayer2.Player"
-                    "Next"))
+  (my-media-player-call-method "Next"))
 
 ;;;###autoload
 (defun my-media-player-pause ()
   "Toggle play/pause."
   (interactive)
-  (dbus-call-method :session
-                    (my-media-player-mpris-service)
-                    "/org/mpris/MediaPlayer2"
-                    "org.mpris.MediaPlayer2.Player"
-                    "PlayPause"))
+  (my-media-player-call-method "PlayPause"))
 
 ;;;###autoload
 (defun my-media-player-previous-track ()
   "Switch to the previous track."
   (interactive)
-  (dbus-call-method :session
-                    (my-media-player-mpris-service)
-                    "/org/mpris/MediaPlayer2"
-                    "org.mpris.MediaPlayer2.Player"
-                    "Previous"))
+  (my-media-player-call-method "Previous"))
 
 ;;;###autoload
 (defun my-media-player ()
