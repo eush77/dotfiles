@@ -291,25 +291,33 @@ The name must be one of the keys in `my-media-players' alist."
 (defun my-media-player-next-track ()
   "Switch to the next track."
   (interactive)
-  (my-media-player-call-method "Next"))
+  (if (my-media-player-get-property "CanGoNext")
+      (my-media-player-call-method "Next")
+    (message "%s has no next track" my-media-player)))
 
 ;;;###autoload
 (defun my-media-player-pause ()
   "Toggle play/pause."
   (interactive)
-  (my-media-player-call-method "PlayPause"))
+  (if (my-media-player-get-property "CanPause")
+      (my-media-player-call-method "PlayPause")
+    (message "%s has no current track" my-media-player)))
 
 ;;;###autoload
 (defun my-media-player-previous-track ()
   "Switch to the previous track."
   (interactive)
-  (my-media-player-call-method "Previous"))
+  (if (my-media-player-get-property "CanGoPrevious")
+      (my-media-player-call-method "Previous")
+    (message "%s has no previous track" my-media-player)))
 
 ;;;###autoload
 (defun my-media-player-stop ()
   "Stop playback."
   (interactive)
-  (my-media-player-call-method "Stop"))
+  (if (my-media-player-get-property "CanControl")
+      (my-media-player-call-method "Stop")
+    (message "%s has no current track" my-media-player)))
 
 (defvar my-media-player-next-state nil
   "Next state to be applied when track changes.
