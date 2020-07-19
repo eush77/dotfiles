@@ -356,7 +356,9 @@ If called interactively, switch to the next state."
     (my-media-player-track-info
      :title (caar (assoc-default "xesam:title" metadata))
      :album (caar (assoc-default "xesam:album" metadata))
-     :artist (caaar (assoc-default "xesam:artist" metadata)))))
+     :artist (mapconcat #'identity
+                        (caar (assoc-default "xesam:artist" metadata))
+                        ", "))))
 
 (defvar my-media-player-current-track-info nil
   "Track info for the currently playing track, or last played.")
