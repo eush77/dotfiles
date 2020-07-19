@@ -67,7 +67,8 @@ With prefix argument, call `my-exwm-edit'."
 (exwm-input-set-key (kbd "<XF86AudioNext>") #'my-media-player-next-track)
 (exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-media-player-pause)
 (exwm-input-set-key (kbd "<XF86AudioPrev>") #'my-media-player-previous-track)
-(exwm-input-set-key (kbd "<XF86AudioStop>") #'my-media-player)
+(exwm-input-set-key (kbd "<XF86AudioStop>") #'my-media-player-next-state)
+(exwm-input-set-key (kbd "<XF86Favorites>") #'my-media-player)
 (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
 (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-screen-brightness-down)
 (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-screen-brightness-up)
@@ -253,14 +254,26 @@ The name must be one of the keys in `my-media-players' alist."
   (cadddr (assoc-default my-media-player my-media-players)))
 
 (defun my-media-player-call-method (name)
-  "Call method NAME on the MediaPlayer2 D-Bus interface."
+  "Call method NAME on the MediaPlayer2 interface."
+  (dbus-call-method :session
+                    (my-media-player-mpris-service)
+                    "/org/mpris/MediaPlayer2"
+                    "org.mpris.MediaPlayer2.Player"
+                    name
+                    :timeout 1000))
+
+(defun my-media-player-get-property (name)
+  "Get property NAME on the MediaPlayer2 interface."
+  (dbus-get-property :session
+                    (my-media-player-mpris-service)
+                    "/org/mpris/MediaPlayer2"
+                    "org.mpris.MediaPlayer2.Player"
+                    name))
+
+(defun my-media-player-handle-dbus-error (func &rest args)
+  "Call FUNC while handling `dbus-error' error signals."
   (condition-case error
-      (dbus-call-method :session
-                        (my-media-player-mpris-service)
-                        "/org/mpris/MediaPlayer2"
-                        "org.mpris.MediaPlayer2.Player"
-                        name
-                        :timeout 1000)
+      (apply func args)
     (dbus-error
      (if-let* ((service (my-media-player-systemd-service))
                ((yes-or-no-p
@@ -268,6 +281,11 @@ The name must be one of the keys in `my-media-players' alist."
                          (error-message-string error) service))))
          (call-process "systemctl" nil nil nil "restart" "--user" service)
        (signal 'dbus-error (cdr error))))))
+
+(advice-add 'my-media-player-call-method
+            :around #'my-media-player-handle-dbus-error)
+(advice-add 'my-media-player-get-property
+            :around #'my-media-player-handle-dbus-error)
 
 ;;;###autoload
 (defun my-media-player-next-track ()
@@ -286,6 +304,95 @@ The name must be one of the keys in `my-media-players' alist."
   "Switch to the previous track."
   (interactive)
   (my-media-player-call-method "Previous"))
+
+;;;###autoload
+(defun my-media-player-stop ()
+  "Stop playback."
+  (interactive)
+  (my-media-player-call-method "Stop"))
+
+(defvar my-media-player-next-state nil
+  "Next state to be applied when track changes.
+
+One of symbols `stop-after', `loop-track', or nil.")
+
+(defun my-media-player-next-state (state)
+  "Toggle variable `my-media-player-next-state'.
+
+If called interactively, switch to the next state."
+  (interactive (list (cl-case my-media-player-next-state
+                       (stop-after 'loop-track)
+                       (loop-track nil)
+                       (t 'stop-after))))
+  (setq my-media-player-next-state state)
+  (message (cl-case state
+             (stop-after "Stopping at next track")
+             (loop-track "Looping this track")
+             (t "Playing through"))))
+
+(defcustom my-media-player-notifications t
+  "Show notifications when tracks change."
+  :type 'boolean
+  :group 'my)
+
+(defclass my-media-player-track-info ()
+  ((title :type string :initarg :title :initform nil)
+   (album :type string :initarg :album :initform nil)
+   (artist :type string :initarg :artist :initform nil))
+  "Track metadata."
+  :allow-nil-initform t)
+
+(defun my-media-player-current-track-info ()
+  "Create track info for the currently playing track."
+  (let ((metadata (my-media-player-get-property "Metadata")))
+    (my-media-player-track-info
+     :title (caar (assoc-default "xesam:title" metadata))
+     :album (caar (assoc-default "xesam:album" metadata))
+     :artist (caaar (assoc-default "xesam:artist" metadata)))))
+
+(defvar my-media-player-current-track-info nil
+  "Track info for the currently playing track, or last played.")
+
+(defun my-media-player-update-current-track-info ()
+  "Update variable `my-media-player-current-track-info'.
+
+Returns t if the update was not a no-op."
+  (let* ((track-info (my-media-player-current-track-info))
+         (updated-p (not (equal my-media-player-current-track-info
+                                track-info))))
+    (setq my-media-player-current-track-info track-info)
+    updated-p))
+
+(defun my-media-player-notify ()
+  "Send current track info as a desktop notification."
+  (with-slots (title album artist) my-media-player-current-track-info
+    (notifications-notify
+     :app-name my-media-player
+     :title (if (and artist title)
+                (format "%s - %s" artist title)
+              (or artist title))
+     :body album)))
+
+(defun my-media-player-on-state-change ()
+  "Handle the player changing state.
+
+Must be called by the player on pause/unpause, but at least when
+the current track changes."
+  (pcase (cons my-media-player-next-state
+               (my-media-player-update-current-track-info))
+    ('(stop-after . t)
+     (setq my-media-player-next-state nil)
+     (my-media-player-stop))
+    ('(loop-track . t)
+     (my-media-player-previous-track))
+    ((and `(,_ . ,updated-p)
+          (guard
+           (and my-media-player-notifications
+                (or updated-p
+                    (string-equal
+                     (my-media-player-get-property "PlaybackStatus")
+                     "Playing")))))
+     (my-media-player-notify))))
 
 ;;;###autoload
 (defun my-media-player ()
@@ -351,7 +458,7 @@ The name must be one of the keys in `my-media-players' alist."
                           _hints
                           _expire_timeout)
   "Handle D-Bus notification using `message'."
-  (if body
+  (if (and body (not (string-empty-p body)))
       (message "%s: %s (%s)" app-name summary body)
     (message "%s: %s" app-name summary)))
 
