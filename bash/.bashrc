@@ -497,6 +497,7 @@ function youtube-mw {
 : z :
 
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
+[[ -r /etc/profile.d/z.sh ]] && source /etc/profile.d/z.sh
 
 #
 # Host Config
