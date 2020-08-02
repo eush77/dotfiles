@@ -25,7 +25,7 @@ export WWW_HOME='https://google.com/'
 eval "$(dircolors)"
 
 # If not running interactively, don't go any further.
-[[ $- != *i* || "$TERM" == "dumb" ]] && return
+[[ $- != *i* ]] && return
 
 #
 # Shell Settings
@@ -116,9 +116,9 @@ bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
 
 bind '"\C-h": "\C-apls -a -- \C-m"'
-[[ "${TERM%-*}" == "eterm" ]] || bind '"\C-j": "\C-e |& fzf\C-m"'
-bind '"\C-l": "\C-e |& $PAGER\C-m"'
+bind '"\C-v": "\C-e |& $PAGER\C-m"'
 bind -x '"\M-i": READLINE_LINE="i $READLINE_LINE"; let READLINE_POINT+=2'
+bind -x '"\M-p": READLINE_LINE="\$PAGER $READLINE_LINE"; let READLINE_POINT+=7'
 bind -x '"\M-s": READLINE_LINE="sudo $READLINE_LINE"; let READLINE_POINT+=5'
 
 # Commacd
@@ -485,7 +485,9 @@ function youtube-mw {
 	       --height=40% \
 	       --layout=reverse;
 	source ~/.fzf.bash;
+	bind '"\C-l": "\C-e |& fzf\C-m"';
 	bind '"\C-t": transpose-chars';
+	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 	bind -x '"\M-v": fzf-file-widget';
 }
 
@@ -498,6 +500,16 @@ function youtube-mw {
 
 [[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
 [[ -r /etc/profile.d/z.sh ]] && source /etc/profile.d/z.sh
+
+: z + fzf :
+
+[[ (-r /usr/share/z/z.sh || -r /etc/profile.d/z.sh) && -f ~/.fzf.bash ]] && {
+	function __fzf_z__ {
+		local line
+		line=$(z -l $@ | tac | fzf --no-sort) && printf "cd %q\n" "${line##+([0-9])+( )}"
+	}
+	bind '"\M-z": "\C-e \C-a\C-k `__fzf_z__`\C-m\C-y\C-b\C-d"'
+}
 
 #
 # Host Config
