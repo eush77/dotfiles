@@ -476,7 +476,7 @@ function youtube-mw {
 
 : fzf :
 
-[[ -f ~/.fzf.bash ]] && {
+[[ -x "$(type -P fzf)" ]] && {
 	export FZF_DEFAULT_OPTS;
 	printf -v FZF_DEFAULT_OPTS "%s " \
 	       --bind=ctrl-k:kill-line \
@@ -484,7 +484,12 @@ function youtube-mw {
 	       --info=inline \
 	       --height=40% \
 	       --layout=reverse;
-	source ~/.fzf.bash;
+	[[ -r ~/.fzf.bash ]] &&
+		source ~/.fzf.bash
+	[[ -r /usr/share/fzf/completion.bash ]] &&
+		source /usr/share/fzf/completion.bash
+	[[ -r /usr/share/fzf/key-bindings.bash ]] &&
+		source /usr/share/fzf/key-bindings.bash
 	bind '"\C-l": "\C-e |& fzf\C-m"';
 	bind '"\C-t": transpose-chars';
 	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
@@ -503,7 +508,7 @@ function youtube-mw {
 
 : z + fzf :
 
-[[ (-r /usr/share/z/z.sh || -r /etc/profile.d/z.sh) && -f ~/.fzf.bash ]] && {
+[[ (-r /usr/share/z/z.sh || -r /etc/profile.d/z.sh) && -x $(type -P fzf) ]] && {
 	function __fzf_z__ {
 		local line
 		line=$(z -l $@ | tac | fzf --no-sort) && printf "cd %q\n" "${line##+([0-9])+( )}"
