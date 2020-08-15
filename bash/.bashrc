@@ -443,9 +443,6 @@ type -P fzf > /dev/null && {
 	[[ -r /usr/share/fzf/key-bindings.bash ]] &&
 		source /usr/share/fzf/key-bindings.bash
 	bind '"\C-l": "\C-e |& fzf\C-m"';
-	bind '"\C-t": transpose-chars';
-	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
-	bind -x '"\M-v": fzf-file-widget';
 
 	# browse [dir] [query] - Browse files with Fzf
 	type -P ctags > /dev/null && type -P ifne > /dev/null &&
@@ -476,6 +473,13 @@ type -P fzf > /dev/null && {
 		}
 	}
 }
+
+type fzf-file-widget > /dev/null &&
+	bind '"\C-t": transpose-chars' &&
+	bind -x '"\M-v": fzf-file-widget'
+
+type __fzf_cd__ > /dev/null &&
+	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 
 : git :
 
