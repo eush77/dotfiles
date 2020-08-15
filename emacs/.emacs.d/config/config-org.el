@@ -1310,6 +1310,16 @@ truncated."
 (when (display-mouse-p)
   (require 'org-mouse))
 
+;;; Open
+
+(define-advice org-open-at-point (:around (func &optional arg) my-default-browser)
+  "Use `browse-url-default-browser' if called with double prefix
+argument."
+  (if (equal arg '(16))
+    (let ((browse-url-browser-function #'browse-url-default-browser))
+      (funcall func arg))
+    (funcall func arg)))
+
 ;;; Priority
 
 (custom-set-variables
