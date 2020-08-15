@@ -430,7 +430,7 @@ function youtube-mw {
 
 [[ -r ~/.fzf.bash ]] && source ~/.fzf.bash
 
-[[ -x "$(type -P fzf)" ]] && {
+type -P fzf > /dev/null && {
 	export FZF_DEFAULT_OPTS;
 	printf -v FZF_DEFAULT_OPTS "%s " \
 	       --bind=ctrl-k:kill-line \
@@ -448,7 +448,7 @@ function youtube-mw {
 	bind -x '"\M-v": fzf-file-widget';
 
 	# browse [dir] [query] - Browse files with Fzf
-	[[ -x "$(type -P ctags)" ]] && [[ -x "$(type -P ifne)" ]] &&
+	type -P ctags > /dev/null && type -P ifne > /dev/null &&
 	function browse {
 		local DIR="${1:-$PWD}"
 		( cd "$DIR" &&
@@ -479,7 +479,7 @@ function youtube-mw {
 
 : git :
 
-[[ -x "$(type -P git)" ]] && {
+type -P git > /dev/null && {
 	alias g=git
 
 	# Set up a `diff-highlight` command. The variable is referenced
@@ -492,7 +492,7 @@ function youtube-mw {
 		export DIFF_HIGHLIGHT="cat"
 	fi
 
-	if [[ -x "$(type -P fzf)" ]]; then
+	if type -P fzf > /dev/null; then
 		function gg {
 			git grep "$@" |
 			fzf |
@@ -533,7 +533,7 @@ function youtube-mw {
 	fi
 
 	# Fzf widget for inserting files from Git status.
-	[[ -x "$(type -P fzf)" ]] && {
+	type -P fzf > /dev/null && {
 		function __fzf_git_status__ {
 			local FILES=$(git status --porcelain | fzf --multi | cut -c4- | while read -r FILE; do
 				printf '%q ' "$FILE"
@@ -558,7 +558,7 @@ function youtube-mw {
 
 : z + fzf :
 
-[[ (-r /usr/share/z/z.sh || -r /etc/profile.d/z.sh) && -x $(type -P fzf) ]] && {
+type z > /dev/null && type -P fzf > /dev/null && {
 	function __fzf_z__ {
 		local line
 		line=$(z -l $@ | tac | fzf --no-sort) && printf "cd %q\n" "${line##+([0-9])+( )}"
