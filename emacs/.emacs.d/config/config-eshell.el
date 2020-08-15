@@ -257,6 +257,7 @@ including the sigil."
   "Search for the file using `pkgfile'."
   (-some--> "pkgfile"
     (eshell-search-path it)
+    (file-local-name it)
     (with-temp-buffer
       (when (zerop (call-process it nil t nil
                                  "--binaries"
