@@ -63,20 +63,7 @@ else
 	PS1_HOSTID_SUFFIX=
 fi
 
-if type -P git >/dev/null; then
-	GIT_PS1_SHOWDIRTYSTATE=1
-	GIT_PS1_SHOWUNTRACKEDFILES=1
-	GIT_PS1_SHOWUPSTREAM=verbose
-	GIT_PS1_STATESEPARATOR=
-
-	if [[ -f /usr/share/git/git-prompt.sh ]]; then
-		source /usr/share/git/git-prompt.sh
-	else
-		source /usr/lib/git-core/git-sh-prompt
-	fi
-else
-	alias __git_ps1=true
-fi
+alias __git_ps1=true  # default value, redefined later
 
 shopt -s \
 	  autocd \
@@ -140,8 +127,6 @@ alias diff='diff --color=auto'
 alias dirs='dirs -v'
 alias du='du -h'
 alias emacs='emacs -nw'
-alias g=git
-alias gg='git grep'
 alias grep='grep --color=auto'
 alias hilite='source-highlight -fesc -i'
 alias l='ls -v --classify --group-directories-first --ignore-backups'
@@ -494,6 +479,35 @@ function youtube-mw {
 	bind '"\C-t": transpose-chars';
 	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 	bind -x '"\M-v": fzf-file-widget';
+}
+
+: git :
+
+[[ -x "$(type -P git)" ]] && {
+	alias g=git
+	alias gg='git grep'
+
+	# Define completions.
+	[[ -r "/usr/share/bash-completion/completions/git" ]] &&
+		source "/usr/share/bash-completion/completions/git" &&
+		__git_complete g __git_main
+
+	if [[ -r "/usr/share/git/git-prompt.sh" ]]; then
+		GIT_PS1="/usr/share/git/git-prompt.sh"
+	elif [[ -r "/usr/lib/git-core/git-sh-prompt" ]]; then
+		GIT_PS1="/usr/lib/git-core/git-sh-prompt"
+	fi
+
+	# Define prompt function.
+	if [[ -v GIT_PS1 ]]; then
+		GIT_PS1_SHOWDIRTYSTATE=1
+		GIT_PS1_SHOWUNTRACKEDFILES=1
+		GIT_PS1_SHOWUPSTREAM=verbose
+		GIT_PS1_STATESEPARATOR=
+
+		unalias __git_ps1
+		source "${GIT_PS1}"
+	fi
 }
 
 : pkgfile :
