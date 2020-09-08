@@ -506,7 +506,8 @@ function youtube-mw {
 	# Define completions.
 	[[ -r "/usr/share/bash-completion/completions/git" ]] &&
 		source "/usr/share/bash-completion/completions/git" &&
-		__git_complete g __git_main
+		__git_complete g __git_main &&
+		__git_complete gg _git_grep
 
 	if [[ -r "/usr/share/git/git-prompt.sh" ]]; then
 		GIT_PS1="/usr/share/git/git-prompt.sh"
