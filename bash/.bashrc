@@ -485,7 +485,23 @@ function youtube-mw {
 
 [[ -x "$(type -P git)" ]] && {
 	alias g=git
-	alias gg='git grep'
+
+	if [[ -x "$(type -P fzf)" ]]; then
+		function gg {
+			git grep "$@" |
+			fzf |
+			grep --perl-regexp --only-matching '.*:\d+(?=:)' | {
+				IFS=: read -a PT;
+				case "${#PT[@]}" in
+					2) $PAGER -N +"${PT[1]}" "${PT[0]}" ;;
+					3) git -c pager.show="$PAGER -N +${PT[2]}" \
+					   show "${PT[0]}:${PT[1]}" ;;
+				esac;
+			}
+		}
+	else
+		alias gg="git grep"
+	fi
 
 	# Define completions.
 	[[ -r "/usr/share/bash-completion/completions/git" ]] &&
