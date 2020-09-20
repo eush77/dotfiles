@@ -240,24 +240,6 @@ function cdkb {
 	fi
 }
 
-# fzf-browse [<dir>] - Browse files with Fzf.
-function fzf-browse {
-	local DIR="${1:-$PWD}"
-	( cd "$DIR" &&
-	  fzf --bind="alt-n:preview-page-down" \
-	      --bind="alt-p:preview-page-up" \
-	      --bind="alt-v:page-up" \
-	      --bind="change:top" \
-	      --bind="ctrl-c:cancel" \
-	      --bind="ctrl-j:jump" \
-	      --bind="ctrl-v:page-down" \
-	      --bind="return:execute(less {})" \
-	      --height=100% \
-	      --layout=reverse-list \
-	      --preview="ctags -x {} | ifne -n cat {}" \
-	      --preview-window=:60% )
-}
-
 # Create a directory if it doesn't exist.
 function to {
 	if [[ "$#" -ne 1 ]]; then
@@ -479,6 +461,25 @@ function youtube-mw {
 	bind '"\C-t": transpose-chars';
 	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 	bind -x '"\M-v": fzf-file-widget';
+
+	# browse [dir] [query] - Browse files with Fzf
+	[[ -x "$(type -P ctags)" ]] && function browse {
+		local DIR="${1:-$PWD}"
+		( cd "$DIR" &&
+		  fzf --bind="alt-n:preview-page-down" \
+		      --bind="alt-p:preview-page-up" \
+		      --bind="alt-v:page-up" \
+		      --bind="change:top" \
+		      --bind="ctrl-c:cancel" \
+		      --bind="ctrl-j:jump" \
+		      --bind="ctrl-v:page-down" \
+		      --bind="return:execute(less {})" \
+		      --height=100% \
+		      --layout=reverse-list \
+		      --preview="ctags -x {} | ifne -n cat {}" \
+		      --preview-window=:60% \
+		      --query="$2" )
+	}
 }
 
 : git :
