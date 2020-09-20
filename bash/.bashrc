@@ -485,6 +485,16 @@ function youtube-mw {
 [[ -x "$(type -P git)" ]] && {
 	alias g=git
 
+	# Set up a `diff-highlight` command. The variable is referenced
+	# in the Git config.
+	if [[ -x "/usr/share/git/diff-highlight/diff-highlight" ]]; then
+		export DIFF_HIGHLIGHT="/usr/share/git/diff-highlight/diff-highlight"
+	elif [[ -r "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then
+		export DIFF_HIGHLIGHT="perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+	else
+		export DIFF_HIGHLIGHT="cat"
+	fi
+
 	if [[ -x "$(type -P fzf)" ]]; then
 		function gg {
 			git grep "$@" |
