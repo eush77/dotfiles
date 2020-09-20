@@ -441,6 +441,8 @@ function youtube-mw {
 
 : fzf :
 
+[[ -r ~/.fzf.bash ]] && source ~/.fzf.bash
+
 [[ -x "$(type -P fzf)" ]] && {
 	export FZF_DEFAULT_OPTS;
 	printf -v FZF_DEFAULT_OPTS "%s " \
@@ -449,8 +451,6 @@ function youtube-mw {
 	       --info=inline \
 	       --height=40% \
 	       --layout=reverse;
-	[[ -r ~/.fzf.bash ]] &&
-		source ~/.fzf.bash
 	[[ -r /usr/share/fzf/completion.bash ]] &&
 		source /usr/share/fzf/completion.bash
 	[[ -r /usr/share/fzf/key-bindings.bash ]] &&
