@@ -526,6 +526,19 @@ function youtube-mw {
 		unalias __git_ps1
 		source "${GIT_PS1}"
 	fi
+
+	# Fzf widget for inserting files from Git status.
+	[[ -x "$(type -P fzf)" ]] && {
+		function __fzf_git_status__ {
+			local FILES=$(git status --porcelain | fzf --multi | cut -c4- | while read -r FILE; do
+				printf '%q ' "$FILE"
+			done)
+			READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILES${READLINE_LINE:$READLINE_POINT}"
+			READLINE_POINT=$(( READLINE_POINT + ${#FILES} ))
+		}
+
+		bind -x '"\M-g": __fzf_git_status__'
+	}
 }
 
 : pkgfile :
