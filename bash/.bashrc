@@ -5,8 +5,14 @@
 #
 
 export EDITOR=mg
-
 export LESSOPEN="| source-highlight --out-format esc -i %s"
+export PAGER="less --quit-if-one-screen"
+export PLS="less -N +%d"
+export W3MMAN_W3M='w3m -o confirm_qq=false'
+export WWW_HOME='https://google.com/'
+
+# If not running interactively, don't go any further.
+[[ $- != *i* ]] && return
 
 # LESS_TERMCAP variables can't be put in a `.lesskey' file in Less 487.
 # https://unix.stackexchange.com/questions/328597/how-to-make-lesskey-terminal-independent
@@ -17,15 +23,7 @@ export LESS_TERMCAP_se="$(tput sgr0)"
 export LESS_TERMCAP_us="$(tput setaf 3)"
 export LESS_TERMCAP_ue="$(tput sgr0)"
 
-export PAGER="less --quit-if-one-screen"
-export PLS="less -N +%d"
-export W3MMAN_W3M='w3m -o confirm_qq=false'
-export WWW_HOME='https://google.com/'
-
 eval "$(dircolors)"
-
-# If not running interactively, don't go any further.
-[[ $- != *i* ]] && return
 
 #
 # Shell Settings
