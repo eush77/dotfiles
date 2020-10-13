@@ -1,3 +1,5 @@
+;;; ibuffer-make-column-filename-and-process
+
 (defun my-ibuffer-process-command (process)
   "Get command to stand for PROCESS in IBuffer."
   (let ((command (process-command process)))
@@ -20,3 +22,17 @@
          'font-lock-face 'italic
          'ibuffer-process process)
       string)))
+
+;;; ibuffer-make-column-process
+
+(define-advice ibuffer-make-column-process
+    (:around (func buffer mark) my-process-command)
+  "Include process command."
+  (let ((string (funcall func buffer mark)))
+    (if (string-empty-p string)
+        ""
+      (replace-regexp-in-string "^([^)]*)"
+                                (with-output-to-string
+                                  (princ (my-ibuffer-process-command
+                                          (get-buffer-process buffer))))
+                                string))))
