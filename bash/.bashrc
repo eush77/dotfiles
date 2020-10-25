@@ -133,7 +133,6 @@ alias lc='ls -1v --group-directories-first --ignore-backups'
 alias ls='ls --color=auto'
 alias pacaur='pacaur --color=auto'
 alias pacman='pacman --color=auto'
-alias rgrep='pls -a -- grep --color=always --line-number --recursive --with-filename $RGREPFLAGS'
 alias ready="zenity --info --text='Ready, Master!' --title=''"
 alias reinit='source ~/.bashrc'
 alias sudo='sudo '  # Expand aliases under `sudo'.
@@ -479,6 +478,14 @@ function youtube-mw {
 		      --preview="ctags -x {} | ifne -n cat {}" \
 		      --preview-window=:60% \
 		      --query="$2" )
+	}
+
+	function rgrep {
+		grep --line-number --recursive --with-filename $RGREPFLAGS "$@" |
+		fzf | {
+			IFS=: read FILE LINE _ &&
+			$PAGER -N +"$LINE" "$FILE";
+		}
 	}
 }
 
