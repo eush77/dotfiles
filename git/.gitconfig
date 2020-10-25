@@ -75,7 +75,7 @@
 			  rm /tmp/$(basename $1) &&\
 			  true
 	graph = log --all --oneline --decorate --graph
-	l = ! git brieflog -10
+	l = ! GIT_PAGER=cat git log --oneline -10
 	reset-unmerged = ! git reset -- $(git ls-files --unmerged |cut -f2 |uniq)
 	root = rev-parse --show-toplevel
 	s = status --short
