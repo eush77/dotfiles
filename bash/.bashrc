@@ -461,7 +461,8 @@ function youtube-mw {
 	bind -x '"\M-v": fzf-file-widget';
 
 	# browse [dir] [query] - Browse files with Fzf
-	[[ -x "$(type -P ctags)" ]] && function browse {
+	[[ -x "$(type -P ctags)" ]] && [[ -x "$(type -P ifne)" ]] &&
+	function browse {
 		local DIR="${1:-$PWD}"
 		( cd "$DIR" &&
 		  fzf --bind="alt-n:preview-page-down" \
