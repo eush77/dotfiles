@@ -471,6 +471,7 @@ function youtube-mw {
 		      --bind="change:top" \
 		      --bind="ctrl-c:cancel" \
 		      --bind="ctrl-j:jump" \
+		      --bind="ctrl-space:toggle-preview" \
 		      --bind="ctrl-v:page-down" \
 		      --bind="return:execute(less {})" \
 		      --height=100% \
