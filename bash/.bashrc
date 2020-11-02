@@ -483,7 +483,7 @@ function youtube-mw {
 	function rgrep {
 		grep --line-number --recursive --with-filename $RGREPFLAGS "$@" |
 		fzf | {
-			IFS=: read FILE LINE _ &&
+			IFS=: read -r FILE LINE _ &&
 			$PAGER -N +"$LINE" "$FILE";
 		}
 	}
@@ -509,7 +509,7 @@ function youtube-mw {
 			git grep "$@" |
 			fzf |
 			grep --perl-regexp --only-matching '.*:\d+(?=:)' | {
-				IFS=: read -a PT;
+				IFS=: read -ra PT;
 				case "${#PT[@]}" in
 					2) $PAGER -N +"${PT[1]}" "${PT[0]}" ;;
 					3) git -c pager.show="$PAGER -N +${PT[2]}" \
