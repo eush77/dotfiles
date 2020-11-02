@@ -133,7 +133,7 @@ alias lc='ls -1v --group-directories-first --ignore-backups'
 alias ls='ls --color=auto'
 alias pacaur='pacaur --color=auto'
 alias pacman='pacman --color=auto'
-alias ready="zenity --info --text='Ready, Master!' --title=''"
+alias ready="zenity --info --text='Ready!' --title=''"
 alias reinit='source ~/.bashrc'
 alias sudo='sudo '  # Expand aliases under `sudo'.
 
