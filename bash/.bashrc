@@ -38,7 +38,7 @@ HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
 PROMPT_COMMAND='history -a; __prompt_listing'
 PROMPT_LISTING_LIMIT=20
-PS1='\[$((PS1_STATUS=$?))\r\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[31m\]$(__ps1_failure)\[\e[0m\]$(__ps1_success) '
+PS1='\[\e[$((PS1_STATUS_COLOR=$??31:0))m\e[0m\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[${PS1_STATUS_COLOR}m\]>\[\e[0m\] '
 
 # Calculate SHLVL nesting level indicator for PS1.
 if [[ -n "$DISPLAY" ]]; then
@@ -161,18 +161,6 @@ function __prompt_listing {
 		[[ "$(find -maxdepth 1 | wc -l)" -le "$PROMPT_LISTING_LIMIT" ]] &&
 		l
 	_LAST_PWD="$PWD"
-}
-
-# This function is called from PS1 to print a prompt sigil after a failed
-# command.
-function __ps1_failure {
-	[[ "$PS1_STATUS" -ne 0 ]] && echo '>'
-}
-
-# This function is called from PS1 to print a prompt sigil after a succeeded
-# command.
-function __ps1_success {
-	[[ "$PS1_STATUS" -eq 0 ]] && echo '>'
 }
 
 # This function is called from PS1 to print the directory stack.
