@@ -475,6 +475,7 @@ type -P fzf > /dev/null && {
 }
 
 type fzf-file-widget > /dev/null &&
+	bind -r '\C-t' &&
 	bind '"\C-t": transpose-chars' &&
 	bind -x '"\M-v": fzf-file-widget'
 
