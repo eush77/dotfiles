@@ -4,8 +4,16 @@
 
 ;;; applications
 
+(defun my-exwm-app-name (app)
+  "Get name of an application APP."
+  (gethash "Name"
+           (xdg-desktop-read-file
+            (assoc-default
+             app
+             (counsel-linux-apps-list-desktop-files)))))
+
 (defun my-exwm-app-class-name (app)
-  "Window Class name of an application APP." ;
+  "Get Window Class name of an application APP."
   (--> (xdg-desktop-read-file
         (assoc-default
          app
@@ -26,6 +34,67 @@ in the selected frame."
             (and (derived-mode-p 'exwm-mode)
                  (string-equal exwm-class-name class-name)))
           (cons (current-buffer) (buffer-list (selected-frame)))))
+
+;;;###autoload
+(defun my-start-app (app &optional class-name)
+  "Start the app or switch to a running instance.
+
+CLASS-NAME defaults to the result of calling
+`my-exwm-app-class-name' on APP.
+
+If the app is running in the selected window already, restore
+the window configuration before the app was opened."
+  (unless class-name
+    (setq class-name (my-exwm-app-class-name app)))
+  (let ((buffer (my-exwm-find-buffer-by-class-name class-name)))
+    (cond
+     ((and (eq (current-buffer) buffer)
+           (boundp 'my-saved-window-configuration))
+      (let ((configuration my-saved-window-configuration))
+        (makunbound 'my-saved-window-configuration)
+        (set-window-configuration configuration)))
+     ((eq (current-buffer) buffer)
+      (quit-window))
+     ((and buffer (not (-> buffer
+                           (get-buffer-window t)
+                           (window-frame)
+                           (eq (selected-frame)))))
+      (select-window (get-buffer-window buffer t)))
+     (buffer
+      (let ((saved-configuration (current-window-configuration)))
+        ;; Delete other windows before switching to avoid jitter.
+        (delete-other-windows)
+        (exwm-workspace-switch-to-buffer buffer)
+        (setf (buffer-local-value 'my-saved-window-configuration buffer)
+              saved-configuration)))
+     (t
+      ;; The buffer is created asynchronously, so schedule the rest of
+      ;; the function using `exwm-update-class-hook'.
+      (setq my-start-app--class-name class-name
+            my-start-app--saved-configuration
+            (current-window-configuration))
+      (add-hook 'exwm-update-class-hook
+                #'my-start-app--on-update-class
+                t)
+      (let ((default-directory "/"))
+        (counsel-linux-app-action-default (cons nil app)))))))
+
+(defvar my-start-app--class-name)
+(defvar my-start-app--saved-configuration)
+
+(defun my-start-app--on-update-class ()
+  (remove-hook 'exwm-update-class-hook 'my-start-app--on-update-class)
+  (setf (buffer-local-value
+         'my-saved-window-configuration
+         (my-exwm-find-buffer-by-class-name my-start-app--class-name))
+        my-start-app--saved-configuration)
+  (makunbound 'my-start-app--class-name)
+  (makunbound 'my-start-app--saved-configuration)
+  (when (one-window-p)
+    ;; The window may not be fully drawn for some reason, force redisplay to
+    ;; fix it.
+    (split-window))
+  (delete-other-windows))
 
 ;;; exwm-edit
 
@@ -404,51 +473,6 @@ the current track changes."
                      "Playing")))))
      (my-media-player-notify))))
 
-;;;###autoload
-(defun my-media-player ()
-  "Toggle display of the media player."
-  (interactive)
-  (let ((buffer
-         (my-exwm-find-buffer-by-class-name (my-media-player-class-name))))
-    (cond ((eq (current-buffer) buffer)
-           (if (boundp 'my-saved-window-configuration)
-               (let ((configuration my-saved-window-configuration))
-                 (makunbound 'my-saved-window-configuration)
-                 (set-window-configuration configuration))
-             (quit-window)))
-          (buffer
-           (let ((saved-configuration (current-window-configuration)))
-             ;; Delete other windows before switching to avoid jitter.
-             (delete-other-windows)
-             (exwm-workspace-switch-to-buffer buffer)
-             (setf (buffer-local-value 'my-saved-window-configuration buffer)
-                   saved-configuration)))
-          (t
-           ;; The buffer is created asynchronously, so schedule the rest of
-           ;; the function using `exwm-update-class-hook'.
-           (setq my-media-player--saved-configuration
-                 (current-window-configuration))
-           (add-hook 'exwm-update-class-hook
-                     #'my-media-player--on-update-class
-                     t)
-           (counsel-linux-app-action-default
-            (cons nil (my-media-player-app)))))))
-
-(defvar my-media-player--saved-configuration)
-
-(defun my-media-player--on-update-class ()
-  (remove-hook 'exwm-update-class-hook 'my-media-player--on-update-class)
-  (setf (buffer-local-value 'my-saved-window-configuration
-                            (my-exwm-find-buffer-by-class-name
-                             (my-media-player-class-name)))
-        my-media-player--saved-configuration)
-  (makunbound 'my-media-player--saved-configuration)
-  (when (one-window-p)
-    ;; The window may not be fully drawn for some reason, force redisplay to
-    ;; fix it.
-    (split-window))
-  (delete-other-windows))
-
 ;;; notification server
 
 (defun my-notify-server-information (&rest args)
@@ -652,24 +676,9 @@ See `my-exwm-unclutter-timeout'."
 BUFFER defaults to the current buffer."
   (unless buffer
     (setq buffer (current-buffer)))
-  (eq (with-current-buffer buffer (my-web-browser-buffer))
+  (eq (with-current-buffer buffer
+        (my-exwm-find-buffer-by-app my-web-browser-app))
       buffer))
-
-;;;###autoload
-(defun my-web-browser-buffer ()
-  "Get live Exwm buffer of the web browser, or nil. "
-  (my-exwm-find-buffer-by-app my-web-browser-app))
-
-;;;###autoload
-(defun my-web-browser ()
-  "Launch or switch to the web browser."
-  (interactive)
-  (if-let ((buffer (my-web-browser-buffer)))
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer-same-window buffer))
-    (let ((default-directory "/"))
-      (counsel-linux-app-action-default (cons nil my-web-browser-app)))))
 
 ;;;###autoload
 (defun my-web-browser-get-current-url ()
@@ -685,16 +694,6 @@ BUFFER defaults to the current buffer."
         (with-temp-buffer
           (insert url)
           (thing-at-point 'url))))))
-
-;;;###autoload
-(defun my-web-browser-send-key (key)
-  "Send KEY to a browser window."
-  (let ((buffer (my-web-browser-buffer)))
-    (save-window-excursion
-      (if-let ((window (get-buffer-window buffer t)))
-          (select-window window)
-        (pop-to-buffer buffer))
-      (mapc #'exwm-input--fake-key (listify-key-sequence key)))))
 
 ;;; workspaces
 
