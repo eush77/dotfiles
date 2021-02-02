@@ -4,6 +4,7 @@
 
 ;;; applications
 
+;;;###autoload
 (defun my-exwm-app-name (app)
   "Get name of an application APP."
   (gethash "Name"
@@ -12,6 +13,7 @@
              app
              (counsel-linux-apps-list-desktop-files)))))
 
+;;;###autoload
 (defun my-exwm-app-class-name (app)
   "Get Window Class name of an application APP."
   (--> (xdg-desktop-read-file
@@ -253,6 +255,7 @@ function forces the variable to be created if it's missing."
 
 (require 'dbus)
 
+;;;###autoload
 (defcustom my-media-players
   '(("Yandex Music"
      "ymp.desktop"
@@ -292,6 +295,7 @@ where:
                        (string :tag "MPRIS Service")))
   :group 'my)
 
+;;;###autoload
 (defcustom my-media-player (caar my-media-players)
   "Currently used media player.
 
@@ -308,9 +312,11 @@ The name must be one of the keys in `my-media-players' alist."
                             widget))))
   :group 'my)
 
+;;;###autoload
 (defun my-media-player-app ()
   (car (assoc-default my-media-player my-media-players)))
 
+;;;###autoload
 (defun my-media-player-class-name ()
   (pcase-let ((`(,app ,class-name . _)
                (assoc-default my-media-player my-media-players)))
@@ -661,10 +667,10 @@ See `my-exwm-unclutter-timeout'."
 
 ;;; web browser
 
+;;;###autoload
 (defcustom my-web-browser-app
   (string-trim
-   (my-local-shell-command-to-string
-    "xdg-settings get default-web-browser"))
+   (shell-command-to-string "xdg-settings get default-web-browser"))
   "Web browser application."
   :type 'string
   :group 'my)
