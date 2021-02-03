@@ -24,6 +24,9 @@
  '(comment-multi-line t)
  '(comment-style 'extra-line))
 
+;; Symbol Font
+(set-fontset-font t nil (font-spec :name "Noto Color Emoji"))
+
 ;; Input method
 (custom-set-variables '(default-input-method "russian-computer"))
 
