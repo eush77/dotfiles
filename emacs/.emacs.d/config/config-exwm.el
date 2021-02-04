@@ -709,8 +709,12 @@ BUFFER defaults to the current buffer."
 (defun my-exwm-workspace-next (n)
   "Switch to the next N-th workspace."
   (interactive "p")
-  (exwm-workspace-switch (mod (+ exwm-workspace-current-index n)
-                              (exwm-workspace--count))))
+  (let ((next-index (mod (+ exwm-workspace-current-index n)
+                         (exwm-workspace--count))))
+    (-some--> exwm--floating-frame
+      (exwm--buffer->id (window-buffer))
+      (exwm-workspace-move-window next-index it))
+    (exwm-workspace-switch next-index)))
 
 ;;;###autoload
 (defun my-exwm-workspace-previous (n)
