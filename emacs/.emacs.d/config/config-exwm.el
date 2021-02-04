@@ -726,7 +726,7 @@ If there is only one workspace or a couple, switch immediately
 without displaying the switching interface unless FORCE-DISPLAY-P
 is non-nil."
   (interactive "P")
-  (cl-case (and (not force-display-p) (length (frame-list)))
+  (cl-case (and (not force-display-p) (exwm-workspace--count))
     (1 (user-error "No other workspace"))
     (2 (my-exwm-workspace-next 1))
     (otherwise
