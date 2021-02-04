@@ -77,23 +77,57 @@ See `sml/generate-buffer-identification'."
   (put-text-property
    0 (length sml/buffer-identification)
    'help-echo
-   (format "%s\n\nmouse-1: %s window\nmouse-3: Rename buffer"
+   (format "%s
+
+mouse-1: Switch buffer / quit minibuffer
+mouse-2: Toggle one window
+mouse-3: %s
+mouse-6/mouse-7: Switch workspace
+mouse-8/mouse-9: Restore window configuration"
            (or (buffer-file-name) (buffer-name))
-           (if (window-dedicated-p) "Undedicate" "Dedicate"))
+           (if (and (derived-mode-p 'exwm-mode)
+                    exwm--floating-frame)
+               "Start moveresize"
+             "Toggle window dedicated"))
    sml/buffer-identification))
 
-(defun my-mode-line-rename-buffer (event)
-  "Rename buffer displayed in the EVENT's window."
-  (interactive "e")
-  (with-current-buffer (window-buffer (posn-window (event-start event)))
-    (call-interactively 'rename-buffer)))
+(defun my-mode-line-switch-buffer-or-quit ()
+  "Switch current buffer or quit if minibuffer is active."
+  (interactive "@")
+  (if (active-minibuffer-window)
+      (ivy-quit-and-run)
+    (call-interactively 'counsel-ibuffer)))
 
-(defun my-mode-line-toggle-window-dedicated-p (event)
-  "Like `my-toggle-window-dedicated-p', but for EVENT's window."
-  (interactive "e")
-  (my-toggle-window-dedicated-p (posn-window (event-start event))))
+(defun my-mode-line-toggle-one-window ()
+  "Delete other windows, or undo if no other windows."
+  (interactive "@")
+  (if (one-window-p t)
+      (while (one-window-p t)
+        (winner-undo))
+    (delete-other-windows)))
+
+(defun my-mode-line-toggle-dedicated-or-moveresize ()
+  "Toggle dedicated state of selected window or start moveresize.
+
+Start moveresize operation if on a floating frame, otherwise
+toggle dedicated."
+  (interactive "@")
+  (if (and (derived-mode-p 'exwm-mode)
+           exwm--floating-frame)
+      (exwm-floating--start-moveresize exwm--id)
+    (my-toggle-window-dedicated-p)))
 
 (define-key mode-line-buffer-identification-keymap
-  [mode-line mouse-1] #'my-mode-line-toggle-window-dedicated-p)
+  [mode-line mouse-1] #'my-mode-line-switch-buffer-or-quit)
 (define-key mode-line-buffer-identification-keymap
-  [mode-line mouse-3] #'my-mode-line-rename-buffer)
+  [mode-line mouse-2] #'my-mode-line-toggle-one-window)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-3] #'my-mode-line-toggle-dedicated-or-moveresize)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-6] #'my-exwm-workspace-previous)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-7] #'my-exwm-workspace-next)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-8] #'winner-undo)
+(define-key mode-line-buffer-identification-keymap
+  [mode-line mouse-9] #'winner-redo)
