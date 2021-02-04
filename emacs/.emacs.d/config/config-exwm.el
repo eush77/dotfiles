@@ -134,6 +134,7 @@ With prefix argument, call `my-exwm-edit'."
       (my-exwm-key-chord-state (current-buffer) t))))
 
 (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'emms-volume-lower)
+(exwm-input-set-key (kbd "<S-XF86AudioLowerVolume>") #'my-emms-volume-fine-lower)
 (exwm-input-set-key (kbd "<XF86AudioMute>") #'my-emms-volume-mute)
 (exwm-input-set-key (kbd "<XF86AudioNext>") #'my-media-player-next-track)
 (exwm-input-set-key (kbd "<XF86AudioPlay>") #'my-media-player-pause)
@@ -141,6 +142,7 @@ With prefix argument, call `my-exwm-edit'."
 (exwm-input-set-key (kbd "<XF86AudioStop>") #'my-media-player-next-state)
 (exwm-input-set-key (kbd "<XF86Favorites>") #'my-media-player)
 (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'emms-volume-raise)
+(exwm-input-set-key (kbd "<S-XF86AudioRaiseVolume>") #'my-emms-volume-fine-raise)
 (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") #'my-screen-brightness-down)
 (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") #'my-screen-brightness-up)
 (exwm-input-set-key (kbd "<XF86TouchpadToggle>") #'my-touchpad-toggle)
