@@ -35,6 +35,14 @@ to exact time.
                 'help-echo help-echo
                 'mouse-face 'highlight)))
 
+(defun my-minibuffer-space (width)
+  "Blank space to include as a filler in the minibuffer line.
+
+When clicked with `[mouse-1]', the space calls `keyboard-quit'."
+  (let ((map (make-sparse-keymap)))
+    (define-key map [mouse-1] #'keyboard-quit)
+    (propertize (make-string width ? ) 'keymap map)))
+
 (defun my-format-minibuffer-battery (battery width)
   "Format minibuffer battery info to the given width."
   (if (< width (string-width battery))
@@ -101,7 +109,7 @@ to exact time.
                                          (string-width clock)))))
              (my-mode-line-escape
               (concat (substring globals 0 globals-width)
-                      (make-string space-width ? )
+                      (my-minibuffer-space space-width)
                       battery
                       clock))))))
 
