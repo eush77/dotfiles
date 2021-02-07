@@ -27,12 +27,20 @@ to exact time.
 
 \[1]: URL `https://sourceforge.net/projects/bashfuzzyclock'
 \[2]: URL `https://aur.archlinux.org/packages/bash-fuzzy-clock'"
-  (let ((help-echo (format-time-string "%c")))
+  (let ((help-echo (format-time-string "%c"))
+        (map (make-sparse-keymap)))
+    (define-key map [mouse-1]
+      (lambda ()
+        (interactive)
+        (if (-some #'get-buffer-window (calendar-buffer-list))
+            (calendar-exit)
+          (calendar))))
     (propertize (condition-case nil
                     (string-trim-right
                      (car (process-lines "bash-fuzzy-clock")))
                   (file-error (format-time-string "%R")))
                 'help-echo help-echo
+                'keymap map
                 'mouse-face 'highlight)))
 
 (defun my-minibuffer-space (width)
