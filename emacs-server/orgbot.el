@@ -10,6 +10,11 @@
   :prefix "my-orgbot-"
   :group 'my)
 
+(defcustom my-orgbot-heading-length-bound 100
+  "Upper bound on length of captured headings."
+  :type 'integer
+  :group 'my-orgbot)
+
 (defcustom my-orgbot-token nil
   "OrgBot Telegram token."
   :type 'string
@@ -22,20 +27,43 @@
 
 ;;; Capture Command
 
+(defun my-orgbot-url-p (url)
+  "t if URL is a url."
+  (with-temp-buffer
+    (insert url)
+    (equal (bounds-of-thing-at-point 'url)
+           (cons (point-min) (point-max)))))
+
 (defun my-orgbot-capture (text)
   "Capture TEXT with no user interaction.
 
 Returns a textual response."
-  (let* ((revert-without-query (list org-default-notes-file))
-         (buffer (find-file-noselect org-default-notes-file))
-         (url (with-temp-buffer
-                (insert text)
-                (and (equal (bounds-of-thing-at-point 'url)
-                            (cons (point-min) (point-max)))
+  (let* ((tree
+          (let ((lines (s-lines text))
+                (url))
+            (if (my-orgbot-url-p (car lines))
+                (setq url (pop lines))
+              (when (> (length (car lines))
+                       my-orgbot-heading-length-bound)
+                (push (s-truncate my-orgbot-heading-length-bound
+                                  (car lines))
+                      lines))
+              (let ((last-line (car (last lines))))
+                (when (my-orgbot-url-p last-line)
+                  (setq url last-line
+                        lines (butlast lines)))))
+            (let ((description
+                   (with-temp-buffer
+                     (insert (s-trim (s-join "\n" lines)))
+                     (goto-char (point-min))
+                     (forward-line)
+                     (fill-region (point) (point-max))
                      (buffer-string))))
-         (tree (if url
-                   (my-org-capture-current-link 'entry url)
-                 (my-org-capture-tree text)))
+              (if url
+                  (my-org-capture-current-link 'entry url description)
+                (my-org-capture-tree description)))))
+         (revert-without-query (list org-default-notes-file))
+         (buffer (find-file-noselect org-default-notes-file))
          (org-capture-templates-contexts)
          (org-capture-templates
           `((t nil entry (file org-default-notes-file) ,tree
