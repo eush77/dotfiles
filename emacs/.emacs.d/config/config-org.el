@@ -424,7 +424,11 @@ list of extracted timestamps."
                 (cl-letf (((symbol-function 'org-string-nw-p)
                            (lambda (_) t)))
                   (org-make-link-string link ""))
-              (org-make-link-string link description)))))
+              (-let (((description body)
+                      (s-split-up-to "\n" description 1)))
+                (concat (org-make-link-string link description)
+                        "\n"
+                        body))))))
       ('item (concat "- " (org-make-link-string link description)))
       (otherwise (user-error "Unsupported entry type")))))
 
