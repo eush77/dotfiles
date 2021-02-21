@@ -847,7 +847,7 @@ property list."
                       (enlive-query-all page [.schedule-place a])
                       ", ")))
      (my-org-extract-from-url url title
-                              :tags '("museum")
+                              :tags '("exhibition")
                               :deadline deadline
                               :LOCATION location))))
 
@@ -1133,7 +1133,7 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
                  (pcase type
                    ("concerts and performances" '(120 . ("music")))
                    ("lectures" '(120 . ("lecture")))
-                   ("guided tours" '(80 . ("museum" "tour")))
+                   ("guided tours" '(80 . ("exhibition" "tour")))
                    (t '(nil . nil))))
                 (start-time
                  (org-read-date
