@@ -969,6 +969,33 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
                   (enlive-filter metacol
                                  (lambda (el) (enlive-attr el 'itemprop)))))))))
 
+(defun my-org-extract-from-mamm-mdf (url)
+  "Extract headline from a MAMM MDF URL."
+  (and
+   (string-match-p "\\`https?://\\(www\\.\\)?mamm-mdf\\.ru/exhibitions/" url)
+   (let* ((page (enlive-fetch url))
+          (author (if-let ((el (enlive-query page [h1 .author])))
+                      (concat (s-trim (enlive-text el)) ". ")
+                    ""))
+          (title (s-trim (enlive-text (enlive-query page [h1 .title]))))
+          (deadline
+           (pcase-let
+               ((`(,day ,month ,year)
+                 (-map #'string-to-number
+                       (s-split
+                        "\\."
+                        (cadr (s-split
+                               "—"
+                               (enlive-text
+                                (enlive-query page [.dates]))))))))
+             `(timestamp (:type active
+                          :year-start ,year
+                          :month-start ,month
+                          :day-start ,day)))))
+     (my-org-extract-from-url url (concat author title)
+                              :tags '("exhibition")
+                              :deadline deadline))))
+
 (defun my-org-extract-from-rambler-kassa (url)
   "Extract headline from a Rambler Kassa URL."
   (when-let*
@@ -1133,6 +1160,7 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
     my-org-extract-from-audible
     my-org-extract-from-garagemca
     my-org-extract-from-goodreads
+    my-org-extract-from-mamm-mdf
     my-org-extract-from-rambler-kassa
     my-org-extract-from-timepad
     my-org-extract-from-tretyakovgallery)
