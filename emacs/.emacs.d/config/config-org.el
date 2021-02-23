@@ -1085,79 +1085,107 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
   "Extract headline from a Tretyakov Gallery URL."
   (and
    (string-match-p "\\`https?://www\\.tretyakovgallery\\.ru/" url)
-   (pcase-let*
-       ((page (enlive-fetch url))
-        (title
-         ;; Strip content rating.
-         (replace-regexp-in-string
-          "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
-          (enlive-text (enlive-query page [.header-event__title]))))
-        (`(,timestamps . ,tags)
-         (if (string-match-p "/cinema/" url)
-             (let ((duration
-                    ;; Round up to the nearest 10-minutes mark.
-                    (* (fceiling
-                        (/ (apply
-                            #'+
-                            (--mapcat
-                             (let ((text (enlive-text it)))
-                               (and (string-match
-                                     "\\b\\([[:digit:]]+\\) мин\\.\\'"
-                                     text)
-                                    (list (string-to-number
-                                           (match-string 1 text)))))
-                             (enlive-query-all page [.event-desc__lid])))
-                           10.0))
-                       10)))
-               (cons
+   (let* ((page (enlive-fetch url))
+          (title
+           ;; Strip content rating.
+           (replace-regexp-in-string
+            "[[:space:]][[:digit:]]\\{1,2\\}\\+\\.?[[:space:]]?$" ""
+            (enlive-text (enlive-query page [h1])))))
+     (pcase url
+       ((pred (string-match-p "/cinema/"))
+        (let* ((duration
+                ;; Round up to the nearest 10-minutes mark.
+                (* (fceiling
+                    (/ (apply
+                        #'+
+                        (--mapcat
+                         (let ((text (enlive-text it)))
+                           (and (string-match
+                                 "\\b\\([[:digit:]]+\\) мин\\.\\'"
+                                 text)
+                                (list (string-to-number
+                                       (match-string 1 text)))))
+                         (enlive-query-all page [.event-desc__lid])))
+                       10.0))
+                   10))
+               (timestamps
                 (--map (with-temp-buffer
-                         (let ((start-time
-                                (org-read-date
-                                 t t
-                                 (alist-get 'value (cadr it)))))
-                           (org-insert-time-stamp
-                            start-time t nil nil nil
-                            (and (not (zerop duration))
-                                 (format-time-string
-                                  "-%R"
-                                  (time-add start-time
-                                            (* duration 60))))))
-                         (buffer-string))
-                       (enlive-query-all page [.event-schedule-time__input]))
-                '("cinema")))
-           (pcase-let*
-               ((page-en
-                 (enlive-fetch
-                  (replace-regexp-in-string "\\.ru/" ".ru/en/" url)))
-                (type
-                 (downcase
-                  (enlive-text
-                   (enlive-query page-en [.event-info__type]))))
-                (`(,duration . ,tags)
-                 (pcase type
-                   ("concerts and performances" '(120 . ("music")))
-                   ("lectures" '(120 . ("lecture")))
-                   ("guided tours" '(80 . ("exhibition" "tour")))
-                   (t '(nil . nil))))
-                (start-time
-                 (org-read-date
-                  t t
-                  (concat
-                   (enlive-text (enlive-query page-en [.event-info__date]))
-                   " "
-                   (enlive-text (enlive-query page-en [.event-info__time]))))))
-             (cons (with-temp-buffer
-                     (org-insert-time-stamp
-                      start-time t nil nil nil
-                      (and duration
-                           (format-time-string "-%R"
-                                               (time-add start-time
-                                                         (* duration 60)))))
-                     (list (buffer-string)))
-                   tags)))))
-     (my-org-extract-from-url url title
-                              :tags tags
-                              :timestamps timestamps))))
+                    (let ((start-time
+                           (org-read-date
+                            t t
+                            (alist-get 'value (cadr it)))))
+                      (org-insert-time-stamp
+                       start-time t nil nil nil
+                       (and (not (zerop duration))
+                            (format-time-string
+                             "-%R"
+                             (time-add start-time
+                                       (* duration 60))))))
+                    (buffer-string))
+                  (enlive-query-all page [.event-schedule-time__input]))))
+          (my-org-extract-from-url url title
+                                   :tags '("cinema")
+                                   :timestamps timestamps)))
+       ((pred (string-match-p "/exhibitions/"))
+        (let ((deadline
+               (-some-> (enlive-query page [.article-lid__text])
+                 (enlive-text)
+                 (split-string "— *")
+                 (cadr)
+                 (string-trim)
+                 (split-string " ")
+                 (->> (-update-at 0 #'string-to-number)
+                      (--update-at 1 (1+ (-elem-index
+                                          it
+                                          '("января" "февраля"
+                                            "марта" "апреля"
+                                            "мая" "июня"
+                                            "июля" "августа"
+                                            "сентября" "октября"
+                                            "ноября" "декабря"))))
+                      (-update-at 2 #'string-to-number))
+                 (--> (-let [(day month year) it]
+                        `(timestamp (:type active
+                                           :year-start ,year
+                                           :month-start ,month
+                                           :day-start ,day)))))))
+          (my-org-extract-from-url url title
+                                   :tags '("exhibition")
+                                   :deadline deadline)))
+       (_
+        (pcase-let*
+            ((page-en
+              (enlive-fetch
+               (replace-regexp-in-string "\\.ru/" ".ru/en/" url)))
+             (type
+              (downcase
+               (enlive-text
+                (enlive-query page-en [.event-info__type]))))
+             (`(,duration . ,tags)
+              (pcase type
+                ("concerts and performances" '(120 . ("music")))
+                ("lectures" '(120 . ("lecture")))
+                ("guided tours" '(80 . ("exhibition" "tour")))
+                (t '(nil . nil))))
+             (start-time
+              (org-read-date
+               t t
+               (concat
+                (enlive-text (enlive-query page-en [.event-info__date]))
+                " "
+                (enlive-text (enlive-query page-en [.event-info__time])))))
+             (timestamps
+              (with-temp-buffer
+                (org-insert-time-stamp
+                 start-time t nil nil nil
+                 (and duration
+                      (format-time-string "-%R"
+                                          (time-add start-time
+                                                    (* duration 60)))))
+                (list (buffer-string)))))
+          (my-org-extract-from-url url title
+                                   :tags tags
+                                   :timestamps timestamps)))))))
 
 (defcustom my-org-extractors
   '(my-org-extract-from-artguide
