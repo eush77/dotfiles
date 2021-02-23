@@ -72,7 +72,18 @@ Returns a textual response."
             (with-current-buffer buffer
               (revert-buffer t t)))
           (org-capture nil t)
-          (replace-regexp-in-string "%\\?" "" tree))
+          (->> tree
+               (s-replace "%?" "")
+               (s-replace "<" "&lt;")
+               (s-replace "* NEW" "* <b>NEW</b>")
+               (replace-regexp-in-string
+                org-link-bracket-re
+                (lambda (link)
+                  (let ((url (match-string 1 link))
+                        (description (match-string 2 link)))
+                    (if description
+                        (format "<a href=\"%s\">%s</a>" url description)
+                      url))))))
       (error (format "Capture failed")))))
 
 ;;; Shopping Commands
@@ -219,6 +230,7 @@ previous update."
                 "sendMessage"
                 `((chat_id . ,chat_id)
                   (text . ,text)
+                  (parse_mode . "HTML")
                   (disable_web_page_preview . "true")
                   (reply_markup
                    . ,(json-serialize
