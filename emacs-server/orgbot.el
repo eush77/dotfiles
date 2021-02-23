@@ -62,17 +62,17 @@ Returns a textual response."
               (if url
                   (my-org-capture-current-link 'entry url description)
                 (my-org-capture-tree description)))))
-         (revert-without-query (list org-default-notes-file))
-         (buffer (find-file-noselect org-default-notes-file))
          (org-capture-templates-contexts)
          (org-capture-templates
           `((t nil entry (file org-default-notes-file) ,tree
                :immediate-finish t))))
     (condition-case nil
-        (progn (org-capture nil t)
-               (format "Added backlog item #%d"
-                       (with-current-buffer buffer
-                         (length (org-map-entries nil nil 'file)))))
+        (progn
+          (when-let ((buffer (get-file-buffer org-default-notes-file)))
+            (with-current-buffer buffer
+              (revert-buffer t t)))
+          (org-capture nil t)
+          (replace-regexp-in-string "%\\?" "" tree))
       (error (format "Capture failed")))))
 
 ;;; Shopping Commands
@@ -219,6 +219,7 @@ previous update."
                 "sendMessage"
                 `((chat_id . ,chat_id)
                   (text . ,text)
+                  (disable_web_page_preview . "true")
                   (reply_markup
                    . ,(json-serialize
                        (if keyboard
