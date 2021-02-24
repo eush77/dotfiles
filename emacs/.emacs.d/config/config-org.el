@@ -1003,7 +1003,8 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 (defun my-org-extract-from-rambler-kassa (url)
   "Extract headline from a Rambler Kassa URL."
   (when-let*
-      ((tag
+      ((url (s-replace "//m." "//" url))
+       (tag
         (pcase (caddr
                 (s-match
                  (concat "\\`https?://kassa\\.rambler\\.ru/"
