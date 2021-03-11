@@ -130,7 +130,8 @@ otherwise include items without a keyword."
     (list (if with-keyword
               (s-join "\n" (--map (s-concat "* " it) shopping-list))
             "...")
-          :keyboard (--map (s-concat "/buy " it) shopping-list))))
+          :keyboard `((,(if with-keyword "/buy" "/shopping") "/X")
+                      ,@(--map (s-concat "/buy " it) shopping-list)))))
 
 ;;; Command Router
 
@@ -235,13 +236,14 @@ previous update."
                   (disable_web_page_preview . "true")
                   (reply_markup
                    . ,(json-serialize
-                       (if keyboard
-                           `(one_time_keyboard t
-                             resize_keyboard t
-                             keyboard ,(vconcat
-                                        (--map (vector `(text ,it))
-                                               (cons "/X" keyboard))))
-                         '(remove_keyboard t))))))
+                       (or (-some->> keyboard
+                             (-map-when #'atom #'list)
+                             (--map (vconcat (--map `(text ,it) it)))
+                             (vconcat)
+                             (list 'one_time_keyboard t
+                                   'resize_keyboard t
+                                   'keyboard))
+                           '(remove_keyboard t))))))
                (my-orgbot-poll update_id))))
          (lambda ()
            (setq my-orgbot-response nil)))))
