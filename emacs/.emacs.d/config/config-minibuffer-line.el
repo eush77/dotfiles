@@ -74,6 +74,14 @@ When clicked with `[mouse-1]', the space calls `keyboard-quit'."
                             global-mode-string))
              " "))
 
+(defun my-minibuffer-width ()
+  "Compute width of the minibuffer line."
+  (let ((client (frame-parameter (selected-frame) 'client)))
+    (->> (minibuffer-frame-list)
+         (--filter (eq (frame-parameter it 'client) client))
+         (-map #'frame-text-cols)
+         (-reduce #'min))))
+
 (defun my-mode-line-escape (mode-line)
   "Escape literal mode line according to `mode-line-format'."
   (replace-regexp-in-string "%" "%%" mode-line))
@@ -83,10 +91,7 @@ When clicked with `[mouse-1]', the space calls `keyboard-quit'."
    '(:eval (let* ((globals (my-format-minibuffer-global-mode-string))
                   (battery (my-minibuffer-battery))
                   (clock (my-minibuffer-clock))
-                  (frame-width
-                   (apply #'min
-                          (mapcar #'frame-text-cols
-                                  (minibuffer-frame-list))))
+                  (frame-width (my-minibuffer-width))
                   (space-width
                    (max 2 (- frame-width
                              (string-width globals)
