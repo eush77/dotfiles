@@ -472,9 +472,12 @@ type -P fzf > /dev/null && {
 	}
 
 	function rgrep {
-		grep --line-number --recursive --with-filename $RGREPFLAGS "$@" |
-		fzf | {
+		{
+			grep --line-number --recursive --with-filename $RGREPFLAGS "$@";
+			echo "EOF";
+		} | fzf | {
 			IFS=: read -r FILE LINE _ &&
+			test "$FILE" != EOF &&
 			$PAGER -N +"$LINE" "$FILE";
 		}
 	}
@@ -505,8 +508,10 @@ type -P git > /dev/null && {
 
 	if type -P fzf > /dev/null; then
 		function gg {
-			git grep "$@" |
-			fzf |
+			{
+				git grep "$@";
+				echo EOF;
+			} | fzf |
 			grep --perl-regexp --only-matching '.*:\d+(?=:)' | {
 				IFS=: read -ra PT;
 				case "${#PT[@]}" in
