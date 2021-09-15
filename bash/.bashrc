@@ -546,8 +546,9 @@ type -P git > /dev/null && {
 	# Fzf widget for inserting files from Git status.
 	type -P fzf > /dev/null && {
 		function __fzf_git_status__ {
+			local ROOT=$(git root)
 			local FILES=$(git status --porcelain | fzf --multi | cut -c4- | while read -r FILE; do
-				printf '%q ' "$FILE"
+				printf '%q ' $(realpath --relative-to="$PWD" "$ROOT/$FILE")
 			done)
 			READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILES${READLINE_LINE:$READLINE_POINT}"
 			READLINE_POINT=$(( READLINE_POINT + ${#FILES} ))
