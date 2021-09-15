@@ -6,6 +6,7 @@
 
 export EDITOR=mg
 export LESSOPEN="| source-highlight --out-format esc -i %s 2> /dev/null"
+export MANPAGER=less
 export PAGER="less --LINE-NUMBERS"
 export PLS="less -N +%d"
 export W3MMAN_W3M='w3m -o confirm_qq=false'
