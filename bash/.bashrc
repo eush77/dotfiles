@@ -166,7 +166,7 @@ function __prompt_listing {
 
 # This function is called from PS1 to print the directory stack.
 function __ps1_paths {
-	builtin dirs -p | sed '2,$ { s:.*/:: }' | tac | paste -sd,
+	builtin dirs -p | sed -r -e "s:$HOME|/home/$USER::" -e '1 { :a; s:/(.)[^/]*/:\1/:; ta }' -e '2,$ { s:.*/:: }' | tac | paste -sd,
 }
 
 # Simple message formatter.
