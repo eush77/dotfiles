@@ -1190,6 +1190,36 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
                                    :tags tags
                                    :timestamps timestamps)))))))
 
+(defun my-org-extract-from-vzmoscow (url)
+  "Extract headline from a VZMoscow URL."
+  (and (string-match-p "\\`https?://vzmoscow\\.ru/events/" url)
+       (when-let*
+           ((url (s-replace-regexp "\\?.*" "" url))
+            (page (enlive-fetch url))
+            (page-en (enlive-fetch (concat url "?lang=en")))
+            (title (enlive-text (enlive-query page [.page-event-name])))
+            (museum (s-replace
+                     " " " "
+                     (enlive-text
+                      (cadr (enlive-query-all
+                             page [.event-details_section_head])))))
+            (address (enlive-text
+                      (enlive-query page [.event-details_section_info_adress])))
+            (end-time (org-read-date
+                       nil t
+                       (car (last (enlive-query
+                                   page-en [.event-details_section_head]))))))
+         (my-org-extract-from-url
+          url title
+          :tags '("exhibition")
+          :deadline (pcase-let ((`(_ _ _ ,day ,month ,year)
+                                 (decode-time end-time)))
+                      `(timestamp (:type active
+                                   :year-start ,year
+                                   :month-start ,month
+                                   :day-start ,day)))
+          :LOCATION (concat museum ", " address)))))
+
 (defcustom my-org-extractors
   '(my-org-extract-from-artguide
     my-org-extract-from-audible
@@ -1198,7 +1228,8 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
     my-org-extract-from-mamm-mdf
     my-org-extract-from-rambler-kassa
     my-org-extract-from-timepad
-    my-org-extract-from-tretyakovgallery)
+    my-org-extract-from-tretyakovgallery
+    my-org-extract-from-vzmoscow)
   "List of Org extractors for URLs.
 
 Each extractor is a function that takes a URL and returns either
