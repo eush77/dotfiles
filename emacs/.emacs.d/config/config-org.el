@@ -1046,8 +1046,10 @@ Get the token from URL `http://dev.timepad.ru/api/oauth/'."
        (url-request-extra-headers
         (cond (my-org-timepad-token
                `(("Authorization" . ,(concat "Bearer " my-org-timepad-token))))
-              ((yes-or-no-p "Need a token to access TimePad API. Customize? ")
-               (customize-variable 'my-org-timepad-token))))
+              (t (let ((message (concat "Need a token to access TimePad API. "
+                                        "Customize `my-org-timepad-token'.")))
+                   (message message)
+                   (error message)))))
        (event
         (with-current-buffer
             (url-retrieve-synchronously
