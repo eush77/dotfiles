@@ -897,32 +897,61 @@ Each element is a cons cell (PREFIX . PROPERTY).")
 
 (defun my-org-extract-from-garagemca (url)
   "Extract headline from a Garage MCA URL."
-  (and
-   (string-match-p "\\`https?://garagemca\\.org/" url)
-   (let* ((page (enlive-fetch url))
-          (page-en
-           (enlive-fetch
-            (replace-regexp-in-string "/ru/" "/en/" url)))
-          (title
-           (enlive-text (enlive-query page [.event__header__title])))
-          (org-end-time-was-given)
-          (start-time
-           (org-read-date
-            nil t
-            (replace-regexp-in-string
-             "–" "-"
-             (enlive-text
-              (--map-when
-               (and (enlive-is-element it) (eq (car it) 'comment))
-               " "
-               (enlive-query page-en [.event__meta__timestamp]))))))
-          (timestamp
-           (with-temp-buffer
-             (org-insert-time-stamp
-              start-time t nil nil nil (list org-end-time-was-given))
-             (buffer-string))))
-     (my-org-extract-from-url url title
-                              :timestamps (list timestamp)))))
+  (when-let ((type (cadr
+                    (s-match "\\`https?://garagemca\\.org/[^/]*/\\(.*?\\)/"
+                             url))))
+    (let* ((page (enlive-fetch url))
+           (page-en (enlive-fetch
+                     (replace-regexp-in-string "/ru/" "/en/" url)))
+           (title (enlive-text (enlive-query page [title])))
+           (deadline (-some-> (enlive-query page-en [.info-bar__date])
+                       (->> (--tree-seq (not (eq (car-safe it) 'comment))
+                                        (enlive-direct-children it))
+                            (-filter #'stringp)
+                            (-partition-after-item "—")
+                            (cadr)
+                            (-remove-item "­")
+                            (-update-at 0 #'string-to-number)
+                            (--update-at 1
+                                         (1+ (seq-position
+                                              calendar-month-abbrev-array
+                                              it)))
+                            (-update-at 2 #'string-to-number))
+                       (--> (-let [(day month year) it]
+                              (list 'timestamp
+                                    (list :type 'active
+                                          :day-start day
+                                          :month-start month
+                                          :year-start year))))))
+           (location (-> (enlive-query page [.event__meta__location a])
+                         (->> (-filter #'stringp))
+                         (cadr)
+                         (or "Музей современного искусства «Гараж»")))
+           (tags (->> (enlive-query-all page-en [.event__header__tags a])
+                      (-map #'enlive-text)
+                      (cons type)
+                      (--map (pcase it
+                               ("exhibition" "exhibition")
+                               ("Film Screenings" "cinema")))
+                      (--filter it)))
+           (timestamps (-some->> (enlive-query page-en [.event__meta__timestamp])
+                         (--tree-seq (not (eq (car-safe it) 'comment))
+                                     (enlive-direct-children it))
+                         (-filter #'stringp)
+                         (--mapcat (s-split "[ –]" it))
+                         (-update-at 0 #'string-to-number)
+                         (--update-at 1 (1+ (seq-position calendar-month-name-array it)))
+                         (-update-at 2 #'string-to-number)
+                         (--map-indexed (if (< it-index 3)
+                                            (format "%02d" it)
+                                          it))
+                         (s-format "<$2-$1-$0 $3-$4>" 'elt)
+                         (list))))
+      (my-org-extract-from-url url title
+                               :deadline deadline
+                               :tags tags
+                               :timestamps timestamps
+                               :LOCATION location))))
 
 (defvar my-org-goodreads-genre-limit 3
   "Maximum number of genres inserted into GENRES property.")
