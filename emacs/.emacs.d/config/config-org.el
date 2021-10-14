@@ -1031,29 +1031,69 @@ Each element is a cons cell (ITEMPROP . PROPERTY).")
 
 (defun my-org-extract-from-rambler-kassa (url)
   "Extract headline from a Rambler Kassa URL."
-  (when-let*
-      ((url (s-replace "//m." "//" url))
-       (tag
-        (pcase (caddr
-                (s-match
-                 (concat "\\`https?://kassa\\.rambler\\.ru/"
-                         "\\([a-z]+/\\)?\\([a-z]+\\)/[[:digit:]]+")
-                 url))
-          ("concert" "music")
-          ("movie" "cinema")
-          ("performance" "play")))
-       (page (enlive-fetch url))
-       (title (enlive-text (enlive-query page [.item_title])))
-       (title2
-        (s-trim
-         (car
-          (s-split "—"
-                   (enlive-text (enlive-query page [.item_title2]))))))
-       (title (if (string-empty-p title2)
-                  title
-                (format "%s (%s)" title title2))))
-    (my-org-extract-from-url url title
-                             :tags (list tag))))
+  (when-let ((tag (pcase (cadddr
+                          (s-match
+                           (concat
+                            "\\`https?://\\(m\\.\\)?kassa\\.rambler\\.ru/"
+                            "\\([a-z]+/\\)?\\([a-z]+\\)/[[:digit:]]+")
+                           url))
+                    ("concert" "music")
+                    ("movie" "cinema")
+                    ("performance" "performance"))))
+    (pcase-let* ((url (s-replace "//m." "//" url))
+                 (page (enlive-fetch url))
+                 (duration (-> (enlive-query-all page [.item_peop])
+                               (->> (--find (string-equal (enlive-attr it 'itemtype)
+                                                          "http://schema.org/Duration")))
+                               (enlive-query [.dd])
+                               (enlive-text)
+                               (->> (s-match "[[:digit:]]+")
+                                    (car))
+                               (string-to-number)))
+                 (timestamps (->> (enlive-query-all page [.date_link])
+                                  (--mapcat (let* ((filename (enlive-attr it 'data-url))
+                                                   (date (->> (s-split "date=" filename)
+                                                              (cadr)
+                                                              (s-replace "." "-"))))
+                                              (-> (url-generic-parse-url url)
+                                                  (--doto (setf (url-filename it) filename))
+                                                  (url-recreate-url)
+                                                  (enlive-fetch)
+                                                  (enlive-query-all [.rasp_list])
+                                                  (->> (--map (cons date it))))))
+                                  (--filter (->> (enlive-query (cdr it) [.rasp_type])
+                                                 (enlive-text)
+                                                 (string-match-p "на языке оригинала")))
+                                  (--mapcat (-map (-partial #'cons (car it))
+                                                  (->> (enlive-query-all (cdr it) [.rasp_time li])
+                                                       (--remove (enlive-has-class it "inactive"))
+                                                       (-map #'enlive-text)
+                                                       (-map #'s-trim))))
+                                  (--map (-> (-cons-to-list it)
+                                             (-snoc (-> (parse-time-string (cdr it))
+                                                        (->> (-replace nil 0))
+                                                        (decoded-time-add
+                                                         (make-decoded-time :minute duration))
+                                                        (-slice 1 3)
+                                                        (->> (--map (format "%02d" it))
+                                                             (reverse)
+                                                             (s-join ":"))))
+                                             (->> (s-format "<$0 $1-$2>" 'elt))))))
+                 (`(,title ,year) (->> '([.item_title] [.item_title2])
+                                       (--map (enlive-text (enlive-query page it)))
+                                       (--update-at 1 (-> (s-split-up-to "—" it 1)
+                                                          (->> (-map #'s-trim)
+                                                               (cons nil))
+                                                          (last 2)))
+                                       (apply #'cons)
+                                       (--update-at 1 (if it (concat " (" it ")") ""))
+                                       (-partition-all 2)
+                                       (--map (apply #'concat it)))))
+      (my-org-extract-from-url url title
+                               :tags (list tag)
+                               :timestamps timestamps
+                               :DURATION (format-seconds "%H %M" (* duration 60))
+                               :YEAR year))))
 
 (defcustom my-org-timepad-token nil
   "TimePad API token for `my-org-extract-from-timepad'.
