@@ -38,30 +38,28 @@
   "Capture TEXT with no user interaction.
 
 Returns a textual response."
-  (let* ((tree
-          (let ((lines (s-lines text))
-                (url))
-            (if (my-orgbot-url-p (car lines))
-                (setq url (pop lines))
-              (when (> (length (car lines))
-                       my-orgbot-heading-length-bound)
-                (push (s-truncate my-orgbot-heading-length-bound
-                                  (car lines))
-                      lines))
-              (let ((last-line (car (last lines))))
-                (when (my-orgbot-url-p last-line)
-                  (setq url last-line
-                        lines (butlast lines)))))
-            (let ((description
-                   (with-temp-buffer
-                     (insert (s-trim (s-join "\n" lines)))
-                     (goto-char (point-min))
-                     (forward-line)
-                     (fill-region (point) (point-max))
-                     (buffer-string))))
-              (if url
-                  (my-org-capture-current-link 'entry url description)
-                (my-org-capture-tree description)))))
+  (let* ((url)
+         (description (let ((lines (s-lines text)))
+                        (if (my-orgbot-url-p (car lines))
+                            (setq url (pop lines))
+                          (when (> (length (car lines))
+                                   my-orgbot-heading-length-bound)
+                            (push (s-truncate my-orgbot-heading-length-bound
+                                              (car lines))
+                                  lines))
+                          (let ((last-line (car (last lines))))
+                            (when (my-orgbot-url-p last-line)
+                              (setq url last-line
+                                    lines (butlast lines)))))
+                        (with-temp-buffer
+                          (insert (s-trim (s-join "\n" lines)))
+                          (goto-char (point-min))
+                          (forward-line)
+                          (fill-region (point) (point-max))
+                          (buffer-string))))
+         (tree (if url
+                   (my-org-capture-current-link 'entry url description)
+                 (my-org-capture-tree description)))
          (org-capture-templates-contexts)
          (org-capture-templates
           `((t nil entry (file org-default-notes-file) ,tree
@@ -235,15 +233,16 @@ previous update."
                   (parse_mode . "HTML")
                   (disable_web_page_preview . "true")
                   (reply_markup
-                   . ,(json-serialize
-                       (or (-some->> keyboard
-                             (-map-when #'atom #'list)
-                             (--map (vconcat (--map `(text ,it) it)))
-                             (vconcat)
-                             (list 'one_time_keyboard t
-                                   'resize_keyboard t
-                                   'keyboard))
-                           '(remove_keyboard t))))))
+                   . ,(-> (-some->> keyboard
+                            (--map (->> (if (listp it) it (list it))
+                                        (--map `(text ,it))
+                                        (vconcat)))
+                            (vconcat)
+                            (-snoc (list 'one_time_keyboard t
+                                         'resize_keyboard t
+                                         'keyboard)))
+                          (or '(remove_keyboard t))
+                          (json-serialize)))))
                (my-orgbot-poll update_id))))
          (lambda ()
            (setq my-orgbot-response nil)))))
