@@ -39,7 +39,7 @@ HISTTIMEFORMAT='(%d.%m|%R)  '
 IGNOREEOF=0
 PROMPT_COMMAND='history -a; __prompt_listing'
 PROMPT_LISTING_LIMIT=20
-PS1='\[\e[$((PS1_STATUS_COLOR=$??31:0))m\e[0m\]!\! ${PS1_SHLVL}$(__git_ps1 "(%s) ")\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[${PS1_STATUS_COLOR}m\]>\[\e[0m\] '
+PS1='\[\e[$((PS1_STATUS_COLOR=$??31:0))m\e[0m\]!\! ${PS1_SHLVL}${PS1_EXT}\[\e[36m\]${PS1_HOSTID}\[\e[0m\]${PS1_HOSTID_SUFFIX}\[\e[36m\]\[\e[36m\]$(__ps1_paths)\[\e[${PS1_STATUS_COLOR}m\]>\[\e[0m\] '
 
 # Calculate SHLVL nesting level indicator for PS1.
 if [[ -n "$DISPLAY" ]]; then
@@ -61,8 +61,6 @@ else
 	PS1_HOSTID=
 	PS1_HOSTID_SUFFIX=
 fi
-
-alias __git_ps1=true  # default value, redefined later
 
 shopt -s \
 	  autocd \
@@ -409,6 +407,8 @@ function youtube-mw {
 # Utilities
 #
 
+[[ -r ~/.fzf.bash ]] && source ~/.fzf.bash
+
 : acpi :
 
 # Show battery status if running on a TTY.
@@ -416,6 +416,27 @@ function youtube-mw {
 	[[ -e /sys/class/power_supply/BAT1/status ]] &&
 	[[ "$(</sys/class/power_supply/BAT1/status)" = "Discharging" ]] &&
 	acpi --battery
+
+: adb :
+
+type -t adb > /dev/null && {
+	export ANDROID_SERIAL
+
+	printf -v PS1_ADB %s \
+		'${ANDROID_SERIAL:+(}' \
+		'${ANDROID_SERIAL:0:1}' \
+		'${ANDROID_SERIAL##*:}' \
+		'${ANDROID_SERIAL:+) }'
+	PS1=${PS1/$\{PS1_EXT\}/${PS1_ADB}$\{PS1_EXT\}}
+
+	type -t fzf > /dev/null &&
+	function adb-select {
+		ANDROID_SERIAL=$(adb devices |
+		                 sed '1d;$d' |
+		                 fzf --prompt="Select device: " |
+		                 cut -f1)
+	}
+}
 
 : bd :
 
@@ -433,8 +454,6 @@ function youtube-mw {
 	eval "$(direnv hook bash)"
 
 : fzf :
-
-[[ -r ~/.fzf.bash ]] && source ~/.fzf.bash
 
 type -P fzf > /dev/null && {
 	export FZF_DEFAULT_OPTS;
@@ -544,8 +563,8 @@ type -P git > /dev/null && {
 		GIT_PS1_SHOWUPSTREAM=verbose
 		GIT_PS1_STATESEPARATOR=
 
-		unalias __git_ps1
 		source "${GIT_PS1}"
+		PS1=${PS1/$\{PS1_EXT\}/$\{PS1_EXT\}$\(__git_ps1 \"(%s) \"\)}
 	fi
 
 	# Fzf widget for inserting files from Git status.
