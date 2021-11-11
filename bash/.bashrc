@@ -431,10 +431,24 @@ type -t adb > /dev/null && {
 
 	type -t fzf > /dev/null &&
 	function adb-select {
-		ANDROID_SERIAL=$(adb devices |
-		                 sed '1d;$d' |
-		                 fzf --prompt="Select device: " |
-		                 cut -f1)
+		ANDROID_SERIAL=$(awk -vOFS=, -f- <(adb devices -l) <<-"EOF" |
+					NR == 2 {
+					    printf "serial%stype", OFS
+					    for (n = 3; n <= NF; ++n) {
+					        split($n, m, /:/)
+					        printf "%s%s", OFS, m[1]
+					    }
+					    print ""
+					}
+					NR > 1 && /./ {
+					    for (n = 3; n <= NF; ++n)
+					        gsub(/.*:/, "", $n)
+					    print
+					}
+					EOF
+		                 column -ts, |
+		                 fzf --header-lines=1 |
+		                 awk '{ print $1 }')
 	}
 }
 
