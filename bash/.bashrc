@@ -432,7 +432,7 @@ type -t adb > /dev/null && {
 	type -t fzf > /dev/null &&
 	function adb-select {
 		ANDROID_SERIAL=$(awk -vOFS=, -f- <(adb devices -l) <<-"EOF" |
-					NR == 2 {
+					NR == 2 && /./ {
 					    printf "serial%stype", OFS
 					    for (n = 3; n <= NF; ++n) {
 					        split($n, m, /:/)
