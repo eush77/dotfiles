@@ -4,12 +4,12 @@
 
 ;;; Ibuffer
 
-(defun my-counsel-ibuffer--get-buffers--preselect (candidates)
+(defun counsel--ibuffer-get-buffers@my-preselect (candidates)
   "Remove the current buffer from the list of candidates."
   (seq-remove (pcase-lambda (`(_ . ,buffer)) (eq buffer (current-buffer)))
               candidates))
-(advice-add 'counsel-ibuffer--get-buffers
-            :filter-return #'my-counsel-ibuffer--get-buffers--preselect)
+(advice-add 'counsel--ibuffer-get-buffers
+            :filter-return #'counsel--ibuffer-get-buffers@my-preselect)
 
 ;;;###autoload
 (defcustom my-counsel-ibuffer-excluded-buffers
@@ -19,7 +19,7 @@
   :type '(repeat string)
   :group 'my)
 
-(defun my-counsel-ibuffer--get-buffers--exclude (candidates)
+(defun counsel--ibuffer-get-buffers@my-exclude (candidates)
   "Exclude `my-counsel-ibuffer-excluded-buffers'"
   (seq-remove (pcase-lambda (`(_ . ,buffer))
                 (seq-some (lambda (regexp)
@@ -27,8 +27,8 @@
                                             (buffer-name buffer)))
                           my-counsel-ibuffer-excluded-buffers))
               candidates))
-(advice-add 'counsel-ibuffer--get-buffers
-            :filter-return #'my-counsel-ibuffer--get-buffers--exclude)
+(advice-add 'counsel--ibuffer-get-buffers
+            :filter-return #'counsel--ibuffer-get-buffers@my-exclude)
 
 (defun my-counsel-ibuffer-visit-buffer--create (name)
   "Create buffer if it doesn't exist."

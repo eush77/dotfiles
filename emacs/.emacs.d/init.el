@@ -60,9 +60,9 @@
 ;; Package archives
 (custom-set-variables
  '(package-archives
-   '(("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "http://melpa.org/packages/")
-     ("org" . "https://orgmode.org/elpa/"))))
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+     ("melpa" . "https://melpa.org/packages/"))))
 (package-refresh-contents)
 
 ;; Check and install missing packages.
@@ -101,7 +101,7 @@
 (add-to-list 'package-selected-packages 'nameless)
 (add-to-list 'package-selected-packages 'narrow-reindent)
 (add-to-list 'package-selected-packages 'nov)
-(add-to-list 'package-selected-packages 'org-plus-contrib)
+(add-to-list 'package-selected-packages 'org-contrib)
 (add-to-list 'package-selected-packages 'org-pomodoro)
 (add-to-list 'package-selected-packages 'pass)
 (add-to-list 'package-selected-packages 'pinentry)

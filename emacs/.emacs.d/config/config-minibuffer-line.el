@@ -142,9 +142,9 @@ When clicked with `[mouse-1]', the space calls `keyboard-quit'."
   "Don't replace any faces when formatting the mode line."
   (cl-letf* ((format-mode-line-function (symbol-function 'format-mode-line))
              ((symbol-function 'format-mode-line)
-              (lambda (format &optional face)
+              (lambda (format &optional face window buffer)
                 ;; Ignore FACE.
-                (funcall format-mode-line-function format))))
+                (funcall format-mode-line-function format nil window buffer))))
     (apply func args)))
 (advice-add 'minibuffer-line--update
             :around #'my-minibuffer-line-update--original-faces)
