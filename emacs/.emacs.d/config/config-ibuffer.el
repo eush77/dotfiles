@@ -46,13 +46,13 @@
     (:around (func buffer mark) my-process-command)
   "Include process command."
   (let ((string (funcall func buffer mark)))
-    (if (string-empty-p string)
-        ""
-      (replace-regexp-in-string "^([^)]*)"
-                                (with-output-to-string
-                                  (princ (my-ibuffer-process-command
-                                          (get-buffer-process buffer))))
-                                string))))
+    (if (string-match-p "^(.*)" string)
+        (->> string
+             (replace-regexp-in-string "^([^)]*)" "")
+             (concat (with-output-to-string
+                       (princ (my-ibuffer-process-command
+                               (get-buffer-process buffer))))))
+      string)))
 
 ;;; identifier
 
