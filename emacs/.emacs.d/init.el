@@ -226,5 +226,6 @@
 (require 'server)
 (unless (server-running-p)
   (server-start))
-(pinentry-start)
+(when (featurep 'make-network-process '(:family local))
+  (pinentry-start))
 (setenv "EDITOR" "emacsclient")
