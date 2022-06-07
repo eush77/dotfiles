@@ -516,12 +516,12 @@ type -P fzf > /dev/null && {
 	}
 }
 
-type fzf-file-widget > /dev/null &&
+type -t fzf-file-widget > /dev/null &&
 	bind -r '\C-t' &&
 	bind '"\C-t": transpose-chars' &&
 	bind -x '"\M-v": fzf-file-widget'
 
-type __fzf_cd__ > /dev/null &&
+type -t __fzf_cd__ > /dev/null &&
 	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 
 : git :
@@ -608,7 +608,7 @@ type -P git > /dev/null && {
 
 : z + fzf :
 
-type z > /dev/null && type -P fzf > /dev/null && {
+type -t z > /dev/null && type -P fzf > /dev/null && {
 	function __fzf_z__ {
 		local line
 		line=$(z -l $@ | tac | fzf --no-sort) && printf "cd %q\n" "${line##+([0-9])+( )}"
