@@ -1,66 +1,73 @@
 #!/bin/bash
 # -*- indent-tabs-mode: t; tab-width: 4; -*-
 
-PID=${1:-$$}
-
 function comm {
-	[[ "$(< "/proc/$PID/comm")" == "$1" ]]
+	[[ "$(< "/proc/$1/comm")" == "$2" ]]
 }
 
 function cmdline {
-	tr '\0' '\n' < "/proc/$PID/cmdline"
+	tr '\0' '\n' < "/proc/$1/cmdline"
 }
 
-function next {
-	PID=$(awk '{ print $4 }' "/proc/$PID/stat")
+function ppid {
+	awk '{ print $4 }' "/proc/$1/stat"
 }
 
-function pid-prefix {
-	printf '\033[90m[%5d]\033[m' "$PID"
-}
-
-function empty-prefix {
-	printf '%7s'
-}
-
-function format-filename {
-	if [[ "$1" = /tmp/*@ ]]
-	then
-		set ${1//@/ }
-		echo "${3//\\//} at $2"
-	else
+function ppids {
+	while [[ "$1" -gt 1 ]]
+	do
 		echo "$1"
-	fi
+		set -- "$(ppid "$1")"
+	done
 }
 
-while [[ "$PID" -gt 1 ]]
-do
-	if ! comm less
+function describe {
+	printf '\033[90m[%5d]\033[m ' "$1"
+
+	local FILES=($(cmdline "$1" | grep -Ev '^(less$|-)'))
+
+	if [[ "${#FILES[@]}" -eq 0 ]]
 	then
-		next
-		continue
-	fi
+		local PID=$(ppid "$1")
 
-	FILES=($(cmdline | grep -Ev '^(less$|-)'))
-
-	if [[ "${#FILES[@]}" -gt 0 ]]
-	then
-		echo "$(pid-prefix) $(format-filename "${FILES[0]}")"
-
-		for FILE in "${FILES[@]:1}"
-		do
-			echo "$(empty-prefix) $(format-filename "$FILE")"
-		done
-	else
-		next
-
-		if comm sh
+		if comm "$PID" sh
 		then
-			next
+			PID=$(ppid "$PID")
 		fi
 
-		echo "$(pid-prefix)" $(cmdline)
-	fi
+		echo $(cmdline "$PID")
+	elif [[ "${FILES[0]}" != /tmp/*@ ]]
+	then
+		echo "${FILES[@]}"
+	else
+		local PARTS=(${FILES[0]//@/ })
+		printf 'at %s:' "${PARTS[1]}"
 
-	next
+		for FILE in "${FILES[@]}"
+		do
+            PARTS=(${FILE//@/ })
+			printf ' %s' "${PARTS[2]//\\//}"
+		done
+
+		echo
+	fi
+}
+
+PIDS=()
+
+for PID in $(ppids "${1:-$$}")
+do
+	if comm "$PID" less
+	then
+		PIDS=("${PIDS[@]}" "$PID")
+	fi
 done
+
+for ((n=0; n < "${#PIDS[@]}"; ++n))
+do
+	printf '%s ' "$n"
+	describe "${PIDS[n]}"
+done | fzf --ansi --disabled --header="Session stack" --height=5 --with-nth=2.. | if read n _ && [[ "$n" -gt 0 ]]
+then
+	kill "${PIDS[@]:0:n}"
+fi
