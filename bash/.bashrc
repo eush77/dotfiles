@@ -472,6 +472,7 @@ type -t adb > /dev/null && {
 type -P fzf > /dev/null && {
 	export FZF_DEFAULT_OPTS;
 	printf -v FZF_DEFAULT_OPTS "%s " \
+	       --bind=alt-i:toggle-all \
 	       --bind=ctrl-k:kill-line \
 	       --color=dark \
 	       --info=inline \
