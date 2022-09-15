@@ -482,6 +482,10 @@ type -P fzf > /dev/null && {
 		source /usr/share/fzf/completion.bash
 	[[ -r /usr/share/fzf/key-bindings.bash ]] &&
 		source /usr/share/fzf/key-bindings.bash
+	[[ -r /usr/share/doc/fzf/examples/completion.bash ]] &&
+		source /usr/share/doc/fzf/examples/completion.bash
+	[[ -r /usr/share/doc/fzf/examples/key-bindings.bash ]] &&
+		source /usr/share/doc/fzf/examples/key-bindings.bash
 	bind '"\C-l": "\C-e |& fzf\C-m"';
 
 	# browse [dir] [query] - Browse files with Fzf
@@ -611,8 +615,7 @@ type -P git > /dev/null && {
 
 type -t z > /dev/null && type -P fzf > /dev/null && {
 	function __fzf_z__ {
-		local line
-		line=$(z -l $@ | tac | fzf --no-sort) && printf "cd %q\n" "${line##+([0-9])+( )}"
+		z -l $@ | tac | awk '{ print $2 }' | fzf --no-sort | xargs --no-run-if-empty printf 'cd %q\n'
 	}
 	bind '"\M-z": "\C-e \C-a\C-k `__fzf_z__`\C-m\C-y\C-b\C-d"'
 }
