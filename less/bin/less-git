@@ -13,9 +13,8 @@ trap 'rm "$INPUT" "$SELECTION"' EXIT
 cat <&3 > "$INPUT" &
 
 awk -lfilefuncs -vOFS='\t' -vcols="$COLUMNS" -vgit_root="$GIT_ROOT" -f- "$INPUT" <<-"EOF" |
-	$1 ~ /^(\033\[[[:digit:]]{2}m)?commit$/ && $2 ~ /^[[:xdigit:]]{40}(\033\[m)?$/ {
-		sub(/commit$/, "", $1)
-		$1 = $1 $2
+	match($1 $2, /^(\033\[[[:digit:]]{2}m)?commit([[:xdigit:]]{40})(\033\[m)?/, m) {
+		$1 = m[1] m[2] m[3]
 	}
 
 	$1 ~ /^(\033\[[[:digit:]]{2}m)?[[:xdigit:]]{7,}(\033\[0?m)?$/ {
