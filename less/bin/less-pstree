@@ -1,0 +1,66 @@
+#!/bin/bash
+# -*- indent-tabs-mode: t; tab-width: 4; -*-
+
+PID=${1:-$$}
+
+function comm {
+	[[ "$(< "/proc/$PID/comm")" == "$1" ]]
+}
+
+function cmdline {
+	tr '\0' '\n' < "/proc/$PID/cmdline"
+}
+
+function next {
+	PID=$(awk '{ print $4 }' "/proc/$PID/stat")
+}
+
+function pid-prefix {
+	printf '\033[90m[%5d]\033[m' "$PID"
+}
+
+function empty-prefix {
+	printf '%7s'
+}
+
+function format-filename {
+	if [[ "$1" = /tmp/*@ ]]
+	then
+		set ${1//@/ }
+		echo "${3//\\//} at $2"
+	else
+		echo "$1"
+	fi
+}
+
+while [[ "$PID" -gt 1 ]]
+do
+	if ! comm less
+	then
+		next
+		continue
+	fi
+
+	FILES=($(cmdline | grep -Ev '^(less$|-)'))
+
+	if [[ "${#FILES[@]}" -gt 0 ]]
+	then
+		echo "$(pid-prefix) $(format-filename "${FILES[0]}")"
+
+		for FILE in "${FILES[@]:1}"
+		do
+			echo "$(empty-prefix) $(format-filename "$FILE")"
+		done
+	else
+		next
+
+		if comm sh
+		then
+			next
+		fi
+
+		echo "$(pid-prefix)" $(cmdline)
+	fi
+
+	next
+done

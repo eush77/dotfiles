@@ -1,5 +1,7 @@
 #command
 \kx	back-screen
+^g	pipe . less-git\n
+^p	shell less-pstree\n
 
 #env
 LESS = --ignore-case --jump-target=6 --no-init --RAW-CONTROL-CHARS --search-skip-screen

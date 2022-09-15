@@ -5,7 +5,7 @@
 #
 
 export EDITOR=mg
-export LESSOPEN="| source-highlight --out-format esc -i %s 2> /dev/null"
+export LESSOPEN="| git highlight %s"
 export MANPAGER=less
 export PAGER="less --LINE-NUMBERS"
 export PLS="less -N +%d"
