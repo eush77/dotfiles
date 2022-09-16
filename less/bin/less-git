@@ -138,7 +138,12 @@ function diff-files-at-commit {
 }
 
 function log-commit {
-	git log "$1"
+	git log --color=always --decorate --graph --oneline "$1" |
+		fzf --ansi --height=100% --layout=reverse-list --no-clear |
+		awk -vOFS=$'\t' 'match($0, /((\<[[:xdigit:]]{7,}\>).*)$/, m) { print m[2], m[1] }' |
+		{
+			IFS=$'\t' read REV DESC && handle-commit "$REV" "$DESC"
+		}
 }
 
 function log-commit-files {
