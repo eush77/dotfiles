@@ -7,8 +7,9 @@ GIT_ROOT=$(git rev-parse --show-toplevel)
 
 INPUT=$(mktemp -u)
 SELECTION=$(mktemp -u)
-mkfifo "$INPUT" "$SELECTION"
-trap 'rm "$INPUT" "$SELECTION"' EXIT
+ENTITY=$(mktemp -u)
+mkfifo "$INPUT" "$SELECTION" "$ENTITY"
+trap "rm '$INPUT' '$SELECTION' '$ENTITY'" EXIT
 
 cat <&3 > "$INPUT" &
 
@@ -61,9 +62,9 @@ awk -lfilefuncs -vOFS='\t' -vcols="$COLUMNS" -vgit_root="$GIT_ROOT" -f- "$INPUT"
 	}
 EOF
 
-fzf -0 --ansi --height=5 --multi --with-nth=3.. >"$SELECTION" &
+fzf -0 --ansi --height=5 --multi --with-nth=3.. > "$SELECTION" &
 
-awk -vFS='\t' -vOFS='\t' -f- "$SELECTION" <<-"EOF" |
+awk -vFS='\t' -vOFS='\t' -f- "$SELECTION" <<-"EOF" > "$ENTITY" &
 	$1 == "commit" {
 		if (commit) {
 			print "error", "Multiple commits selected"
@@ -102,116 +103,81 @@ awk -vFS='\t' -vOFS='\t' -f- "$SELECTION" <<-"EOF" |
 	}
 EOF
 
-while IFS=$'\t' read TYPE VALUE REST
-do
-	case $TYPE in
-		error)
-			echo error "$VALUE"
-			exit
-			;;
+function handle-error {
+	echo "Error: $1" >&2
+	exit 1
+}
 
-		commit)
-			fzf --header="$REST" --height=7 --with-nth=2.. <<-EOF |
-				show-commit Show commit
-				show-files-at-commit Show files at commit
-				diff-files-at-commit Diff files at commit
-				log-commit Git log
-				log-files Git log files at commit
-			EOF
-            while read ACTION _
-			do
-                case $ACTION in
-					show-commit)
-						echo show-commit "$VALUE"
-						;;
+function show-commit {
+	git show --patch-with-stat "$1"
+}
 
-					show-files-at-commit)
-						git ls-files |
-							fzf --header="Files in $GIT_ROOT" --height=10 --multi |
-							xargs --no-run-if-empty echo show-files-at-commit "$VALUE"
-						;;
+function show-files-at-commit {
+	local REV=$1
 
-					diff-files-at-commit)
-						git show --format= --name-only "$VALUE" |
-							fzf --header="$REST" --height=10 --multi |
-							xargs -n1 --no-run-if-empty printf '%s/%s\n' "$GIT_ROOT" |
-							xargs --no-run-if-empty echo diff-files-at-commit "$VALUE"
-						;;
+	git ls-files |
+		fzf --header="Files in $GIT_ROOT" --height=10 --multi |
+		while read FILE
+		do
+			local TEMP=$(mktemp --suffix="@$REV@${FILE////\\}@")
+			trap "rm '$TEMP'" EXIT
+			git highlight "$REV" "$FILE" > "$TEMP"
+			printf '%s\0' "$TEMP"
+		done |
+		xargs -0 --no-run-if-empty $PAGER
+}
 
-					log-commit)
-						echo log-commit "$VALUE"
-						;;
+function diff-files-at-commit {
+	local REV=$1
+	local DESC=$2
 
-					log-files)
-						git ls-files |
-							fzf --header="Files in $GIT_ROOT" --height=10 --multi |
-							xargs --no-run-if-empty echo log-files "$VALUE"
-						;;
-				esac
-			done
-			;;
+	git show --format= --name-only "$REV" |
+		fzf --header="$DESC" --height=10 --multi |
+		xargs -n1 --no-run-if-empty printf '%s/%s\n' "$GIT_ROOT" |
+		xargs --no-run-if-empty git diff "$REV^..$REV" --
+}
 
-		files)
-			IFS=$'\t'
-			FILES=($REST)
-			fzf --header="$VALUE" --height=4 --with-nth=2.. <<-EOF |
-				examine-files Examine $([[ ${#FILES[@]} -eq 1 ]] && echo file || echo files)
-				log-files Git log
-			EOF
-			while IFS=" " read ACTION _
-			do
-				echo "$ACTION" "${FILES[@]}"
-			done
-			;;
-	esac
-done |
+function log-commit {
+	git log "$1"
+}
 
-while read ACTION VALUE
-do
-    case $ACTION in
-		error)
-			echo "Error: $VALUE" >&2
-			exit 1
-			;;
+function log-commit-files {
+	git ls-files |
+		fzf --header="Files in $GIT_ROOT" --height=10 --multi |
+		xargs --no-run-if-empty git log --stat "$1" --
+}
 
-		diff-files-at-commit)
-			set $VALUE
-			REV=$1
-			shift
-			echo "$@"
-			git diff "$REV^..$REV" -- "$@"
-			;;
+function handle-commit {
+	fzf --header="$2" --height=7 --with-nth=2.. <<-EOF |
+		show-commit Show commit
+		show-files-at-commit Show files at commit
+		diff-files-at-commit Diff files at commit
+		log-commit Git log
+		log-commit-files Git log files at commit
+	EOF
+	{
+		read -d' ' ACTION && "$ACTION" "$@"
+	}
+}
 
-		examine-files)
-			$PAGER $VALUE
-			;;
+function examine-files {
+	$PAGER "$@"
+}
 
-		log-commit)
-			git log "$VALUE"
-			;;
+function log-files {
+	git log --stat "$@"
+}
 
-		log-files)
-			git log --stat $VALUE
-			;;
+function handle-files {
+	local FILES=${@:2}
 
-		show-commit)
-			git show --patch-with-stat "$VALUE"
-			;;
+	fzf --header="$1" --height=4 --with-nth=2.. <<-EOF |
+		examine-files Examine $([[ ${#FILES[@]} -eq 1 ]] && echo file || echo files)
+		log-files Git log
+	EOF
+	{
+		read -d' ' ACTION && "$ACTION" "${FILES[@]}"
+	}
+}
 
-		show-files-at-commit)
-			set $VALUE
-			REV=$1
-			shift
-
-			for FILENAME in "$@"
-			do
-				FILE=$(mktemp --suffix="@$REV@${FILENAME////\\}@")
-				FILES=("${FILES[@]}" "$FILE")
-				trap "rm '$FILE'" EXIT
-				git highlight "$REV" "$FILENAME" > "$FILE"
-			done
-
-			$PAGER "${FILES[@]}"
-			;;
-	esac
-done
+IFS=$'\t' read -a ENTITY < "$ENTITY" && "handle-${ENTITY[0]}" "${ENTITY[@]:1}"
