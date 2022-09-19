@@ -14,21 +14,31 @@ trap "rm '$INPUT' '$SELECTION' '$ENTITY'" EXIT
 cat <&3 > "$INPUT" &
 
 awk -lfilefuncs -vOFS='\t' -vcols="$COLUMNS" -vgit_root="$GIT_ROOT" -f- "$INPUT" <<-"EOF" |
-	match($1 $2, /^(\033\[[[:digit:]]{2}m)?commit([[:xdigit:]]{40})(\033\[m)?/, m) {
-		$1 = m[1] m[2] m[3]
+	{
+		sha = ""
 	}
 
-	$1 ~ /^(\033\[[[:digit:]]{2}m)?[[:xdigit:]]{7,}(\033\[0?m)?$/ {
-		if ($1 in seen)
+	# git highlight
+	match($1, /^(\033\[[[:digit:]]{2}m)?([[:xdigit:]]{7,})(\033\[m)?$/, m) {
+		display_begin = m[1]
+		sha = m[2]
+		display_end = m[3]
+	}
+
+	# git log
+	match($0, /^(\033\[[[:digit:]]{2}m)?(commit )?([[:xdigit:]]{7,})(\033\[m)?/, m) {
+		display_begin = m[1]
+		sha = m[3]
+		display_end = m[4]
+	}
+
+	sha {
+		if (sha in seen)
 			next
 
-		seen[$1] = 1
+		seen[sha] = 1
 
-		display_sha = $1
-		sha = gensub(/\033\[[[:digit:]]*m/, "", "g", $1)
-		sha_length = length(sha)
-
-		if (!("git show --format='%at %s' --no-patch " sha | getline))
+		if (!("git show --format='%at %h %s' --no-patch " sha | getline))
 			next
 
 		if (sprintf("python3 -c '%s;print(%s)'",
@@ -38,12 +48,18 @@ awk -lfilefuncs -vOFS='\t' -vcols="$COLUMNS" -vgit_root="$GIT_ROOT" -f- "$INPUT"
         else
 			days = ""
 
-		subject = $2
+		sha = $2
+		subject = $3
 
-		for (n = 3; n <= NF; ++n)
+		for (n = 4; n <= NF; ++n)
 			subject = subject " " $n
 
-		print "commit", sha, sprintf("%s %-*s\033[36m%s\033[0m", display_sha, cols - sha_length - length(days) - 4, subject, days)
+		print "commit", sha, sprintf("%s %-*s\033[36m%s\033[m",
+			display_begin sha display_end,
+			cols - length(sha) - length(days) - 4,
+			subject,
+			days\
+		)
 		next
 	}
 

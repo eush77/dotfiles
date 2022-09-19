@@ -92,7 +92,7 @@ function sha-stream {
 
 		$1 ~ /^[[:xdigit:]]{40}$/ {
 			color = colors[$1]
-			format = color ? sprintf("\033[%sm%%s\033[0m\n", color) : "%s\n"
+			format = color ? sprintf("\033[%sm%%s\033[m\n", color) : "%s\n"
 			printf format, substr($1, 1, 8)
 		}
 	EOF
