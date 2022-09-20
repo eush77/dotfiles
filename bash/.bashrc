@@ -5,7 +5,7 @@
 #
 
 export EDITOR=mg
-export LESSOPEN="| git highlight %s"
+export LESSOPEN="| source-highlight --out-format esc -i %s 2> /dev/null"
 export MANPAGER=less
 export PAGER="less --LINE-NUMBERS"
 export PLS="less -N +%d"
@@ -529,78 +529,6 @@ type -t fzf-file-widget > /dev/null &&
 type -t __fzf_cd__ > /dev/null &&
 	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 
-: git :
-
-type -P git > /dev/null && {
-	alias g=git
-
-	# Set up a `diff-highlight` command. The variable is referenced
-	# in the Git config.
-	if [[ -x "/usr/share/git/diff-highlight/diff-highlight" ]]; then
-		export DIFF_HIGHLIGHT="/usr/share/git/diff-highlight/diff-highlight"
-	elif [[ -r "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then
-		export DIFF_HIGHLIGHT="perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight"
-	else
-		export DIFF_HIGHLIGHT="cat"
-	fi
-
-	if type -P fzf > /dev/null; then
-		function gg {
-			{
-				git grep "$@";
-				echo EOF;
-			} | fzf |
-			grep --perl-regexp --only-matching '.*:\d+(?=:)' | {
-				IFS=: read -ra PT;
-				case "${#PT[@]}" in
-					2) $PAGER -N +"${PT[1]}" "${PT[0]}" ;;
-					3) git -c pager.show="$PAGER -N +${PT[2]}" \
-					   show "${PT[0]}:${PT[1]}" ;;
-				esac;
-			}
-		}
-	else
-		alias gg="git grep"
-	fi
-
-	# Define completions.
-	[[ -r "/usr/share/bash-completion/completions/git" ]] &&
-		source "/usr/share/bash-completion/completions/git" &&
-		__git_complete g __git_main &&
-		__git_complete gg _git_grep
-
-	if [[ -r "/usr/share/git/git-prompt.sh" ]]; then
-		GIT_PS1="/usr/share/git/git-prompt.sh"
-	elif [[ -r "/usr/lib/git-core/git-sh-prompt" ]]; then
-		GIT_PS1="/usr/lib/git-core/git-sh-prompt"
-	fi
-
-	# Define prompt function.
-	if [[ -v GIT_PS1 ]]; then
-		GIT_PS1_SHOWDIRTYSTATE=1
-		GIT_PS1_SHOWUNTRACKEDFILES=1
-		GIT_PS1_SHOWUPSTREAM=verbose
-		GIT_PS1_STATESEPARATOR=
-
-		source "${GIT_PS1}"
-		PS1=${PS1/$\{PS1_EXT\}/$\{PS1_EXT\}$\(__git_ps1 \"(%s) \"\)}
-	fi
-
-	# Fzf widget for inserting files from Git status.
-	type -P fzf > /dev/null && {
-		function __fzf_git_status__ {
-			local ROOT=$(git root)
-			local FILES=$(git status --porcelain | fzf --multi | cut -c4- | while read -r FILE; do
-				printf '%q ' $(realpath --relative-to="$PWD" "$ROOT/$FILE")
-			done)
-			READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILES${READLINE_LINE:$READLINE_POINT}"
-			READLINE_POINT=$(( READLINE_POINT + ${#FILES} ))
-		}
-
-		bind -x '"\M-g": __fzf_git_status__'
-	}
-}
-
 : pkgfile :
 
 [[ -r "/usr/share/doc/pkgfile/command-not-found.bash" ]] &&
@@ -621,8 +549,19 @@ type -t z > /dev/null && type -P fzf > /dev/null && {
 }
 
 #
-# Host Config
+# Plugins
 #
 
-[[ -r ~/.bashrc.host ]] && source ~/.bashrc.host
+if [[ -d ~/.bashrc.d ]]
+then
+	for CONFIG in ~/.bashrc.d/*.sh
+	do
+		if [[ -r "$CONFIG" ]]
+		then
+			. "$CONFIG"
+		fi
+	done
+	unset CONFIG
+fi
+
 true
