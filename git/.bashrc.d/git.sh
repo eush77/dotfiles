@@ -80,14 +80,52 @@ type __git_complete > /dev/null && __git_complete gg _git_grep
 # Fzf Widget
 #
 
-function __my_git_M_g__ {
-	local ROOT=$(git root)
-	local FILES=$(git status --porcelain | fzf --multi | cut -c4- | while read -r FILE
-				  do
-					  printf '%q ' $(realpath --relative-to="$PWD" "$ROOT/$FILE")
-				  done)
-	READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILES${READLINE_LINE:$READLINE_POINT}"
-	READLINE_POINT=$(( READLINE_POINT + ${#FILES} ))
+function __my_git_widget_select__ {
+	local BINDINGS HEADER MAIN MAIN_PRI
+
+	while IFS=$'\t' read KEY DESCRIPTION COMMAND PRI
+	do
+		[[ "$PRI" -eq 0 ]] && continue
+
+		[[ "$PRI" -gt "$MAIN_PRI" ]] && {
+			MAIN=$COMMAND
+			MAIN_PRI=$PRI
+		}
+
+		BINDINGS+=("--bind=alt-$KEY:reload:$COMMAND")
+		HEADER+="${HEADER:+$'\t'}[M-$KEY]: $DESCRIPTION"
+	done <<-EOF
+		b	branch	git branch --all --color=always	1
+		r	commit	git log -10 --color=always --decorate --oneline ${1:+${1@Q}} --	$([[ -n "$1" ]] && echo 3 || echo 1)
+		s	status	git -c color.status=always status --short	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
+	EOF
+
+	eval "$MAIN" |
+		fzf --ansi --header="$HEADER" --header-first --multi "${BINDINGS[@]}" |
+		while read -r FIRST SECOND _
+		do
+			if [[ "${#FIRST}" -gt 2 ]]
+			then
+				git name-rev --always --name-only "$FIRST"
+			else
+				printf "$SECOND\n"
+			fi
+		done |
+		xargs -r echo
 }
 
-bind -x '"\M-g": __my_git_M_g__'
+function __my_git_widget__ {
+	local FRONT=${READLINE_LINE:0:$READLINE_POINT}
+	local BACK=${READLINE_LINE:$READLINE_POINT}
+
+	local ARG=${FRONT##* }
+	local SUB=$(__my_git_widget_select__ "$ARG")
+
+    if [[ -n "$SUB" ]]
+	then
+		READLINE_LINE="${FRONT:0:${#FRONT}-${#ARG}}$SUB$BACK"
+		READLINE_POINT=$((READLINE_POINT - ${#ARG} + ${#SUB}))
+	fi
+}
+
+bind -x '"\M-g": __my_git_widget__'
