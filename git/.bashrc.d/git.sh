@@ -92,7 +92,7 @@ function __my_git_widget_select__ {
 			MAIN_PRI=$PRI
 		}
 
-		BINDINGS+=("--bind=alt-$KEY:reload:$COMMAND")
+		BINDINGS+=("--bind=alt-$KEY:clear-query+reload:$COMMAND")
 		HEADER+="${HEADER:+$'\t'}[M-$KEY]: $DESCRIPTION"
 	done <<-EOF
 		b	branch	git branch --all --color=always	1
