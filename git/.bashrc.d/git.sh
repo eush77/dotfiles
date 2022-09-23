@@ -100,6 +100,7 @@ function __my_git_widget_select__ {
 		TRANSFORMERS[$KEY]=$TRANSFORMER
 	done <<-EOF
 		b	branch	git branch --all --color=always	[[ "\$1" = "*" ]] && echo "\$2" || echo "\$1"	1
+		f	files	git ls-files	echo "\$1"	1
 		r	commit	git log -10 --color=always --decorate --oneline ${1:+${1@Q}} --	git name-rev --always --name-only "\$1"	$([[ -n "$1" ]] && echo 3 || echo 1)
 		s	status	git -c color.status=always status --short	printf -- "\$2\\\n"	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
 	EOF
