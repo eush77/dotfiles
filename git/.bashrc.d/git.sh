@@ -81,11 +81,14 @@ type __git_complete > /dev/null && __git_complete gg _git_grep
 #
 
 function __my_git_widget_select__ {
-	local BINDINGS HEADER MAIN MAIN_PRI
+	local BINDINGS HEADER MAIN MAIN_PRI TRANSFORMERS
+	declare -A TRANSFORMERS
 
-	while IFS=$'\t' read KEY DESCRIPTION COMMAND PRI
+	while IFS=$'\t' read KEY DESCRIPTION COMMAND TRANSFORMER PRI
 	do
 		[[ "$PRI" -eq 0 ]] && continue
+
+		COMMAND="$COMMAND | xargs -d'\n' -rn1 echo $KEY"
 
 		[[ "$PRI" -gt "$MAIN_PRI" ]] && {
 			MAIN=$COMMAND
@@ -94,22 +97,19 @@ function __my_git_widget_select__ {
 
 		BINDINGS+=("--bind=alt-$KEY:clear-query+reload:$COMMAND")
 		HEADER+="${HEADER:+$'\t'}[M-$KEY]: $DESCRIPTION"
+		TRANSFORMERS[$KEY]=$TRANSFORMER
 	done <<-EOF
-		b	branch	git branch --all --color=always	1
-		r	commit	git log -10 --color=always --decorate --oneline ${1:+${1@Q}} --	$([[ -n "$1" ]] && echo 3 || echo 1)
-		s	status	git -c color.status=always status --short	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
+		b	branch	git branch --all --color=always	[[ "\$1" = "*" ]] && echo "\$2" || echo "\$1"	1
+		r	commit	git log -10 --color=always --decorate --oneline ${1:+${1@Q}} --	git name-rev --always --name-only "\$1"	$([[ -n "$1" ]] && echo 3 || echo 1)
+		s	status	git -c color.status=always status --short	printf -- "\$2\\\n"	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
 	EOF
 
 	eval "$MAIN" |
-		fzf --ansi --header="$HEADER" --header-first --multi "${BINDINGS[@]}" |
-		while read -r FIRST SECOND _
+		fzf --ansi "${BINDINGS[@]}" --delimiter=" " --header="$HEADER" --header-first --multi --with-nth=2.. |
+		while read -ra WORDS
 		do
-			if [[ "${#FIRST}" -gt 2 ]]
-			then
-				git name-rev --always --name-only "$FIRST"
-			else
-				printf "$SECOND\n"
-			fi
+			set -- "${WORDS[@]:1}"
+			eval "${TRANSFORMERS[${WORDS[0]}]}"
 		done |
 		xargs -r echo
 }
