@@ -470,24 +470,6 @@ type -t adb > /dev/null && {
 : fzf :
 
 type -P fzf > /dev/null && {
-	export FZF_DEFAULT_OPTS;
-	printf -v FZF_DEFAULT_OPTS "%s " \
-	       --bind=alt-i:toggle-all \
-	       --bind=ctrl-k:kill-line \
-	       --color=dark \
-	       --info=inline \
-	       --height=40% \
-	       --layout=reverse;
-	[[ -r /usr/share/fzf/completion.bash ]] &&
-		source /usr/share/fzf/completion.bash
-	[[ -r /usr/share/fzf/key-bindings.bash ]] &&
-		source /usr/share/fzf/key-bindings.bash
-	[[ -r /usr/share/doc/fzf/examples/completion.bash ]] &&
-		source /usr/share/doc/fzf/examples/completion.bash
-	[[ -r /usr/share/doc/fzf/examples/key-bindings.bash ]] &&
-		source /usr/share/doc/fzf/examples/key-bindings.bash
-	bind '"\C-l": "\C-e |& fzf\C-m"';
-
 	# browse [dir] [query] - Browse files with Fzf
 	type -P ctags > /dev/null && type -P ifne > /dev/null &&
 	function browse {
@@ -508,26 +490,7 @@ type -P fzf > /dev/null && {
 		      --preview-window=:60% \
 		      --query="$2" )
 	}
-
-	function rgrep {
-		{
-			grep --line-number --recursive --with-filename $RGREPFLAGS "$@";
-			echo "EOF";
-		} | fzf | {
-			IFS=: read -r FILE LINE _ &&
-			test "$FILE" != EOF &&
-			$PAGER -N +"$LINE" "$FILE";
-		}
-	}
 }
-
-type -t fzf-file-widget > /dev/null &&
-	bind -r '\C-t' &&
-	bind '"\C-t": transpose-chars' &&
-	bind -x '"\M-v": fzf-file-widget'
-
-type -t __fzf_cd__ > /dev/null &&
-	bind '"\M-c": "\C-e \C-a\C-k `__fzf_cd__`\C-m\C-y\C-b\C-d"'
 
 : pkgfile :
 
