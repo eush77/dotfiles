@@ -58,17 +58,21 @@ if type -P fzf > /dev/null
 then
 	function gg {
 		{
-			git grep "$@";
-			echo EOF;
-		} | fzf |
-			grep --perl-regexp --only-matching '.*:\d+(?=:)' | {
-			IFS=: read -ra PT;
-			case "${#PT[@]}" in
-				2) $PAGER -N +"${PT[1]}" "${PT[0]}" ;;
-				3) git -c pager.show="$PAGER -N +${PT[2]}" \
-					   show "${PT[0]}:${PT[1]}" ;;
-			esac;
-		}
+			git grep --color=always "$@"
+			echo EOF
+		} | fzf --ansi |
+			grep --only-matching --perl-regexp '.*:\d+(?=:)' |
+			if IFS=: read -r REV FILE LINE
+			then
+				if [[ -n "$LINE" ]]
+				then
+					git -c pager.show="$PAGER -N +$LINE" show "$REV:$FILE"
+				else
+					LINE=$FILE
+					FILE=$REV
+					$PAGER -N +"$LINE" "$FILE"
+				fi
+			fi
 	}
 else
 	alias gg="git grep"
