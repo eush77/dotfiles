@@ -12,7 +12,10 @@
 export FZF_DEFAULT_OPTS;
 printf -v FZF_DEFAULT_OPTS "%s " \
 	   --bind=alt-i:toggle-all \
+	   --bind=alt-v:page-up \
 	   --bind=ctrl-k:kill-line \
+	   --bind=ctrl-v:page-down \
+	   --bind=tab:jump-accept \
 	   --color=dark \
 	   --info=inline \
 	   --height=40% \
