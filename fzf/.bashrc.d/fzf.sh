@@ -40,24 +40,29 @@ function __my_file_widget_select__ {
 		fi
 	done | fzf --ansi --prompt="$(realpath "$1")/" "${@:2}" |
 		xargs -r printf '%s/%s' "$1" |
-		xargs -r realpath --relative-to="$PWD"
+		xargs -r realpath
 }
 
 function __my_directory_widget__ {
-	local PREV FILE=.
+	local PREV DIR=$PWD
 
-	until [[ -z "$FILE" || "$FILE" = "$PREV" ]]
+	until [[ -z "$DIR" || "$DIR" = "$PREV" ]]
 	do
-		PREV=$FILE
-		FILE=$({
-				  echo .
-				  echo ..
-				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%P\n'
-				  find -L "$FILE" -mindepth 2 -type d \( -path '*/.*' -prune -o -printf '%P\n' \)
-			  } | __my_file_widget_select__ "$FILE" --bind=backward-eof:first+down+accept)
+		PREV=$DIR
+		DIR=$({
+				 echo .
+				 echo ..
+				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%P\n'
+				 find -L "$DIR" -mindepth 2 -type d \( -path '*/.*' -prune -o -printf '%P\n' \)
+			 } | __my_file_widget_select__ "$DIR" \
+										   --bind=backward-eof:first+down+accept \
+										   --no-info \
+										   --preview="ls --almost-all -C --color \"$DIR\"/{}" \
+										   --preview-window=,$((COLUMNS - ${#DIR} - 20)))
 	done
 
-	echo "$FILE"
+	[[ -n "$DIR" ]] &&
+		realpath --relative-to="$PWD" "$DIR"
 }
 
 function __my_file_widget__ {
