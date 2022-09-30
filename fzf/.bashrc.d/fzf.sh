@@ -62,6 +62,7 @@ function __my_directory_widget__ {
 				 echo .
 				 echo ..
 				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%P\n' 2> /dev/null
+				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				 find -L "$DIR" -mindepth 2 -type d \( -path '*/.*' -prune -o -printf '%P\n' \) 2> /dev/null
 			 } | __my_file_widget_select__ "$DIR" \
 										   --bind=backward-eof:first+down+accept \
@@ -82,6 +83,7 @@ function __my_file_widget__ {
 		FILE=$({
 				  echo ..
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%P\n' 2> /dev/null
+				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type f ! -name '*~' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 2 \( -name '*~' -o -path '*/.*' \) -prune -o -printf '%P\n' 2> /dev/null
 			  } | __my_file_widget_select__ "$FILE" --bind=backward-eof:first+accept)
