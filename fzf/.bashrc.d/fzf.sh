@@ -32,13 +32,6 @@ bind '"\C-t": transpose-chars'
 #
 
 function __my_file_widget_select__ {
-	local PROMPT=$(realpath "$1")
-
-	if [[ "$PROMPT" != "/" ]]
-	then
-		PROMPT+="/"
-	fi
-
 	while read -r FILE
 	do
 		if [[ -d "$1/$FILE" ]]
@@ -47,7 +40,7 @@ function __my_file_widget_select__ {
 		else
 			echo "$FILE"
 		fi
-	done | fzf --ansi --prompt="$PROMPT" "${@:2}" |
+	done | fzf --ansi --prompt="$([[ "$1" = "/" ]] && echo "$1" || echo "$1/")" "${@:2}" |
 		xargs -r printf '%s/%s' "$1" |
 		xargs -r realpath
 }
@@ -76,7 +69,7 @@ function __my_directory_widget__ {
 }
 
 function __my_file_widget__ {
-	local FILE=.
+	local FILE=$PWD
 
 	while [[ -d "$FILE" ]]
 	do
