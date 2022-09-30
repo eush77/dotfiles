@@ -33,7 +33,7 @@ bind '"\C-t": transpose-chars'
 # File Widget
 #
 
-function __my_file_widget_select__ {
+function __my_file_select__ {
 	while read -r FILE
 	do
 		if [[ -d "$1/$FILE" ]]
@@ -44,10 +44,11 @@ function __my_file_widget_select__ {
 		fi
 	done | fzf --ansi \
 			   --no-info \
-			   --preview="${2//\{\}/\"$1\"/\{\}}" \
+			   --preview="[[ -d \"$1\"/{} ]] && ls --almost-all -C --color \"$1\"/{} || \
+						  source-highlight --out-format=esc -i \"$1\"/{} 2> /dev/null || cat \"$1\"/{}" \
 			   --preview-window=,$((COLUMNS - ${#1} - 20)) \
 			   --prompt="$([[ "$1" = "/" ]] && echo "$1" || echo "$1/")" \
-			   "${@:3}" |
+			   "${@:2}" |
 		xargs -r printf '%s/%s' "$1" |
 		xargs -r realpath
 }
@@ -64,9 +65,7 @@ function __my_directory_widget__ {
 				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%P\n' 2> /dev/null
 				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				 find -L "$DIR" -mindepth 2 -type d \( -path '*/.*' -prune -o -printf '%P\n' \) 2> /dev/null
-			 } | __my_file_widget_select__ "$DIR" \
-										   "ls --almost-all -C --color {}" \
-										   --bind=backward-eof:first+down+accept)
+			 } | __my_file_select__ "$DIR" --bind=backward-eof:first+down+accept)
 	done
 
 	[[ -n "$DIR" ]] &&
@@ -84,10 +83,7 @@ function __my_file_widget__ {
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type f ! -name '*~' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 2 \( -name '*~' -o -path '*/.*' \) -prune -o -printf '%P\n' 2> /dev/null
-			  } | __my_file_widget_select__ "$FILE" \
-											"[[ -d {} ]] && ls --almost-all -C --color {} || \
-											 source-highlight --out-format=esc -i {} 2> /dev/null || cat {}" \
-											--bind=backward-eof:first+accept)
+			  } | __my_file_select__ "$FILE" --bind=backward-eof:first+accept)
 	done
 
 	READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILE${READLINE_LINE:$READLINE_POINT}"

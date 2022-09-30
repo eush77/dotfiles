@@ -472,20 +472,6 @@ type -t adb > /dev/null && {
 [[ -r "/usr/share/doc/pkgfile/command-not-found.bash" ]] &&
 	source "/usr/share/doc/pkgfile/command-not-found.bash"
 
-: z :
-
-[[ -r /usr/share/z/z.sh ]] && source /usr/share/z/z.sh
-[[ -r /etc/profile.d/z.sh ]] && source /etc/profile.d/z.sh
-
-: z + fzf :
-
-type -t z > /dev/null && type -P fzf > /dev/null && {
-	function __fzf_z__ {
-		z -l $@ | tac | awk '{ print $2 }' | fzf --no-sort | xargs --no-run-if-empty printf 'cd %q\n'
-	}
-	bind '"\M-z": "\C-e \C-a\C-k `__fzf_z__`\C-m\C-y\C-b\C-d"'
-}
-
 #
 # Plugins
 #
