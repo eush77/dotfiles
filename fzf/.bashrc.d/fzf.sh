@@ -12,6 +12,8 @@
 export FZF_DEFAULT_OPTS;
 printf -v FZF_DEFAULT_OPTS "%s " \
 	   --bind=alt-i:toggle-all \
+	   --bind=alt-n:preview-page-down \
+	   --bind=alt-p:preview-page-up \
 	   --bind=alt-v:page-up \
 	   --bind=ctrl-k:kill-line \
 	   --bind=ctrl-v:page-down \

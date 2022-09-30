@@ -475,14 +475,10 @@ type -P fzf > /dev/null && {
 	function browse {
 		local DIR="${1:-$PWD}"
 		( cd "$DIR" &&
-		  fzf --bind="alt-n:preview-page-down" \
-		      --bind="alt-p:preview-page-up" \
-		      --bind="alt-v:page-up" \
-		      --bind="change:top" \
+		  fzf --bind="change:top" \
 		      --bind="ctrl-c:cancel" \
 		      --bind="ctrl-j:jump" \
 		      --bind="ctrl-space:toggle-preview" \
-		      --bind="ctrl-v:page-down" \
 		      --bind="return:execute(less {})" \
 		      --height=100% \
 		      --layout=reverse-list \
