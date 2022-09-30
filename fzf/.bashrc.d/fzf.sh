@@ -40,7 +40,12 @@ function __my_file_widget_select__ {
 		else
 			echo "$FILE"
 		fi
-	done | fzf --ansi --prompt="$([[ "$1" = "/" ]] && echo "$1" || echo "$1/")" "${@:2}" |
+	done | fzf --ansi \
+			   --no-info \
+			   --preview="${2//\{\}/\"$1\"/\{\}}" \
+			   --preview-window=,$((COLUMNS - ${#1} - 20)) \
+			   --prompt="$([[ "$1" = "/" ]] && echo "$1" || echo "$1/")" \
+			   "${@:3}" |
 		xargs -r printf '%s/%s' "$1" |
 		xargs -r realpath
 }
@@ -58,10 +63,8 @@ function __my_directory_widget__ {
 				 find -L "$DIR" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				 find -L "$DIR" -mindepth 2 -type d \( -path '*/.*' -prune -o -printf '%P\n' \) 2> /dev/null
 			 } | __my_file_widget_select__ "$DIR" \
-										   --bind=backward-eof:first+down+accept \
-										   --no-info \
-										   --preview="ls --almost-all -C --color \"$DIR\"/{}" \
-										   --preview-window=,$((COLUMNS - ${#DIR} - 20)))
+										   "ls --almost-all -C --color {}" \
+										   --bind=backward-eof:first+down+accept)
 	done
 
 	[[ -n "$DIR" ]] &&
@@ -79,7 +82,10 @@ function __my_file_widget__ {
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type d -name '.*' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 1 -maxdepth 1 -type f ! -name '*~' -printf '%P\n' 2> /dev/null
 				  find -L "$FILE" -mindepth 2 \( -name '*~' -o -path '*/.*' \) -prune -o -printf '%P\n' 2> /dev/null
-			  } | __my_file_widget_select__ "$FILE" --bind=backward-eof:first+accept)
+			  } | __my_file_widget_select__ "$FILE" \
+											"[[ -d {} ]] && ls --almost-all -C --color {} || \
+											 source-highlight --out-format=esc -i {} 2> /dev/null || cat {}" \
+											--bind=backward-eof:first+accept)
 	done
 
 	READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILE${READLINE_LINE:$READLINE_POINT}"
