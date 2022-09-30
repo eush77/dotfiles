@@ -467,27 +467,6 @@ type -t adb > /dev/null && {
 [[ "$(type -t direnv)" = "file" ]] &&
 	eval "$(direnv hook bash)"
 
-: fzf :
-
-type -P fzf > /dev/null && {
-	# browse [dir] [query] - Browse files with Fzf
-	type -P ctags > /dev/null && type -P ifne > /dev/null &&
-	function browse {
-		local DIR="${1:-$PWD}"
-		( cd "$DIR" &&
-		  fzf --bind="change:top" \
-		      --bind="ctrl-c:cancel" \
-		      --bind="ctrl-j:jump" \
-		      --bind="ctrl-space:toggle-preview" \
-		      --bind="return:execute(less {})" \
-		      --height=100% \
-		      --layout=reverse-list \
-		      --preview="ctags -x {} | ifne -n cat {}" \
-		      --preview-window=:60% \
-		      --query="$2" )
-	}
-}
-
 : pkgfile :
 
 [[ -r "/usr/share/doc/pkgfile/command-not-found.bash" ]] &&
