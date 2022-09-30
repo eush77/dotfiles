@@ -11,6 +11,8 @@
 
 export FZF_DEFAULT_OPTS;
 printf -v FZF_DEFAULT_OPTS "%s " \
+	   --bind=alt-\\\<:first \
+	   --bind=alt-\\\>:last \
 	   --bind=alt-i:toggle-all \
 	   --bind=alt-n:preview-page-down \
 	   --bind=alt-p:preview-page-up \
