@@ -17,9 +17,9 @@ printf -v FZF_DEFAULT_OPTS "%s " \
 	   --bind=alt-n:preview-page-down \
 	   --bind=alt-p:preview-page-up \
 	   --bind=alt-v:page-up \
+	   --bind=btab:jump-accept \
 	   --bind=ctrl-k:kill-line \
 	   --bind=ctrl-v:page-down \
-	   --bind=tab:jump-accept \
 	   --color=dark \
 	   --info=inline \
 	   --height=40% \
