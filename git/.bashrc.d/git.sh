@@ -59,7 +59,7 @@ then
 	function gg {
 		{
 			git grep --color=always "$@"
-			echo EOF
+			printf '\r\e[38;5;110m>%s' $'\u25A0' >&2
 		} | fzf --ansi |
 			grep --only-matching --perl-regexp '.*:\d+(?=:)' |
 			if IFS=: read -r REV FILE LINE

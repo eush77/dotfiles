@@ -101,7 +101,7 @@ bind -x '"\M-v": __my_file_widget__'
 function rgrep {
 	{
 		grep --color=always --line-number --recursive --with-filename $RGREPFLAGS "$@"
-		echo EOF
+		printf '\r\e[38;5;110m>%s' $'\u25A0' >&2
 	} | fzf --ansi |
 		if IFS=: read -r FILE LINE _  && [[ "$FILE" != EOF ]]
 		then
