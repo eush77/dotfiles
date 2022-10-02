@@ -66,7 +66,7 @@ then
 			then
 				if [[ -n "$LINE" ]]
 				then
-					git -c pager.show="$PAGER -N +$LINE" show "$REV:$FILE"
+					git -c pager.show="$PAGER -N +$LINE" show "$REV:./$FILE"
 				else
 					LINE=$FILE
 					FILE=$REV
