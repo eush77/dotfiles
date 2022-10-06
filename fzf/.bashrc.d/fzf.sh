@@ -34,6 +34,13 @@ bind '"\C-t": transpose-chars'
 #
 
 function __my_file_select__ {
+	local PROMPT=${1/#$HOME\//\~/}
+
+	if [[ "$PROMPT" != "/" ]]
+	then
+		PROMPT+="/"
+	fi
+
 	while read -r FILE
 	do
 		if [[ -d "$1/$FILE" ]]
@@ -46,11 +53,16 @@ function __my_file_select__ {
 			   --no-info \
 			   --preview="[[ -d \"$1\"/{} ]] && ls --almost-all -C --color \"$1\"/{} || \
 						  source-highlight --out-format=esc -i \"$1\"/{} 2> /dev/null || cat \"$1\"/{}" \
-			   --preview-window=,$((COLUMNS - ${#1} - 20)) \
-			   --prompt="$([[ "$1" = "/" ]] && echo "$1" || echo "$1/")" \
+			   --preview-window=,$((COLUMNS - ${#PROMPT} - 20)) \
+			   --prompt="$PROMPT" \
 			   "${@:2}" |
 		xargs -r printf '%s/%s' "$1" |
 		xargs -r realpath
+}
+
+function __my_format_file_name__ {
+	local FILE=$(realpath --relative-base="$PWD" "$1")
+	echo "${FILE/#$HOME\//\~/}"
 }
 
 function __my_directory_widget__ {
@@ -68,8 +80,18 @@ function __my_directory_widget__ {
 			 } | __my_file_select__ "$DIR" --bind=backward-eof:first+down+accept)
 	done
 
-	[[ -n "$DIR" ]] &&
-		realpath --relative-to="$PWD" "$DIR"
+	[[ -n "$DIR" ]] || return
+
+	if [[ ! -v READLINE_LINE ]]
+	then
+		echo "$DIR"
+		return
+	fi
+
+	DIR=$(__my_format_file_name__ "$DIR")
+
+	READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$DIR${READLINE_LINE:$READLINE_POINT}"
+	READLINE_POINT=$((READLINE_POINT + ${#DIR}))
 }
 
 function __my_file_widget__ {
@@ -86,12 +108,14 @@ function __my_file_widget__ {
 			  } | __my_file_select__ "$FILE" --bind=backward-eof:first+accept)
 	done
 
+	FILE=$(__my_format_file_name__ "$FILE")
+
 	READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$FILE${READLINE_LINE:$READLINE_POINT}"
 	READLINE_POINT=$((READLINE_POINT + ${#FILE}))
 }
 
-
 bind '"\M-c": "\C-e \C-a\C-k `__my_directory_widget__`\C-m\C-y\C-b\C-d"'
+bind -x '"\M-C": __my_directory_widget__'
 bind -x '"\M-v": __my_file_widget__'
 
 #
