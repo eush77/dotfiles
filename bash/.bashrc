@@ -452,11 +452,6 @@ type -t adb > /dev/null && {
 	}
 }
 
-: bd :
-
-[[ -x "$(type -P bd)" ]] &&
-	alias bd=". bd -si"
-
 : commacd :
 
 [[ -r /usr/share/commacd/commacd.bash ]] &&
