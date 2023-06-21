@@ -6,7 +6,7 @@
 function __my_z_widget__ {
 	z -l "$@" |
 		tac |
-		awk '{ print $2 }' |
+		awk '{ if ($2 != ENVIRON["PWD"]) print $2 }' |
 		__my_file_select__ / --no-sort --preview-window=,50% |
 		xargs -r printf 'cd %q\n'
 }
