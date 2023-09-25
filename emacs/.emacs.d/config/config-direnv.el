@@ -45,7 +45,7 @@ environment."
   :type '(repeat string)
   :group 'my)
 
-(defun tramp-sh-handle-start-file-process@my-direnv (args)
+(defun tramp-handle-start-file-process@my-direnv (args)
   "Enable Direnv for hosts in `my-direnv-enabled-hosts'."
   (pcase-let ((`(,name ,buffer . ,program) args))
     (if (and (stringp (car program))
@@ -63,5 +63,5 @@ environment."
       args)))
 
 (with-eval-after-load "tramp-sh"
-  (advice-add 'tramp-sh-handle-start-file-process
-              :filter-args #'tramp-sh-handle-start-file-process@my-direnv))
+  (advice-add 'tramp-handle-start-file-process
+              :filter-args #'tramp-handle-start-file-process@my-direnv))

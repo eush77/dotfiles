@@ -63,7 +63,7 @@
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")
      ("melpa" . "https://melpa.org/packages/"))))
-(package-refresh-contents)
+;(package-refresh-contents)
 
 ;; Check and install missing packages.
 (add-to-list 'package-selected-packages 'avy)

@@ -77,7 +77,7 @@ won't use it for source buffers."
   "Display the buffer in `gdb-source-window' and do not even
 think about splitting it."
   (let ((display-buffer-overriding-action
-         (when (window-live-p gdb-source-window)
+         (when-let ((gdb-source-window (-find #'window-live-p gdb-source-window-list)))
            (list (lambda (buffer alist)
                    (set-window-buffer gdb-source-window buffer))))))
     (apply func args)))

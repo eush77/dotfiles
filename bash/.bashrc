@@ -99,7 +99,7 @@ bind 'Meta-n: menu-complete'
 bind 'Meta-p: menu-complete-backward'
 bind 'SPACE: magic-space'
 
-bind '"\C-h": "\C-apls -a -- \C-m"'
+#bind '"\C-h": "\C-apls -a -- \C-m"'
 bind '"\C-v": "\C-e |& $PAGER\C-m"'
 bind -x '"\M-i": READLINE_LINE="i $READLINE_LINE"; let READLINE_POINT+=2'
 bind -x '"\M-p": READLINE_LINE="\$PAGER $READLINE_LINE"; let READLINE_POINT+=7'
