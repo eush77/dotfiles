@@ -1,0 +1,16 @@
+#!/bin/bash
+# -*- indent-tabs-mode: t; tab-width: 4; -*-
+
+printf -v FZF_DEFAULT_OPTS '%s ' "$FZF_DEFAULT_OPTS" \
+	   --height=100% --layout=reverse-list --preview-window=up,99% \
+	   --bind=alt-n:preview-page-down \
+	   --bind=alt-p:preview-page-up \
+	   --bind=alt-v:page-up \
+	   --bind=ctrl-c:cancel \
+	   --bind=ctrl-j:jump \
+	   --bind=ctrl-v:page-down
+
+fzf --preview="git finder-{} --preview" --bind=return:execute:"git finder-{}" <<-EOF
+	status
+	log
+EOF

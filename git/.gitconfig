@@ -9,6 +9,7 @@
 [core]
 	excludesfile = ~/.gitignore
 	whitespace = trailing-space
+	filemode = false
 
 #
 # UI & interface settings.

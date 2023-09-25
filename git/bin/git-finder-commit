@@ -1,0 +1,15 @@
+#!/bin/bash
+# -*- indent-tabs-mode: t; tab-width: 4; -*-
+
+fzf --header="$(git show --format='%h %s' --no-patch "$1")" --height=1 --layout=reverse <<-EOF |
+	show
+EOF
+
+if read ACTION
+then
+	case $ACTION in
+		show)
+			git show "$1"
+			;;
+	esac
+fi

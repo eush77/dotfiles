@@ -1,0 +1,13 @@
+#!/bin/bash
+# -*- indent-tabs-mode: t; tab-width: 4; -*-
+
+function execute {
+	grep --max-count=1 --only-matching '\b[[:xdigit:]]*\b' <<< "$1" | xargs git finder-commit
+}
+
+function finder {
+	fzf --ansi --border --no-clear --bind=return:execute:"$(type execute | tail -n+2); execute {}"
+}
+
+git log --color=always --decorate --graph --oneline |
+	"$([[ "$1" = "--preview" ]] && echo cat || echo finder)"

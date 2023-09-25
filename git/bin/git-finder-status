@@ -1,0 +1,12 @@
+#!/bin/bash
+# -*- indent-tabs-mode: t; tab-width: 4; -*-
+
+if [[ "$1" = "--preview" ]]
+then
+	git -c color.status=always status
+else
+	git status --porcelain |
+		fzf --multi --preview="git -c color.status=always status" --preview-window=80% |
+		awk '{ print $2 }' |
+		xargs --no-run-if-empty $PAGER
+fi

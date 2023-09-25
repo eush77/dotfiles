@@ -106,11 +106,11 @@ function __my_git_widget_select__ {
 		b	branch	git branch --all --color=always	[[ "\$1" = "*" ]] && echo "\$2" || echo "\$1"	1
 		f	files	git ls-files	echo "\$1"	1
 		r	commit	git log --color=always --decorate --oneline ${1:+${1@Q}} --	git name-rev --always --name-only "\$1"	$([[ -n "$1" ]] && echo 3 || echo 1)
-		s	status	git -c color.status=always status --short	printf -- "\$2\\\n"	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
+		s	status	git -c color.status=always status --no-renames --short	printf -- "\$2\\\n"	$([[ -n "$(git status --porcelain | head -1)" ]] && echo 2 || echo 0)
 	EOF
 
 	eval "$MAIN" |
-		fzf --ansi "${BINDINGS[@]}" --delimiter=" " --header="$HEADER" --header-first --multi --with-nth=2.. |
+		fzf --ansi "${BINDINGS[@]}" --delimiter=" " --header="$HEADER" --header-first --multi --no-sort --with-nth=2.. |
 		while read -ra WORDS
 		do
 			set -- "${WORDS[@]:1}"
@@ -134,3 +134,5 @@ function __my_git_widget__ {
 }
 
 bind -x '"\M-g": __my_git_widget__'
+
+# git diff | grep '^@@ ' | fzf --height=100% --multi --preview='git diff --color=always | $DIFF_HIGHLIGHT | awk "/^\033\[[[:digit:]]+m@@ / { n++ } n == {n} + 1"' --preview-window=up:80%
