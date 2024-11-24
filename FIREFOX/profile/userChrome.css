@@ -1,0 +1,50 @@
+body, #navigator-toolbox {
+  flex-direction: column-reverse !important;
+}
+
+/*
+ * Menu Bar
+ */
+
+#toolbar-menubar {
+  position: fixed !important;
+  left: 0px !important;
+  top: 0px !important;
+  width: 100% !important;
+}
+
+:root:not([inFullscreen]) #browser {
+  margin-top: 28px;  /* <-- TOGGLE the menu bar */
+}
+
+#menubar-items {
+  flex-direction: unset !important;
+}
+
+#toggle_toolbar-menubar {
+  display: none !important;
+}
+
+/*
+ * URL Bar
+ */
+
+#urlbar[breakout][breakout-extend] {
+  bottom: 0px !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+}
+
+#urlbar[breakout][open] > .urlbarView {
+  background: var(--toolbar-field-background-color) !important;
+}
+
+/*
+ * Tab Bar
+ */
+
+#TabsToolbar,  /* <-- TOGGLE the tab bar */
+#TabsToolbar > .titlebar-spacer,
+#TabsToolbar > .titlebar-buttonbox-container {
+  display: none !important;
+}
